@@ -132,6 +132,18 @@ h2:first-child{margin-top:0}
 .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.4)}
 .btn.red{background:linear-gradient(180deg,#e05048,#b02820)}
 .btn.green{background:linear-gradient(180deg,#58c878,#2f9050)}
+.panel.paused{opacity:.5;filter:grayscale(.6)}
+
+/* ===== Datensicherung (Analyse-Tab) ===== */
+.backup-box{
+  margin-top:16px;padding:12px;
+  background:var(--panel,#fff);border:3px solid var(--line);border-radius:10px;
+}
+.backup-box h3{font-size:10px;margin:0 0 6px}
+.backup-box p{font-size:8px;line-height:1.5;color:#555;margin:0 0 10px}
+.backup-btns{display:flex;flex-direction:column;gap:0}
+.backup-btns .btn{margin-bottom:8px}
+.backup-btns .btn:last-child{margin-bottom:0}
 
 /* ===== Team / Pokémon cards ===== */
 .mon-card{display:flex;align-items:center;gap:10px}
@@ -375,92 +387,6 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   35%{filter:brightness(0) invert(1);transform:scale(.85)}
   65%{filter:brightness(0) invert(1);transform:scale(1.15)}
   100%{filter:brightness(1);transform:scale(1)}
-}
-
-/* ===== Konzentrationsmodus-Overlay ===== */
-#focus-overlay {
-  position: fixed; inset: 0; background: rgba(8,10,16,.97); z-index: 120;
-  display: none; flex-direction: column; align-items: center;
-  padding: 24px 16px; overflow-y: auto;
-}
-#focus-overlay.open { display: flex; }
-#focus-overlay nav, #focus-overlay .tab-bar { display: none; }
-
-.focus-mon-sprite {
-  width: 96px; height: 96px; image-rendering: pixelated;
-  animation: focusbob 1.8s ease-in-out infinite alternate;
-}
-@keyframes focusbob {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-8px); }
-}
-
-.focus-timer-display {
-  font-size: 36px; color: var(--gold); letter-spacing: 2px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,.6); margin: 10px 0 4px;
-}
-.focus-timer-display.urgent { color: #e04038; animation: urgentpulse .6s ease-in-out infinite alternate; }
-@keyframes urgentpulse { from { opacity: 1; } to { opacity: .5; } }
-
-.focus-mon-name {
-  font-size: 10px; color: var(--white); margin-bottom: 16px; text-align: center;
-}
-.focus-progress-bar {
-  width: 100%; max-width: 320px; height: 8px;
-  background: var(--bg2); border: 2px solid var(--line); border-radius: 4px;
-  margin-bottom: 20px; overflow: hidden;
-}
-.focus-progress-fill {
-  height: 100%; background: var(--gold);
-  transition: width .5s linear;
-}
-
-.focus-task-list { width: 100%; max-width: 320px; margin-bottom: 20px; }
-.focus-task-item {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--bg2); border: 2px solid var(--line);
-  border-radius: 8px; padding: 8px 10px; margin-bottom: 6px;
-  font-size: 9px;
-}
-.focus-task-item.done { opacity: .5; }
-.focus-task-item.done .focus-task-text { text-decoration: line-through; }
-.focus-task-text { flex: 1; word-break: break-word; }
-.focus-task-check {
-  width: 18px; height: 18px; border: 2px solid var(--line);
-  border-radius: 4px; cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px;
-}
-.focus-task-check.checked { background: var(--hpgreen); border-color: var(--hpgreen); }
-
-.focus-setup-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px; width: 100%; max-width: 320px; margin-bottom: 16px;
-}
-.focus-time-btn {
-  background: var(--bg2); border: 2px solid var(--line);
-  border-radius: 8px; padding: 8px 4px; font-size: 9px;
-  color: var(--white); cursor: pointer; text-align: center;
-}
-.focus-time-btn.selected { border-color: var(--gold); color: var(--gold); }
-
-.focus-task-input-row {
-  display: flex; gap: 6px; width: 100%; max-width: 320px; margin-bottom: 8px;
-}
-.focus-task-input-row input {
-  flex: 1; background: var(--bg2); border: 2px solid var(--line);
-  border-radius: 6px; padding: 6px 8px; font-size: 9px; color: var(--white);
-}
-.focus-streak-info {
-  font-size: 7px; color: #909080; text-align: center;
-  margin-bottom: 12px; line-height: 1.9;
-}
-.pick-card.selected { outline: 2px solid var(--gold); }
-.mega-stone-badge {
-  display: inline-block; font-size: 7px;
-  background: linear-gradient(135deg, #3060a8, #c060d8);
-  border-radius: 4px; padding: 2px 6px; color: #fff;
-  margin-left: 4px; vertical-align: middle;
 }
 
 /* ===== Perfekter-Tag-Overlay + Konfetti ===== */
@@ -846,7 +772,6 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 
       <h2>&#9654; Dein Team (max. 3)</h2>
       <p class="muted" style="margin-bottom:10px">Team-Pokémon leveln passiv: ca. 3 Level pro Tag. Jeder erledigte Habit gibt sofort +0.5 Level. Unten auf Route 1 kämpft dein Team gegen wilde Pokémon – tippe ein Team-Pokémon auf dem Feld an, um seinen nächsten Move zu wählen!</p>
-      <button class="btn" style="width:100%;margin-bottom:10px" onclick="openFocusSetup()">🎯 Konzentrationsmodus</button>
       <div id="team-list"></div>
 
       <h2>&#9654; Sichtungen</h2>
@@ -890,6 +815,16 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <section class="tab" id="tab-analyse">
       <h2>&#9654; TRAINER-ANALYSE</h2>
       <div id="analyse-content"></div>
+      <!-- Datensicherung: Backup exportieren / importieren -->
+      <div class="backup-box">
+        <h3>&#128190; DATENSICHERUNG</h3>
+        <p>Sichere deinen Fortschritt als Datei oder stelle ihn wieder her.</p>
+        <div class="backup-btns">
+          <button class="btn green" onclick="exportBackup()">&#11015; Backup exportieren</button>
+          <button class="btn" onclick="document.getElementById('import-file').click()">&#11014; Backup importieren</button>
+        </div>
+        <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
+      </div>
     </section>
   </main>
 
@@ -947,6 +882,12 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
         <input type="time" id="habit-reminder-time" value="20:00">
       </div>
       <div class="hint">Hinweis: Erinnerungen funktionieren nur, solange die App geöffnet ist (kein Service Worker im Scope).</div>
+      <label>Pausieren bis (optional)</label>
+      <div class="reminder-row">
+        <input type="date" id="habit-pause-input">
+        <button type="button" class="mini-btn" onclick="document.getElementById('habit-pause-input').value=''">✕</button>
+      </div>
+      <div class="hint">Pausierte Habits sind ausgegraut, zählen nicht für Perfekten Tag/Streak und frieren die Streak ein.</div>
       <div style="height:12px"></div>
       <button class="btn green" onclick="saveHabit()">Speichern</button>
       <button class="btn red" onclick="closeModal('habit-modal')">Abbrechen</button>
@@ -1145,9 +1086,6 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <div class="pd-body" id="pd-body"></div>
   </div>
 
-  <!-- Konzentrationsmodus-Overlay (Inhalt wird via JS gerendert) -->
-  <div id="focus-overlay"></div>
-
 </div>
 
 <script>
@@ -1239,46 +1177,6 @@ const STONE_MAP_REVERSE = Object.fromEntries(
   Object.entries(STONE_MAP).map(([k, v]) => [v, k])
 );
 
-/* ---------- Mega-Entwicklungen (Gen 1–4, dex ≤ 493) ----------
-   megaDex = offizielle PokeAPI-ID der Mega-Form → SPRITE(megaDex,false). */
-const MEGA_MAP = {
-  3:   { name: "Mega-Bisaflor",    megaDex: 10003 },
-  6:   { name: "Mega-Glurak X",    megaDex: 10034 },
-  9:   { name: "Mega-Turtok",      megaDex: 10008 },
-  15:  { name: "Mega-Bibor",       megaDex: 10016 },
-  18:  { name: "Mega-Tauboss",     megaDex: 10021 },
-  65:  { name: "Mega-Simsala",     megaDex: 10037 },
-  80:  { name: "Mega-Lahmus",      megaDex: 10070 },
-  94:  { name: "Mega-Gengar",      megaDex: 10038 },
-  115: { name: "Mega-Kangama",     megaDex: 10045 },
-  127: { name: "Mega-Pinsir",      megaDex: 10046 },
-  130: { name: "Mega-Garados",     megaDex: 10044 },
-  142: { name: "Mega-Aerodactyl",  megaDex: 10042 },
-  150: { name: "Mega-Mewtu X",     megaDex: 10043 },
-  181: { name: "Mega-Ampharos",    megaDex: 10056 },
-  208: { name: "Mega-Stahlos",     megaDex: 10068 },
-  212: { name: "Mega-Scherox",     megaDex: 10064 },
-  214: { name: "Mega-Skaraborn",   megaDex: 10074 },
-  229: { name: "Mega-Hundemon",    megaDex: 10058 },
-  248: { name: "Mega-Despotar",    megaDex: 10076 },
-  254: { name: "Mega-Gewaldro",    megaDex: 10065 },
-  257: { name: "Mega-Lohgock",     megaDex: 10075 },
-  260: { name: "Mega-Sumpex",      megaDex: 10064 },
-  282: { name: "Mega-Guardevoir",  megaDex: 10036 },
-  302: { name: "Mega-Zobiris",     megaDex: 10066 },
-  303: { name: "Mega-Flunkifer",   megaDex: 10067 },
-  306: { name: "Mega-Lairon",      megaDex: 10055 },
-  308: { name: "Mega-Meditalis",   megaDex: 10060 },
-  310: { name: "Mega-Frizelbliz",  megaDex: 10057 },
-  354: { name: "Mega-Banette",     megaDex: 10059 },
-  359: { name: "Mega-Absol",       megaDex: 10056 },
-  380: { name: "Mega-Latias",      megaDex: 10071 },
-  381: { name: "Mega-Latios",      megaDex: 10072 },
-  445: { name: "Mega-Knakrack",    megaDex: 10058 },
-  448: { name: "Mega-Lucario",     megaDex: 10076 },
-  460: { name: "Mega-Rexblisar",   megaDex: 10077 },
-};
-
 /* ---------- Habit-Kategorien ---------- */
 const CATS = {
   fitness:    { icon:"💪", label:"Fitness",     color:"#c03028" },
@@ -1294,7 +1192,8 @@ const HABIT_TYPES = {
   yesno:    { icon:"✅", label:"Ja/Nein" },
   count:    { icon:"🔢", label:"Zählbar" },
   timer:    { icon:"⏱", label:"Zeit" },
-  negative: { icon:"🚫", label:"Negativ" }
+  negative: { icon:"🚫", label:"Negativ" },
+  weekly:   { icon:"📅", label:"Woche" }
 };
 
 /* ---------- Zonen / Routen ---------- */
@@ -1313,6 +1212,17 @@ const ZONES = [
     pool:[175,133,196,197,447,448,280,315,407,406,173,174,433,443,444,446,439,438,440,425,200,359,228] }
 ];
 function zoneById(id) { return ZONES.find(z => z.id === id) || ZONES[0]; }
+
+/* ---------- Angel-Spawn-Pools (Phase 3b): Wasser-Dex-IDs je Zone, ansteigendes Tier ---------- */
+const FISH_POOLS = {
+  1: [129, 118, 60, 54, 72, 116],        // Route 1: frühe/schwache Wasser-Pokémon
+  2: [72, 116, 90, 98, 60, 54],          // Blaue Höhle
+  3: [7, 129, 120, 90, 98, 116, 170, 223, 72], // Azuria-Meer
+  4: [54, 60, 318, 320, 116, 90],        // Feuerspitze
+  5: [86, 87, 90, 91, 124, 131],         // Schneepass
+  6: [130, 131, 134, 230, 171, 224]      // Mystischer Wald: starke Wasser-Pokémon
+};
+function fishPoolForZone(id) { return FISH_POOLS[id] || FISH_POOLS[1]; }
 
 /* ---------- Wöchentliches Legenden-Event (feste Rotation nach KW) ---------- */
 const WEEKLY_LEGENDS = [144,145,146,150,243,244,245,249,250,
@@ -1382,10 +1292,6 @@ let cache = null; // { pokemon:{}, evo:{}, evoDone:{}, battle:{dex:{speed,moves}
 let dlNoteBuffer = "";        // Tipp-Puffer für die Tages-Notiz (nicht persistiert)
 let noteArchiveOpen = false;  // Notizspeicher im Analyse-Tab auf/zu (nicht persistiert)
 let pendingStoneKey = null;   // aktuell einzusetzender Stein-Key (Stein-Auswahlgrid)
-let focusTimer = null;         // setInterval-Handle der aktiven Fokus-Session
-let focusSelectedMon = null;   // uid des gewählten Pokémon (Setup)
-let focusSelectedMinutes = 25; // Standard-Fokuszeit
-let focusTasks = [];           // Setup-Aufgaben [{ id, text, done }]
 
 function defaultState() {
   return {
@@ -1396,7 +1302,7 @@ function defaultState() {
     team: [],         // [uid,...] max 3
     items: { pokeball:0, superball:0, hyperball:0, trank:0, sonderbonbon:0, beere:0 },
     lastTick: Date.now(),
-    lastSeen: Date.now(),   // Zeitstempel beim Pausieren – Basis für Offline-Progression
+    lastSeen: Date.now(),   // Zeitstempel für Offline-Progression (Pausieren/Fortsetzen)
     log: [],          // encounter log [{t,text}]
     freezeTokens: 0,
     catchLog: [],     // [{d:"YYYY-MM-DD", dex}]
@@ -1407,11 +1313,12 @@ function defaultState() {
     seen: {},         // {dexId:true} – jemals gesichtet (Route + gefangen)
     weeklyEvent: null, // {weekNum, dexId, level, defeated, caught}
     coins: 0,          // Shop-Währung
-    arenaBadges: 0,    // Anzahl errungener Arena-Badges (0–8)
-    arenaWins: 0,      // Gesamtzahl gewonnener Arena-Kämpfe
+    arenaBadges: 0,    // Anzahl errungener Arena-Orden (0–8, = besiegte Arenaleiter)
+    arenaWins: 0,      // Gesamtzahl gewonnener Arena-Kämpfe (inkl. Freies Training)
+    gymProgress: 0,    // höchster besiegter Arenaleiter (0–8) – schaltet den nächsten frei
+    lastFishTime: 0,   // Zeitstempel des letzten Angel-Versuchs (Cooldown)
     shopSeed: "",      // Datum des aktuellen Shop-Angebots
     shopStock: [],     // Array von 6 item-keys aus SHOP_ITEMS
-    focus: null,      // aktive Konzentrations-Session oder null
     dailyLog: {}      // { "YYYY-MM-DD": { sleep, gym, food, note } }
                       // sleep: { bedtime:"HH:MM", waketime:"HH:MM", feeling:1-5 } | null
                       // gym:   { strength:1-5, feeling:1-5 } | null
@@ -1435,20 +1342,21 @@ function loadAll() {
     if (h.target === undefined) h.target = 0;
     if (h.timerRunning === undefined) h.timerRunning = false;
     if (h.timerStart === undefined) h.timerStart = 0;
+    if (h.pausedUntil === undefined) h.pausedUntil = null;   // Pausenmodus (4b)
+    if (h.lastWeekKey === undefined) h.lastWeekKey = null;   // Wochenziel-Streak (4a)
   });
   state.seen = state.seen || {};
   if (!state.coins) state.coins = 0;
   if (state.arenaBadges === undefined) state.arenaBadges = 0;
   if (state.arenaWins === undefined) state.arenaWins = 0;
+  if (state.gymProgress === undefined) state.gymProgress = 0;
+  if (state.lastFishTime === undefined) state.lastFishTime = 0;
   if (!state.shopSeed) state.shopSeed = "";
   if (!state.shopStock) state.shopStock = [];
   if (state.dailyLog === undefined) state.dailyLog = {};
+  if (state.lastSeen === undefined) state.lastSeen = Date.now();
   if (!state.people) state.people = [];
   if (!state.stackBonusGiven) state.stackBonusGiven = {};
-  if (state.focus === undefined) state.focus = null;
-  if (state.lastSeen === undefined) state.lastSeen = Date.now();
-  // Hängende Session aufräumen (App-Crash Recovery): unvollständige verwerfen
-  if (state.focus && !state.focus.startTime) state.focus = null;
   // Bereits gefangene Pokémon als „gesehen“ nachtragen + Detail-Felder migrieren
   (state.box || []).forEach(m => {
     state.seen[m.dex] = true;
@@ -1462,9 +1370,6 @@ function loadAll() {
     if (m.happiness === undefined) m.happiness = 120;
     if (m.happinessDate === undefined) m.happinessDate = null;
     if (!m.pendingMoves) m.pendingMoves = [];
-    if (m.focusSessionCount === undefined) m.focusSessionCount = 0;
-    if (m.megaStone === undefined) m.megaStone = false;
-    if (m.megaUntil === undefined) m.megaUntil = null;
   });
   // TM-Migration: alte disc_*-Items aus state.items entfernen
   ["disc_normal","disc_feuer","disc_wasser","disc_elektro",
@@ -1520,13 +1425,12 @@ function saveCache() {
 }
 
 /* =====================================================================
-   DATEN-BACKUP (JSON-Export / -Import)
+   DATENSICHERUNG (Backup) — Export/Import des kompletten State
    ===================================================================== */
-// Serialisiert den gesamten State als JSON-Datei zum Download.
 function exportBackup() {
   try {
-    const data = JSON.stringify(state, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -1534,37 +1438,54 @@ function exportBackup() {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast("💾 Backup exportiert!");
   } catch (e) {
     toast("⚠ Export fehlgeschlagen.");
   }
 }
 
-// Liest eine Backup-Datei ein, prüft sie und ersetzt (nach Bestätigung) den State.
-function importBackup(input) {
+function importBackup(event) {
+  const input = event.target;
   const file = input.files && input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = () => {
     let data;
-    try { data = JSON.parse(e.target.result); }
-    catch (err) { toast("⚠ Datei ist kein gültiges JSON."); input.value = ""; return; }
-    // Plausibilitätscheck: muss habits- und box-Array enthalten
-    if (!data || !Array.isArray(data.habits) || !Array.isArray(data.box)) {
-      toast("⚠ Kein gültiges Habitdex-Backup (habits/box fehlen).");
+    try {
+      data = JSON.parse(reader.result);
+    } catch (e) {
+      toast("⚠ Datei ist kein gültiges JSON.");
       input.value = "";
       return;
     }
-    if (!confirm("Backup importieren?\n\nDein aktueller Fortschritt wird vollständig überschrieben. Diese Aktion kann nicht rückgängig gemacht werden.")) {
+    // Plausibilitätscheck: muss ein Habitdex-State sein
+    if (!data || typeof data !== "object" ||
+        !Array.isArray(data.habits) || !Array.isArray(data.box)) {
+      toast("⚠ Keine gültige Habitdex-Sicherung.");
       input.value = "";
       return;
     }
-    state = data;
-    save();
-    location.reload();
+    const ok = confirm(
+      "Backup importieren?\n\n" +
+      "Dein aktueller Fortschritt wird VOLLSTÄNDIG ersetzt.\n" +
+      "Diese Aktion kann nicht rückgängig gemacht werden."
+    );
+    if (!ok) { input.value = ""; return; }
+    try {
+      state = data;
+      save();
+      toast("✅ Backup geladen — App wird neu gestartet …");
+      setTimeout(() => location.reload(), 400);
+    } catch (e) {
+      toast("⚠ Import fehlgeschlagen.");
+      input.value = "";
+    }
   };
-  reader.onerror = () => { toast("⚠ Datei konnte nicht gelesen werden."); input.value = ""; };
+  reader.onerror = () => {
+    toast("⚠ Datei konnte nicht gelesen werden.");
+    input.value = "";
+  };
   reader.readAsText(file);
 }
 
@@ -1613,6 +1534,16 @@ function toggleDailyLog() {
 }
 
 // berechnet Schlafdauer als "6h 45min" (über Mitternacht korrekt) oder "" falls unvollständig
+// Schlafdauer in Minuten (null wenn unvollständig) – für Korrelationsanalyse
+function sleepMinutes(sleep) {
+  if (!sleep || !sleep.bedtime || !sleep.waketime) return null;
+  const [bh, bm] = sleep.bedtime.split(":").map(Number);
+  const [wh, wm] = sleep.waketime.split(":").map(Number);
+  if ([bh, bm, wh, wm].some(n => isNaN(n))) return null;
+  let m = (wh * 60 + wm) - (bh * 60 + bm);
+  if (m <= 0) m += 1440;
+  return m;
+}
 function sleepDuration(bedtime, waketime) {
   if (!bedtime || !waketime) return "";
   const [bh, bm] = bedtime.split(":").map(Number);
@@ -2005,6 +1936,60 @@ function renderAnalyse() {
     html += stackHTML;
   }
 
+  /* ---- Korrelation: Schlaf ≥7h vs. Habit-Quote (letzte 30 Tage) ---- */
+  const corrDates = lastNDays(30);
+  const sleepDays = corrDates
+    .map(d => ({ d, min: sleepMinutes((state.dailyLog[d] || {}).sleep) }))
+    .filter(x => x.min != null);
+  if (state.habits.length && sleepDays.length >= 10) {
+    const grpQuote = arr => {
+      const vs = arr.map(x => dayHabitQuote(x.d)).filter(v => v != null);
+      return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
+    };
+    const good = sleepDays.filter(x => x.min >= 420);   // ≥ 7h
+    const rest = sleepDays.filter(x => x.min < 420);
+    const gq = grpQuote(good), rq = grpQuote(rest);
+    const pct = v => v == null ? "&ndash;" : Math.round(v * 100) + "%";
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#128564; Schlaf &amp; Habit-Quote</div>' +
+        '<div class="an-lead">&#128564; Tage mit &ge;7h Schlaf: Habit-Quote <span class="an-val">' + pct(gq) + '</span> <span class="an-hint">(' + good.length + ' Tage)</span></div>' +
+        '<div class="an-sub an-lead">&#9925; Tage mit &lt;7h Schlaf: Habit-Quote <span class="an-val">' + pct(rq) + '</span> <span class="an-hint">(' + rest.length + ' Tage)</span></div>' +
+        ((gq != null && rq != null)
+          ? '<div class="an-row an-hint">' + (gq >= rq
+              ? '&#9650; Mit genug Schlaf erledigst du mehr.'
+              : '&#9660; Mit weniger Schlaf war die Quote höher.') + '</div>'
+          : '') +
+      '</div>';
+  }
+
+  /* ---- 7-Tage-Trend pro Habit: diese Woche vs. Vorwoche ---- */
+  if (state.habits.length) {
+    const thisWeek = lastNDays(7);
+    const prevWeek = [];
+    for (let i = 13; i >= 7; i--) { const d = new Date(); d.setDate(d.getDate() - i); prevWeek.push(dateStr(d)); }
+    const rows = state.habits.map(h => {
+      const cur = habitWindowQuote(h, thisWeek);
+      const prev = habitWindowQuote(h, prevWeek);
+      const cp = cur == null ? "&ndash;" : Math.round(cur * 100) + "%";
+      const pp = prev == null ? "&ndash;" : Math.round(prev * 100) + "%";
+      let arrow = "&minus;", col = "#a8b8c8";
+      if (cur != null && prev != null) {
+        if (cur > prev + 0.001) { arrow = "&#9650;"; col = "#50c878"; }
+        else if (cur < prev - 0.001) { arrow = "&#9660;"; col = "#e04038"; }
+      }
+      return '<div class="an-row" style="display:flex;justify-content:space-between;gap:6px;align-items:center">' +
+        '<span style="min-width:0">' + (h.emoji ? esc(h.emoji) + ' ' : '') + esc(h.name) + '</span>' +
+        '<span class="an-hint">' + pp + ' &rarr; ' + cp + ' <span style="color:' + col + '">' + arrow + '</span></span>' +
+      '</div>';
+    }).join("");
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#128200; 7-Tage-Trend pro Habit</div>' +
+        rows +
+      '</div>';
+  }
+
   /* ---- Notizspeicher (aufklappbar, mit #tag-Filter) ---- */
   noteArchiveOpen = false; // beim (Neu-)Rendern immer eingeklappt starten
   html += '<div class="panel dark an-panel" id="note-archive-panel">' +
@@ -2018,17 +2003,6 @@ function renderAnalyse() {
       '</div>' +
       '<div id="note-archive-list"></div>' +
     '</div>' +
-  '</div>';
-
-  // Daten-Backup (immer sichtbar, unabhängig von der Datenmenge)
-  html += '<div class="panel dark an-panel">' +
-    '<div class="an-title">&#128190; Daten-Backup</div>' +
-    '<div class="an-lead">Sichere deinen Fortschritt als Datei oder stelle ihn wieder her.</div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
-      '<button class="btn" onclick="exportBackup()">&#11015; Exportieren</button>' +
-      '<button class="btn" onclick="document.getElementById(\'backup-import-input\').click()">&#11014; Importieren</button>' +
-    '</div>' +
-    '<input id="backup-import-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackup(this)">' +
   '</div>';
 
   el.innerHTML = html;
@@ -2111,6 +2085,7 @@ function checkDayRollover() {
     currentDay = t;
     // laufende Timer über Nacht stoppen (neuer Tag = neue Historie)
     state.habits.forEach(h => { if (h.timerRunning) { h.timerRunning = false; h.timerStart = 0; } });
+    freezePausedStreaks();   // pausierte Tages-Streaks einfrieren, bevor Rescue prüft
     ensureTodayStats();
     renderAll();
     checkStreakRescue();
@@ -2131,13 +2106,12 @@ function updateDailyHappiness() {
   state.box.forEach(mon => {
     if (mon.happinessDate === yesterday) return; // schon heute berechnet
     mon.happinessDate = yesterday;
-    const totalHabits = state.habits.length;
+    // Gestern pausierte Habits zählen nicht mit
+    const activeHabits = state.habits.filter(h => !isPausedOn(h, yesterday));
+    const totalHabits = activeHabits.length;
     if (totalHabits === 0) return;
-    // Wie viele Habits waren gestern erledigt?
-    const doneCount = state.habits.filter(h => {
-      const info = h.history && h.history[yesterday];
-      return info && (info === true || info.done);
-    }).length;
+    // Wie viele Habits waren gestern erfüllt? (Weekly: Wochenziel der Vorwoche)
+    const doneCount = activeHabits.filter(h => habitDoneOn(h, yesterday)).length;
     const ratio = doneCount / totalHabits;
     let delta = 0;
     if (ratio >= 1.0) delta = 5;
@@ -2152,11 +2126,7 @@ function updateDailyHappiness() {
         monData.types.forEach(t => {
           const habitCat = TYPE_HABIT_MAP[t];
           if (habitCat) {
-            const catDone = state.habits.some(h => {
-              if (h.category !== habitCat) return false;
-              const info = h.history && h.history[yesterday];
-              return info && (info === true || info.done);
-            });
+            const catDone = activeHabits.some(h => h.category === habitCat && habitDoneOn(h, yesterday));
             if (catDone) delta += 3;
           }
         });
@@ -2169,9 +2139,9 @@ function updateDailyHappiness() {
   state.box.forEach(mon => { checkFriendshipEvolution(mon); });
 }
 function updateHeader() {
-  const t = todayStr();
-  const done = state.habits.filter(h => h.doneDate === t).length;
-  const total = state.habits.length;
+  const active = state.habits.filter(h => !isPaused(h));
+  const done = active.filter(h => isHabitSatisfied(h)).length;
+  const total = active.length;
   document.getElementById("header-day").innerHTML =
     new Date().toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}) +
     " · Lv&#8593; " + teamLevelSum() +
@@ -2193,6 +2163,89 @@ function histInfo(h, d) {
   if (!v) return null;
   if (v === true) return { done: true };
   return v;
+}
+
+/* =====================================================================
+   WOCHENZIEL- & PAUSEN-HELFER (Phase 4a/4b)
+   ===================================================================== */
+// Eindeutiger ISO-Wochen-Schlüssel "YYYY-Www" (jahresübergreifend eindeutig)
+function isoWeekKey(dateLike) {
+  const base = dateLike ? new Date(dateLike) : new Date();
+  const d = new Date(Date.UTC(base.getFullYear(), base.getMonth(), base.getDate()));
+  const dayNum = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - dayNum + 3);           // Donnerstag dieser Woche
+  const week = isoWeekNum(new Date(d));
+  return d.getUTCFullYear() + "-W" + String(week).padStart(2, "0");
+}
+// Die 7 lokalen Datums-Strings (Mo–So) der ISO-Woche, die dateLike enthält
+function isoWeekDates(dateLike) {
+  const base = dateLike ? new Date(dateLike) : new Date();
+  const day = (base.getDay() + 6) % 7;                 // 0 = Montag (lokal)
+  const monday = new Date(base.getFullYear(), base.getMonth(), base.getDate() - day);
+  const out = [];
+  for (let i = 0; i < 7; i++) {
+    out.push(dateStr(new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i)));
+  }
+  return out;
+}
+// Anzahl erledigter Tage in der Woche von refDateStr (Default: aktuelle Woche)
+function weeklyDoneCount(h, refDateStr) {
+  const anchor = refDateStr ? refDateStr + "T12:00:00" : null;
+  let n = 0;
+  isoWeekDates(anchor).forEach(d => { const info = histInfo(h, d); if (info && info.done) n++; });
+  return n;
+}
+function weeklyTarget(h) { return Math.max(1, h.target || 1); }
+function weeklyGoalMet(h, refDateStr) { return weeklyDoneCount(h, refDateStr) >= weeklyTarget(h); }
+
+// Pausenmodus: pausiert bis einschließlich pausedUntil
+function isPausedOn(h, dStr) { return !!(h.pausedUntil && dStr <= h.pausedUntil); }
+function isPaused(h) { return isPausedOn(h, todayStr()); }
+
+// War der Habit an einem bestimmten Tag "erfüllt"? (typ-abhängig, für Happiness)
+function habitDoneOn(h, dStr) {
+  if (h.type === "weekly") return weeklyGoalMet(h, dStr);
+  const info = h.history && h.history[dStr];
+  return !!(info && (info === true || info.done));
+}
+// Ist der Habit aktuell erfüllt? (heute bzw. diese Woche) – ohne Pausen-Sonderfall
+function isHabitSatisfied(h) {
+  if (h.type === "weekly") return weeklyGoalMet(h);
+  return isHabitDone(h);
+}
+
+// Wochen-Streak fortschreiben, sobald das Wochenziel neu erreicht wurde
+function updateWeeklyStreak(h) {
+  const cur = isoWeekKey();
+  if (h.lastWeekKey === cur) return;                   // diese Woche schon gezählt
+  const prevDate = new Date(); prevDate.setDate(prevDate.getDate() - 7);
+  const prev = isoWeekKey(prevDate);
+  h.streak = (h.lastWeekKey === prev) ? (h.streak || 0) + 1 : 1;
+  h.lastWeekKey = cur;
+}
+
+// Habit-Quote eines Tages: Anteil erfüllter (nicht-pausierter) Habits an dem Tag
+function dayHabitQuote(dStr) {
+  const active = state.habits.filter(h => !isPausedOn(h, dStr));
+  if (!active.length) return null;
+  return active.filter(h => habitDoneOn(h, dStr)).length / active.length;
+}
+// Quote eines einzelnen Habits über ein Datumsfenster (pausierte Tage ausgenommen)
+function habitWindowQuote(h, datesArr) {
+  let done = 0, tot = 0;
+  datesArr.forEach(d => { if (isPausedOn(h, d)) return; tot++; if (habitDoneOn(h, d)) done++; });
+  return tot ? done / tot : null;
+}
+
+// Pausierte (nicht-wöchentliche) Habits: Tages-Streak einfrieren, ohne Freeze-Token,
+// damit displayStreak/checkStreakRescue sie nicht fälschlich als gebrochen werten.
+function freezePausedStreaks() {
+  const y = yesterdayStr();
+  state.habits.forEach(h => {
+    if (h.type !== "weekly" && isPaused(h) && (h.streak || 0) > 0 && h.lastDoneDate !== todayStr()) {
+      h.lastDoneDate = y;
+    }
+  });
 }
 
 /* =====================================================================
@@ -2347,12 +2400,12 @@ function switchTab(name) {
   const cityDiv = document.getElementById("city");
   if (name === "city") {
     cityDiv.style.display = "block";
-    stopBattleLoop();               // City überlagert #battle → Battle-Loop pausieren
     startCityLoop();
+    stopBattleLoop();          // City überlagert den Battle-Canvas
   } else {
     cityDiv.style.display = "none";
     stopCityLoop();
-    // Battle-Karte ist wieder sichtbar → Loop nur bei Vordergrund fortsetzen
+    // Battle-Canvas wieder sichtbar → Loop nur bei sichtbarem Dokument starten
     if (document.visibilityState === "visible") startBattleLoop();
   }
 
@@ -2416,6 +2469,7 @@ function updateTargetWrap() {
   const label = document.getElementById("target-label");
   if (selectedType === "count") { wrap.style.display = "block"; label.textContent = "Zielwert (z.B. 8)"; }
   else if (selectedType === "timer") { wrap.style.display = "block"; label.textContent = "Zielminuten (z.B. 30)"; }
+  else if (selectedType === "weekly") { wrap.style.display = "block"; label.textContent = "Ziel pro Woche (z.B. 3)"; }
   else wrap.style.display = "none";
 }
 
@@ -2433,6 +2487,7 @@ function openHabitModal(id) {
   buildCatRow();
   document.getElementById("habit-reminder-on").checked = !!(h && h.reminder && h.reminder.on);
   document.getElementById("habit-reminder-time").value = (h && h.reminder && h.reminder.time) || "20:00";
+  document.getElementById("habit-pause-input").value = (h && h.pausedUntil) || "";
   openModal("habit-modal");
 }
 function saveHabit() {
@@ -2442,16 +2497,18 @@ function saveHabit() {
   const remTime = document.getElementById("habit-reminder-time").value || "20:00";
   if (!name) { toast("Bitte einen Namen eingeben."); return; }
   const targetRaw = parseInt(document.getElementById("habit-target-input").value, 10);
-  const target = (selectedType === "count" || selectedType === "timer")
-    ? (targetRaw && targetRaw > 0 ? targetRaw : (selectedType === "timer" ? 30 : 1)) : 0;
+  const target = (selectedType === "count" || selectedType === "timer" || selectedType === "weekly")
+    ? (targetRaw && targetRaw > 0 ? targetRaw : (selectedType === "timer" ? 30 : selectedType === "weekly" ? 3 : 1)) : 0;
+  const pauseVal = document.getElementById("habit-pause-input").value || null;
   let h;
   if (editingHabitId) {
     h = state.habits.find(x => x.id === editingHabitId);
-    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; }
+    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; h.pausedUntil = pauseVal; }
   } else {
     h = { id: uid(), name, emoji, category: selectedCat, type: selectedType, target,
       doneDate: null, rewardDate: null, streak: 0, lastDoneDate: null, lastFreezeStreak: 0,
-      history: {}, reminder: null, timerRunning: false, timerStart: 0 };
+      history: {}, reminder: null, timerRunning: false, timerStart: 0,
+      pausedUntil: pauseVal, lastWeekKey: null };
     state.habits.push(h);
   }
   if (h) {
@@ -2482,8 +2539,9 @@ function rollReward() {
 /* Ist der Habit heute erledigt? (typ-abhängig) */
 function isHabitDone(h) {
   const t = todayStr();
-  if (h.type === "count") return getCount(h) >= (h.target || 1);
-  if (h.type === "timer") return getTimerSec(h) >= (h.target || 30) * 60;
+  if (h.type === "count")  return getCount(h) >= (h.target || 1);
+  if (h.type === "timer")  return getTimerSec(h) >= (h.target || 30) * 60;
+  if (h.type === "weekly") return weeklyGoalMet(h);   // Wochenziel erreicht?
   return h.doneDate === t; // yesno + negative
 }
 function getCount(h) { const i = histInfo(h, todayStr()); return (i && i.count) || 0; }
@@ -2550,6 +2608,8 @@ function completeHabit(h) {
 function toggleHabit(id) {
   const h = state.habits.find(x => x.id === id);
   if (!h) return;
+  if (isPaused(h)) { toast("⏸ Dieser Habit ist pausiert."); return; }
+  if (h.type === "weekly") { toggleWeeklyDay(h); return; }
   const t = todayStr();
   if (h.doneDate === t) {
     // Abwählen erlaubt – Belohnung bleibt aber für heute verbraucht (rewardDate)
@@ -2563,10 +2623,37 @@ function toggleHabit(id) {
   completeHabit(h);
 }
 
+/* Wochenziel-Habits: der Check markiert/entfernt die heutige Erledigung.
+   Streak zählt erfüllte Wochen (updateWeeklyStreak beim Erreichen des Ziels). */
+function toggleWeeklyDay(h) {
+  const t = todayStr();
+  const info = histInfo(h, t) || {};
+  const wasDone = !!info.done;
+  const metBefore = weeklyGoalMet(h);
+  if (wasDone) {
+    // heutige Erledigung zurücknehmen (Notiz bleibt erhalten)
+    if (info.note) h.history[t] = Object.assign({}, info, { done: false });
+    else delete h.history[t];
+  } else {
+    const patch = { done: true };
+    if (!info.doneAt) patch.doneAt = new Date().toTimeString().slice(0, 5);
+    h.history[t] = Object.assign({}, info, patch);
+    grantHabitReward(h);   // Tages-Belohnung (max. 1×/Tag über rewardDate)
+  }
+  const metAfter = weeklyGoalMet(h);
+  if (!metBefore && metAfter) {
+    updateWeeklyStreak(h);
+    toast("📅 Wochenziel erreicht! 🔥 " + (h.streak || 0) + " Woche" + ((h.streak || 0) === 1 ? "" : "n"));
+  }
+  save(); renderHabits(); updateHeader();
+  checkPerfectDay();
+}
+
 /* Zählbare Habits */
 function bumpCount(id, delta) {
   const h = state.habits.find(x => x.id === id);
   if (!h) return;
+  if (isPaused(h)) { toast("⏸ Dieser Habit ist pausiert."); return; }
   const t = todayStr();
   const info = histInfo(h, t) || {};
   const c = Math.max(0, (info.count || 0) + delta);
@@ -2583,6 +2670,7 @@ let timerTick = null;
 function toggleTimer(id) {
   const h = state.habits.find(x => x.id === id);
   if (!h) return;
+  if (isPaused(h)) { toast("⏸ Dieser Habit ist pausiert."); return; }
   if (h.timerRunning) pauseTimer(h); else startTimer(h);
 }
 function startTimer(h) {
@@ -2629,6 +2717,13 @@ function updateTimerDisplays() {
 }
 
 function displayStreak(h) {
+  if (h.type === "weekly") {
+    // Streak gilt, wenn die letzte erfüllte Woche die aktuelle oder direkte Vorwoche ist
+    const cur = isoWeekKey();
+    const prevDate = new Date(); prevDate.setDate(prevDate.getDate() - 7);
+    if (h.lastWeekKey === cur || h.lastWeekKey === isoWeekKey(prevDate)) return h.streak || 0;
+    return 0;
+  }
   const t = todayStr(), y = yesterdayStr();
   if (h.lastDoneDate === t || h.lastDoneDate === y) return h.streak || 0;
   return 0;
@@ -2646,6 +2741,7 @@ function renderHabits() {
   el.innerHTML = state.habits.map(h => {
     const type = h.type || "yesno";
     const isNeg = type === "negative";
+    const paused = isPaused(h);
     const done = isHabitDone(h);
     const streak = displayStreak(h);
     const cat = CATS[h.category];
@@ -2665,7 +2761,7 @@ function renderHabits() {
 
     // Linke Steuerung
     let control;
-    if (type === "yesno") {
+    if (type === "yesno" || type === "weekly") {
       control = '<div class="habit-check' + (done ? " done" : "") + '" onclick="toggleHabit(\'' + h.id + '\')">' + (done ? "✔" : "") + '</div>';
     } else {
       control = '<div class="habit-check' + (done ? " done" : "") + '" style="cursor:default">' + (done ? "✔" : HABIT_TYPES[type].icon) + '</div>';
@@ -2694,24 +2790,42 @@ function renderHabits() {
     } else if (type === "negative") {
       extra = '<button class="neg-btn' + (done ? " done" : "") + '" onclick="toggleHabit(\'' + h.id + '\')">' +
         (done ? "✓ Heute geschafft!" : "✓ Heute geschafft") + '</button>';
+    } else if (type === "weekly") {
+      const wc = weeklyDoneCount(h), tg = weeklyTarget(h);
+      const pct = Math.min(100, Math.round(wc / tg * 100));
+      extra =
+        '<div class="count-box">' +
+          '<div class="count-val"><b>' + wc + '</b> / ' + tg + ' diese Woche</div>' +
+        '</div>' +
+        '<div class="count-bar"><div class="count-fill" style="width:' + pct + '%"></div></div>';
     }
 
     const streakCls = isNeg ? "habit-streak neg" : "habit-streak";
     const streakIcon = isNeg ? "💪" : "🔥";
+    // Streak-Einheit: Wochenziele zählen Wochen, sonst Tage
+    const streakUnit = type === "weekly"
+      ? (" Woche" + (streak === 1 ? "" : "n"))
+      : (" Tag" + (streak === 1 ? "" : "e"));
+    // Pausen-Badge (4b)
+    const pauseBadge = paused
+      ? '<span class="cat-badge" style="background:#78849a">⏸ bis ' +
+          esc(new Date(h.pausedUntil + "T12:00:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})) + '</span>'
+      : "";
     // Stack-Tipp: wenn heute erledigt und ein bestätigter Partner noch offen ist
     const tip = done ? getStackTip(h, stacks30) : null;
     const tipHTML = tip
       ? '<div style="font-size:7px;color:var(--gold);margin-top:4px">' +
           '⚡ Stack: Jetzt auch ' + esc(tip.name) + ' erledigen!</div>'
       : "";
-    return '<div class="panel' + (isNeg ? " negative" : "") + '" data-hid="' + h.id + '">' +
+    return '<div class="panel' + (isNeg ? " negative" : "") + (paused ? " paused" : "") + '" data-hid="' + h.id + '">' +
       '<div class="habit-row">' +
         control +
         '<div class="habit-info">' +
           '<div class="habit-name' + (done ? " done" : "") + '">' + (h.emoji ? esc(h.emoji) + " " : "") + esc(h.name) +
             (cat ? '<span class="cat-badge" style="background:' + cat.color + '">' + cat.icon + " " + cat.label + '</span>' : "") +
+            pauseBadge +
           '</div>' +
-          '<div class="' + streakCls + '">' + streakIcon + ' Streak: ' + streak + ' Tag' + (streak === 1 ? "" : "e") +
+          '<div class="' + streakCls + '">' + streakIcon + ' Streak: ' + streak + streakUnit +
             ((h.reminder && h.reminder.on) ? " · 🔔 " + esc(h.reminder.time) : "") + '</div>' +
         '</div>' +
         '<div class="habit-actions">' +
@@ -2812,7 +2926,9 @@ document.addEventListener("touchmove", e => { if (drag.active) e.preventDefault(
 function checkStreakRescue() {
   if ((state.freezeTokens || 0) < 1) return;
   const dby = dayBeforeYesterdayStr();
-  const broken = state.habits.filter(h => (h.streak || 0) >= 1 && h.lastDoneDate === dby);
+  // Weekly-Habits brechen nicht tageweise; pausierte Habits sind eingefroren
+  const broken = state.habits.filter(h =>
+    h.type !== "weekly" && !isPaused(h) && (h.streak || 0) >= 1 && h.lastDoneDate === dby);
   if (!broken.length) return;
   document.getElementById("freeze-info").textContent =
     "Du hast gestern Habits verpasst. Freeze-Tokens verfügbar: " + state.freezeTokens;
@@ -2843,9 +2959,11 @@ function useFreeze(id) {
 /* ---- Perfekter Tag ---- */
 function checkPerfectDay() {
   const t = todayStr();
-  if (!state.habits.length) return;
+  // Pausierte Habits zählen nicht mit
+  const active = state.habits.filter(h => !isPaused(h));
+  if (!active.length) return;
   if (state.lastPerfectDay === t) return;
-  if (!state.habits.every(h => h.doneDate === t)) return;
+  if (!active.every(h => isHabitSatisfied(h))) return;
   state.lastPerfectDay = t;
   state.items.sonderbonbon = (state.items.sonderbonbon || 0) + 1;
   save(); renderItems();
@@ -3191,7 +3309,6 @@ async function checkFriendshipEvolution(mon) {
 // Level-Up-Moves lernt. Freier Slot → sofort lernen; sonst → pendingMoves
 // (Angebot im "Lernen"-Tab, alten Move vergessen).
 async function checkLearnMoves(mon) {
-  if (window.__offlineGrant) return;   // keine Move-Learns während Offline-Gutschrift
   let bt = cache.battle[mon.dex];
   if (!bt || !bt.learnset) { bt = await getBattleData(mon.dex); }
   if (!bt || !bt.learnset || !bt.learnset.length) return;
@@ -3253,348 +3370,6 @@ function showEvoOverlay(oldD, newD, shiny) {
 }
 function closeEvo() { document.getElementById("evo-overlay").classList.remove("open"); }
 
-/* =====================================================================
-   KONZENTRATIONSMODUS
-   ===================================================================== */
-function openFocusOverlay() {
-  document.getElementById("focus-overlay").classList.add("open");
-  const nav = document.querySelector("nav");
-  if (nav) { nav.style.pointerEvents = "none"; nav.style.opacity = "0.3"; }
-}
-function closeFocusOverlay() {
-  document.getElementById("focus-overlay").classList.remove("open");
-  const nav = document.querySelector("nav");
-  if (nav) { nav.style.pointerEvents = ""; nav.style.opacity = ""; }
-}
-
-async function openFocusSetup() {
-  // Läuft bereits eine Session? → direkt zur aktiven Ansicht
-  if (state.focus) { openFocusOverlay(); renderFocusActive(); return; }
-
-  focusSelectedMon = state.team[0] || (state.box[0] ? state.box[0].uid : null);
-  focusSelectedMinutes = 25;
-  focusTasks = [];
-
-  const overlay = document.getElementById("focus-overlay");
-  overlay.innerHTML = '<div class="spin" style="margin-top:80px"></div>';
-  openFocusOverlay();
-  await renderFocusSetup();
-}
-
-async function renderFocusSetup() {
-  const overlay = document.getElementById("focus-overlay");
-  const allMons = state.box.length ? state.box : [];
-
-  if (!allMons.length) {
-    overlay.innerHTML =
-      '<h3 style="color:var(--gold);margin-bottom:12px">🎯 Konzentrationsmodus</h3>' +
-      '<p style="font-size:9px;color:#909080;text-align:center">Du brauchst zuerst ein Pokémon!</p>' +
-      '<button class="btn" style="max-width:220px;margin-top:20px" onclick="closeFocusOverlay()">Schließen</button>';
-    return;
-  }
-
-  // Standardauswahl absichern (falls uid nicht mehr existiert)
-  if (!allMons.some(m => m.uid === focusSelectedMon)) focusSelectedMon = allMons[0].uid;
-
-  const THRESHOLD = 10;
-  const monCards = await Promise.all(allMons.map(async m => {
-    const d = await getPokemonData(m.dex);
-    const hasMega = !!MEGA_MAP[m.dex];
-    const sessions = m.focusSessionCount || 0;
-    const megaStone = m.megaStone || false;
-    const isSelected = m.uid === focusSelectedMon;
-    const progress = Math.min(sessions, THRESHOLD);
-    const megaInfo = hasMega
-      ? (megaStone
-          ? '<div style="font-size:7px;color:#c060d8">💎 Mega-Stein!</div>'
-          : '<div style="font-size:7px;color:#909080">' + progress + '/' + THRESHOLD + ' Sessions</div>')
-      : '';
-    return '<div class="pick-card' + (isSelected ? ' selected' : '') + '"' +
-      ' onclick="focusSelectMon(\'' + m.uid + '\')">' +
-      '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
-      '<div class="pn">' + (m.shiny ? "✨ " : "") + esc(monName(m, d.name)) + '</div>' +
-      '<div style="font-size:7px;color:#a8b8c8">Lv.' + m.level + '</div>' +
-      megaInfo +
-    '</div>';
-  }));
-
-  const timeOptions = [15, 25, 45, 60, 90];
-  const timeButtons = timeOptions.map(t =>
-    '<button class="focus-time-btn' + (t === focusSelectedMinutes ? ' selected' : '') + '"' +
-    ' onclick="focusSelectTime(' + t + ')">' + t + ' Min</button>'
-  ).join("");
-
-  const taskHTML = focusTasks.map((task, i) =>
-    '<div class="focus-task-item">' +
-      '<div class="focus-task-check" onclick="focusRemoveSetupTask(' + i + ')">✕</div>' +
-      '<span class="focus-task-text">' + esc(task.text) + '</span>' +
-    '</div>'
-  ).join("");
-
-  overlay.innerHTML =
-    '<h3 style="color:var(--gold);margin-bottom:4px">🎯 Konzentrationsmodus</h3>' +
-    '<p style="font-size:8px;color:#909080;margin-bottom:14px;text-align:center">' +
-      'Wähle dein Pokémon, stelle die Zeit ein und starte.' +
-    '</p>' +
-
-    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Pokémon wählen</label>' +
-    '<div class="pick-grid" style="margin-bottom:16px;width:100%;max-width:320px">' + monCards.join("") + '</div>' +
-
-    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Fokuszeit</label>' +
-    '<div class="focus-setup-grid">' + timeButtons + '</div>' +
-
-    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Aufgaben (optional)</label>' +
-    '<div class="focus-task-input-row">' +
-      '<input id="focus-task-input" type="text" maxlength="60" placeholder="Aufgabe hinzufügen …"' +
-      ' onkeydown="if(event.key===\'Enter\')focusAddSetupTask()">' +
-      '<button class="mini-btn" onclick="focusAddSetupTask()">+</button>' +
-    '</div>' +
-    '<div class="focus-task-list" id="focus-setup-tasks">' + taskHTML + '</div>' +
-
-    '<button class="btn green" style="max-width:280px" onclick="startFocusSession()">▶ Fokus starten</button>' +
-    '<button class="btn" style="max-width:280px;margin-top:6px" onclick="closeFocusOverlay()">Abbrechen</button>';
-}
-
-function focusSelectMon(uidv) { focusSelectedMon = uidv; renderFocusSetup(); }
-function focusSelectTime(min) { focusSelectedMinutes = min; renderFocusSetup(); }
-
-function focusAddSetupTask() {
-  const input = document.getElementById("focus-task-input");
-  if (!input) return;
-  const text = input.value.trim();
-  if (!text) return;
-  focusTasks.push({ id: uid(), text, done: false });
-  input.value = "";
-  renderFocusSetup();
-}
-function focusRemoveSetupTask(i) {
-  focusTasks.splice(i, 1);
-  renderFocusSetup();
-}
-
-function startFocusSession() {
-  const mon = getMon(focusSelectedMon);
-  if (!mon) { toast("Kein Pokémon gewählt."); return; }
-
-  state.focus = {
-    monUid:       mon.uid,
-    startTime:    Date.now(),
-    durationMs:   focusSelectedMinutes * 60 * 1000,
-    tasks:        focusTasks.map(t => ({ ...t })),
-    levelsEarned: 0,
-    completed:    false,
-  };
-  save();
-  renderFocusActive();
-}
-
-function renderFocusActive() {
-  const sess = state.focus;
-  if (!sess) { closeFocusOverlay(); return; }
-  const mon = getMon(sess.monUid);
-  if (!mon) { state.focus = null; save(); closeFocusOverlay(); return; }
-
-  const overlay = document.getElementById("focus-overlay");
-  const elapsed = Date.now() - sess.startTime;
-  const remaining = Math.max(0, sess.durationMs - elapsed);
-  const pct = Math.min(100, (elapsed / sess.durationMs) * 100);
-  const allDone = sess.tasks.length > 0 && sess.tasks.every(t => t.done);
-  const timerDone = remaining <= 0;
-
-  const mm = Math.floor(remaining / 60000);
-  const ss = Math.floor((remaining % 60000) / 1000);
-  const timeStr = String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
-  const urgent = remaining < 60000 && remaining > 0;
-
-  const spriteId = monSpriteId(mon);
-
-  const taskHTML = sess.tasks.map((task, i) =>
-    '<div class="focus-task-item' + (task.done ? ' done' : '') + '">' +
-      '<div class="focus-task-check' + (task.done ? ' checked' : '') + '"' +
-      ' onclick="focusToggleTask(' + i + ')">' + (task.done ? '✔' : '') + '</div>' +
-      '<span class="focus-task-text">' + esc(task.text) + '</span>' +
-    '</div>'
-  ).join("");
-
-  const canFinish = timerDone || allDone;
-
-  overlay.innerHTML =
-    '<h3 style="color:var(--gold);margin-bottom:8px">🎯 Fokus-Training</h3>' +
-    '<img class="focus-mon-sprite" src="' + SPRITE(spriteId, mon.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
-    '<div class="focus-mon-name">' + (mon.shiny ? "✨ " : "") + esc(monName(mon, null)) + ' · Lv.' + mon.level + '</div>' +
-    '<div class="focus-timer-display' + (urgent ? ' urgent' : '') + '">' + timeStr + '</div>' +
-    '<div class="focus-progress-bar"><div class="focus-progress-fill" style="width:' + pct + '%"></div></div>' +
-
-    (sess.tasks.length ? '<div class="focus-task-list">' + taskHTML + '</div>' : '') +
-
-    '<div class="focus-streak-info">Session läuft … Die App bleibt gesperrt bis du fertig bist.</div>' +
-
-    (canFinish
-      ? '<button class="btn green" style="max-width:280px" onclick="completeFocusSession()">✅ Session abschließen</button>'
-      : '') +
-
-    '<button class="btn red" style="max-width:280px;margin-top:6px" onclick="abortFocusSession()">❌ Abbrechen (kein EXP)</button>';
-
-  if (!focusTimer && !timerDone) {
-    focusTimer = setInterval(() => {
-      const s = state.focus;
-      if (!s) { clearInterval(focusTimer); focusTimer = null; return; }
-      const rem = Math.max(0, s.durationMs - (Date.now() - s.startTime));
-      if (rem <= 0) { clearInterval(focusTimer); focusTimer = null; }
-      renderFocusActive();
-    }, 1000);
-  }
-}
-
-function focusToggleTask(i) {
-  if (!state.focus || !state.focus.tasks[i]) return;
-  state.focus.tasks[i].done = !state.focus.tasks[i].done;
-  save();
-  renderFocusActive();
-}
-
-async function completeFocusSession() {
-  const sess = state.focus;
-  if (!sess) return;
-  if (focusTimer) { clearInterval(focusTimer); focusTimer = null; }
-
-  const mon = getMon(sess.monUid);
-  if (!mon) { state.focus = null; save(); closeFocusOverlay(); return; }
-
-  // 1 Level pro angefangene 15 Minuten, mindestens 1
-  const minutesTotal = Math.ceil(sess.durationMs / 60000);
-  const levelsToGain = Math.max(1, Math.floor(minutesTotal / 15));
-
-  let levelsGained = 0;
-  for (let i = 0; i < levelsToGain; i++) {
-    if (mon.level < MAX_LEVEL) { mon.level++; levelsGained++; }
-  }
-
-  mon.focusSessionCount = (mon.focusSessionCount || 0) + 1;
-
-  const MEGA_THRESHOLD = 10;
-  const hasMegaEligible = !!MEGA_MAP[mon.dex];
-  const justEarnedStone = hasMegaEligible && !mon.megaStone && mon.focusSessionCount >= MEGA_THRESHOLD;
-  if (justEarnedStone) mon.megaStone = true;
-
-  // Mega-Modus erneuern, falls bereits Stein vorhanden und Mega-fähig
-  if (mon.megaStone && hasMegaEligible && !justEarnedStone) {
-    mon.megaUntil = Date.now() + 24 * 60 * 60 * 1000;
-    toast("💎 " + MEGA_MAP[mon.dex].name + " – Mega-Mode für 24h erneuert!");
-  }
-
-  // Happiness-Bonus (wie bei Arena-Sieg)
-  mon.happiness = Math.min(255, (mon.happiness || 120) + 5);
-
-  state.focus = null;
-  save();
-
-  // Neue Level-Up-Moves prüfen und Evolution auslösen (async)
-  if (levelsGained > 0) checkLearnMoves(mon);
-  await tryEvolve(mon);
-
-  const overlay = document.getElementById("focus-overlay");
-
-  let resultHTML =
-    '<h3 style="color:var(--gold);margin-bottom:12px">✅ Session abgeschlossen!</h3>' +
-    '<img src="' + SPRITE(mon.dex, mon.shiny) + '" alt="" style="width:80px;height:80px;image-rendering:pixelated;margin-bottom:8px" onerror="this.style.opacity=.2">' +
-    '<div style="font-size:9px;color:var(--white);margin-bottom:6px">' + esc(monName(mon, null)) + '</div>' +
-    '<div class="panel dark" style="max-width:280px;margin-bottom:16px;padding:12px">' +
-      '<div style="font-size:9px;line-height:2.2">' +
-        (levelsGained > 0 ? '⬆️ +' + levelsGained + ' Level (jetzt Lv.' + mon.level + ')<br>' : '') +
-        '❤️ Zuneigung +5<br>' +
-        '🎯 Focus-Sessions: ' + mon.focusSessionCount +
-        (hasMegaEligible && !justEarnedStone && !mon.megaStone ? ' / ' + MEGA_THRESHOLD : '') +
-      '</div>' +
-    '</div>';
-
-  if (justEarnedStone) {
-    const megaName = MEGA_MAP[mon.dex].name;
-    resultHTML +=
-      '<div class="panel" style="max-width:280px;margin-bottom:16px;border:2px solid #c060d8;padding:12px;text-align:center">' +
-        '<div style="font-size:12px;margin-bottom:4px">💎</div>' +
-        '<div style="font-size:9px;color:#c060d8;font-weight:bold">Mega-Stein erhalten!</div>' +
-        '<div style="font-size:8px;color:#a8b8c8;margin-top:4px">' +
-          esc(monName(mon, null)) + ' kann sich jetzt als ' + esc(megaName) + ' Mega-Entwickeln!' +
-        '</div>' +
-      '</div>';
-  }
-
-  resultHTML +=
-    '<button class="btn green" style="max-width:280px" onclick="closeFocusOverlay();renderTeam();renderBox()">Weiter</button>';
-
-  overlay.innerHTML = resultHTML;
-  renderTeam();
-  renderBox();
-}
-
-function abortFocusSession() {
-  if (!confirm("Session abbrechen? Kein EXP wird vergeben.")) return;
-  if (focusTimer) { clearInterval(focusTimer); focusTimer = null; }
-  state.focus = null;
-  save();
-  closeFocusOverlay();
-  toast("Fokus-Session abgebrochen.");
-}
-
-/* =====================================================================
-   MEGA-EVOLUTION
-   ===================================================================== */
-function isMegaActive(mon) {
-  return !!(mon && mon.megaUntil && Date.now() < mon.megaUntil);
-}
-function megaAtkMultiplier(mon)   { return isMegaActive(mon) ? 1.3 : 1.0; }
-function megaSpAtkMultiplier(mon) { return isMegaActive(mon) ? 1.2 : 1.0; }
-function monSpriteId(mon) {
-  if (isMegaActive(mon) && MEGA_MAP[mon.dex]) return MEGA_MAP[mon.dex].megaDex;
-  return mon.dex;
-}
-
-async function activateMegaEvolution(uidv) {
-  const mon = getMon(uidv);
-  if (!mon) return;
-  if (!mon.megaStone) { toast("Kein Mega-Stein vorhanden."); return; }
-  if (!MEGA_MAP[mon.dex]) { toast("Dieses Pokémon hat keine Mega-Form."); return; }
-
-  const megaInfo = MEGA_MAP[mon.dex];
-
-  if (isMegaActive(mon)) {
-    const remaining = Math.ceil((mon.megaUntil - Date.now()) / 3600000);
-    toast("💎 Mega-Evolution bereits aktiv! Noch ~" + remaining + "h.");
-    return;
-  }
-
-  // 24h Mega-Modus aktivieren
-  mon.megaUntil = Date.now() + 24 * 60 * 60 * 1000;
-  save();
-
-  // Evo-Overlay für die Animation wiederverwenden
-  const evoImg = document.getElementById("evo-img");
-  const evoText = document.getElementById("evo-text");
-  const evoOverlay = document.getElementById("evo-overlay");
-
-  evoImg.classList.remove("evo-anim");
-  evoImg.src = SPRITE(mon.dex, mon.shiny);
-  evoText.innerHTML = "Was ist das?!<br>" + esc(monName(mon, null)) + " …";
-  evoOverlay.classList.add("open");
-  void evoImg.offsetWidth;
-  evoImg.classList.add("evo-anim");
-
-  setTimeout(() => {
-    evoImg.src = SPRITE(megaInfo.megaDex, false);
-    evoText.innerHTML =
-      esc(monName(mon, null)) + " hat sich zu<br><b>" + esc(megaInfo.name) + "</b> Mega-Entwickelt!<br>" +
-      "Aktiv für 24 Stunden. 💎";
-  }, 1100);
-
-  renderTeam();
-  renderBox();
-  // Detail-Modal aktualisieren, falls offen
-  if (document.getElementById("mon-detail-modal").classList.contains("open")) {
-    renderMonDetailModal(mon, "stats");
-  }
-}
-
 async function renderTeam() {
   const el = document.getElementById("team-list");
   if (!state.team.length) {
@@ -3609,7 +3384,7 @@ async function renderTeam() {
     const pct = Math.round((m.exp / expForLevel(m.level)) * 100);
     return '<div class="panel">' +
       '<div class="mon-card">' +
-        '<img class="mon-sprite" style="cursor:pointer" src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2" onclick="openMonDetail(\'' + m.uid + '\')">' +
+        '<img class="mon-sprite" style="cursor:pointer" src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2" onclick="openMonDetail(\'' + m.uid + '\')">' +
         '<div class="mon-body">' +
           '<div class="mon-top"><span class="mon-name">' + (m.shiny ? "✨ " : "") + esc(monName(m, d.name)) + '</span><span class="mon-lv">Lv. ' + m.level + '</span></div>' +
           typeBadges(d.types) +
@@ -3635,7 +3410,7 @@ async function renderBox() {
     const d = await getPokemonData(m.dex);
     const inTeam = state.team.includes(m.uid);
     return '<div class="box-cell' + (inTeam ? " inteam" : "") + '" onclick="openMonDetail(\'' + m.uid + '\')">' +
-      '<img src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
+      '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
       '<div class="bn">' + (m.shiny ? "✨" : "") + esc(monName(m, d.name)) + '</div>' +
       '<div class="bl">Lv.' + m.level + (inTeam ? " ★" : "") + '</div>' +
     '</div>';
@@ -3865,54 +3640,51 @@ function renderShop() {
 /* =====================================================================
    IDLE-TICK & OFFLINE-PROGRESSION
    ===================================================================== */
-// Timestamp-basierte Offline-Progression: schreibt für die Abwesenheitszeit
-// (max. 120 Min.) Team-EXP, Trainer-EXP und Münzen gut. Kein Fangen, keine
-// Move-Learns offline (checkLearnMoves respektiert das __offlineGrant-Flag).
+// Timestamp-basierte Offline-Progression: rechnet die Zeit seit dem letzten
+// Sichtbar-Sein (state.lastSeen) gutgeschrieben, gedeckelt auf max. 120 Minuten.
+// Kein Pokémon-Fangen, keine Move-Learns offline.
 function processOffline() {
   const now = Date.now();
-  state.lastTick = now;                        // Vordergrund-Idle-Timer zurücksetzen
-  const awayMs = Math.max(0, now - (state.lastSeen || now));
+  const last = state.lastSeen || now;
+  const elapsedMin = (now - last) / 60000;
+  const effektivMin = Math.min(120, Math.max(0, elapsedMin));
+  // Baselines zurücksetzen, damit weder Offline- noch der 30s-Foreground-Ticker
+  // dieselbe Zeitspanne doppelt gutschreiben.
   state.lastSeen = now;
-  const effektivMin = Math.min(120, Math.floor(awayMs / 60000));
+  state.lastTick = now;
   if (effektivMin > 2) {
-    let expGain = 0;
-    if (state.team.length) {
-      expGain = Math.round(effektivMin * 0.8 * state.team.length);
-      window.__offlineGrant = true;            // Move-Learns während Offline-Gutschrift unterdrücken
-      grantTeamExp(expGain, false);
-      window.__offlineGrant = false;
-    }
-    const trExp = Math.round(effektivMin * 0.4);
-    if (trExp > 0) addTrainerExp(trExp);
-    const coinGain = Math.floor(effektivMin * 0.3);
-    state.coins = (state.coins || 0) + coinGain;
-    toast("😴 " + effektivMin + " Min. offline — Team hat trainiert! +" + expGain + " EXP, +" + coinGain + " Münzen");
-    updateHeader();
+    const teamExp    = Math.round(effektivMin * 0.8 * state.team.length);
+    const trainerExp = Math.round(effektivMin * 0.4);
+    const coins      = Math.floor(effektivMin * 0.3);
+    if (teamExp > 0 && state.team.length) grantTeamExp(teamExp, false);
+    if (trainerExp > 0) addTrainerExp(trainerExp);
+    state.coins = (state.coins || 0) + coins;
+    toast("😴 " + Math.round(effektivMin) + " Min. offline — Team hat trainiert! +" +
+          teamExp + " EXP, +" + coins + " Münzen");
   }
   save();
 }
+// Foreground-Idle-Progression: nur bei sichtbarem Dokument, damit im Hintergrund
+// nichts unkontrolliert weiterläuft (Offline übernimmt die Pausen-Zeit).
 setInterval(() => {
+  if (document.visibilityState !== "visible") return;
   const now = Date.now();
   const elapsed = now - (state.lastTick || now);
   state.lastTick = now;
-  // Im Hintergrund NICHT laufend gutschreiben – dort übernimmt processOffline()
-  // die Gutschrift. lastTick wird dennoch aktualisiert, damit beim Zurückkehren
-  // kein Riesen-Batzen aus diesem Intervall entsteht.
-  if (document.hidden) { save(); return; }
+  state.lastSeen = now;   // „zuletzt lebendig“ mitführen → korrekte Offline-Differenz nach hartem Schließen
   if (state.team.length) grantTeamExp(elapsed * EXP_PER_MS, false);
   else save();
 }, 30000);
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    // App geht in den Hintergrund → Loops pausieren, Zeitstempel merken
-    stopBattleLoop();
+    // Pausieren: Zeitstempel merken, Battle-Loop anhalten
     state.lastSeen = Date.now();
     save();
+    stopBattleLoop();
   } else {
-    // App kehrt zurück → Offline-Zeit gutschreiben, dann passenden Loop fortsetzen
+    // Fortsetzen: Offline-Zeit gutschreiben, Loop je nach Tab wieder starten
     processOffline();
-    const cityActive = document.getElementById("city").style.display === "block";
-    if (cityActive) startCityLoop();
+    if (CITY.active) { CITY.last = 0; }          // City-dt-Baseline zurücksetzen
     else startBattleLoop();
   }
 });
@@ -3952,13 +3724,22 @@ const BT = {
   ballSig: "",
   moveLabelTimer: null,
   last: 0,
+  running: false,                 // Loop läuft nur bei sichtbarem Battle-Tab
+  raf: null,                      // requestAnimationFrame-Handle (zum Stoppen)
+  // ---- Angeln (Phase 3b) ----
+  fishTimer: 0,                   // Sekunden, die ein Team-Pokémon durchgehend am Wasser steht
+  fishReady: false,               // Angel-Button sichtbar?
+  fishing: false,                 // 10-s-Wartephase aktiv?
+  fishWaitT: 0,                   // Restzeit der Wartephase
+  fishBtn: null,                  // Button-Element
   // ---- Top-Down Overworld ----
   cam: { x: 0, y: 0 },            // Kamera (Welt-Koordinaten)
   mapTiles: null, mapBiome: "",   // gecachte Tile-Map (flaches Array) + aktuelles Biom
   mapW: 1600, mapH: 800, tileSize: 16, cols: 100, rows: 50,
   mini: null, minimapFrame: 0,    // Mini-Map-Offscreen-Canvas
-  activeFighterUid: null, combatPause: -1,  // 1v1-Kampfsteuerung
-  running: false                  // Battle-Loop aktiv? (Start/Stop wie CITY.active)
+  activeFighterUid: null, combatPause: -1,   // 1v1-Kampfsteuerung
+  anchorWaiting: false,
+  anchorWaitPos: null
 };
 
 /* =====================================================================
@@ -3989,12 +3770,12 @@ const CITY = {
   last: 0,
   dialogQ: [],        // Warteschlange für NPC-Dialoge
   dialogOpen: false,
+  lastBuilding: null, // zuletzt betretenes Gebäude – Sperre gegen Sofort-Retrigger
+  lastNpc: null,      // zuletzt angesprochener NPC – Sperre gegen Dialog-Retrigger
   martFilter: "all",  // aktiver PokéMart-Filter
   labBonusDate: "",   // Datum, an dem der Labor-Bonus zuletzt geholt wurde
   martReopenOk: false, // erlaubt openMart() trotz dialogOpen-Guard (Re-Render)
   labReopenOk: false,  // erlaubt openLab() trotz dialogOpen-Guard (Re-Render)
-  lastBuilding: null,  // zuletzt betretenes Gebäude – Betretens-Sperre gegen Retrigger
-  lastNpc: null,       // zuletzt angesprochener NPC – Sperre gegen Dialog-Retrigger
   battle: null         // null = kein Arena-Kampf aktiv; sonst Kampf-State-Objekt
 };
 
@@ -4148,6 +3929,54 @@ const ARENA_TRAINERS = [
     win:  "Noch nicht gut genug. Trainiere mehr und komm wieder!",
     lose: "Beeindruckend. Du verdienst dieses Badge, Trainer!"
   }
+];
+
+/* =====================================================================
+   ARENALEITER (Phase 3a) — 8 feste Leiter mit Typ-Spezialisierung.
+   Freischaltung: Leiter N ab Trainer-Level N*3 UND Sieg gegen Leiter N-1.
+   Sieg gibt einen Orden (state.arenaBadges / state.gymProgress).
+   ===================================================================== */
+const GYM_LEADERS = [
+  { name:"Felsit",  type:"rock",     sprite:{ body:"#b8a038", hair:"#604020", shirt:"#8a6a20" },
+    greeting:"Meine Steinpokémon sind hart wie Fels. Zerbrichst du daran?",
+    win:"Unerschütterlich! Komm wieder, wenn du stärker bist.",
+    lose:"Du hast meinen Fels zerschlagen. Der Orden gehört dir!",
+    team:[{dex:74,level:9},{dex:75,level:10},{dex:95,level:12}] },
+  { name:"Marina",  type:"water",    sprite:{ body:"#6890f0", hair:"#284088", shirt:"#3060c8" },
+    greeting:"Wie eine Welle werde ich dich überrollen!",
+    win:"Die Strömung war auf meiner Seite. Trainiere weiter!",
+    lose:"Du schwimmst gegen jeden Strom. Beeindruckend!",
+    team:[{dex:90,level:15},{dex:120,level:16},{dex:130,level:18}] },
+  { name:"Volt",    type:"electric", sprite:{ body:"#f8d030", hair:"#282030", shirt:"#c8a020" },
+    greeting:"Ich lade dir gleich einen Schock auf!",
+    win:"Kurzschluss für dich! Noch nicht genug Spannung.",
+    lose:"Du hast mich geerdet. Der Orden ist verdient!",
+    team:[{dex:100,level:22},{dex:101,level:23},{dex:125,level:25}] },
+  { name:"Flora",   type:"grass",    sprite:{ body:"#78c850", hair:"#386028", shirt:"#50a840" },
+    greeting:"Meine Pflanzen wurzeln tief. Kannst du sie ausreißen?",
+    win:"Meine Ranken haben dich festgehalten. Übe weiter!",
+    lose:"Du hast meinen Garten überwunden. Respekt!",
+    team:[{dex:44,level:29},{dex:71,level:30},{dex:45,level:32}] },
+  { name:"Tox",     type:"poison",   sprite:{ body:"#a040a0", hair:"#301830", shirt:"#782878" },
+    greeting:"Ein Tropfen meines Giftes genügt …",
+    win:"Zersetzt! Komm zurück, wenn du ein Gegengift hast.",
+    lose:"Du bist immun gegen meine Tricks. Der Orden ist deiner!",
+    team:[{dex:89,level:36},{dex:110,level:37},{dex:34,level:39}] },
+  { name:"Psyche",  type:"psychic",  sprite:{ body:"#f85888", hair:"#282030", shirt:"#c03868" },
+    greeting:"Ich habe deinen Verlust bereits vorhergesehen.",
+    win:"Genau wie vorhergesagt. Dein Geist ist noch nicht bereit.",
+    lose:"Meine Vision war falsch … du bist außergewöhnlich!",
+    team:[{dex:65,level:43},{dex:97,level:44},{dex:122,level:46}] },
+  { name:"Ignis",   type:"fire",     sprite:{ body:"#f08030", hair:"#401810", shirt:"#c05018" },
+    greeting:"Meine Flamme brennt heißer als deine Entschlossenheit!",
+    win:"Verbrannt! Meine Glut ist dir noch zu stark.",
+    lose:"Du hast meine Flammen gelöscht. Ein würdiger Sieg!",
+    team:[{dex:59,level:50},{dex:78,level:51},{dex:126,level:53}] },
+  { name:"Terra",   type:"ground",   sprite:{ body:"#e0c068", hair:"#503818", shirt:"#a88030" },
+    greeting:"Der Boden selbst kämpft an meiner Seite. Letzte Prüfung!",
+    win:"Der Boden verschluckt dich. Der Champion-Rang bleibt fern.",
+    lose:"Du hast die Erde bezwungen. Du bist ein wahrer Meister!",
+    team:[{dex:28,level:57},{dex:51,level:58},{dex:105,level:61}] }
 ];
 
 /* ---- Init & Resize ---- */
@@ -4327,40 +4156,48 @@ function updateCity(dt) {
   CITY.cam.y += (targetCamY - CITY.cam.y) * 0.15;
   clampCityCam();
 
-  // Gebäude-Näheprüfung (Eintreten) mit Betretens-Sperre:
-  // ausgelöst wird erst wieder, wenn der Spieler den Radius (+10 px) einmal
-  // verlassen hat – sonst öffnet das Modal nach dem Schließen sofort erneut.
-  let nearBuilding = null;
-  for (const b of CITY.buildings) {
-    const dist = Math.hypot(p.wx - b.enterX, p.wy - b.enterY);
-    if (dist < b.enterRadius) { nearBuilding = b; break; }
-  }
-  // Sperre aufheben, sobald der Spieler weit genug entfernt ist
+  // Betretens-Sperre lösen, sobald der Spieler den zuletzt betretenen Radius
+  // (Gebäude bzw. NPC) verlassen hat — verhindert Sofort-Retrigger nach dem Schließen.
   if (CITY.lastBuilding) {
     const lb = CITY.lastBuilding;
-    const d = Math.hypot(p.wx - lb.enterX, p.wy - lb.enterY);
-    if (d > lb.enterRadius + 10) CITY.lastBuilding = null;
+    if (Math.hypot(p.wx - lb.enterX, p.wy - lb.enterY) > lb.enterRadius + 10) {
+      CITY.lastBuilding = null;
+    }
   }
-  if (!CITY.dialogOpen && nearBuilding && nearBuilding !== CITY.lastBuilding) {
-    CITY.lastBuilding = nearBuilding;
-    if (nearBuilding.onEnter && typeof window[nearBuilding.onEnter] === "function") {
-      window[nearBuilding.onEnter]();
+  if (CITY.lastNpc) {
+    const ln = CITY.lastNpc;
+    if (Math.hypot(p.wx - ln.wx, p.wy - ln.wy) > 22 + 10) {
+      CITY.lastNpc = null;
     }
   }
 
-  // NPC-Näheprüfung mit gleicher Sperr-Logik (Retrigger alle 2,5 s verhindern)
-  let nearNpc = null;
-  for (const npc of CITY_NPCS) {
-    const dist = Math.hypot(p.wx - npc.wx, p.wy - npc.wy);
-    if (dist < 22) { nearNpc = npc; break; }
+  // Gebäude-Näheprüfung (Eintreten) — nur wenn kein Dialog offen
+  if (!CITY.dialogOpen) {
+    for (const b of CITY.buildings) {
+      const dist = Math.hypot(p.wx - b.enterX, p.wy - b.enterY);
+      if (dist < b.enterRadius) {
+        // Nur auslösen, wenn nicht bereits durch dieses Gebäude gesperrt
+        if (b !== CITY.lastBuilding && b.onEnter && typeof window[b.onEnter] === "function") {
+          CITY.lastBuilding = b;
+          window[b.onEnter]();
+        }
+        break;
+      }
+    }
   }
-  if (CITY.lastNpc) {
-    const d = Math.hypot(p.wx - CITY.lastNpc.wx, p.wy - CITY.lastNpc.wy);
-    if (d > 22 + 10) CITY.lastNpc = null;
-  }
-  if (!CITY.dialogOpen && nearNpc && nearNpc !== CITY.lastNpc) {
-    CITY.lastNpc = nearNpc;
-    talkNpc(nearNpc);
+
+  // NPC-Näheprüfung (nur wenn kein Dialog offen)
+  if (!CITY.dialogOpen) {
+    for (const npc of CITY_NPCS) {
+      const dist = Math.hypot(p.wx - npc.wx, p.wy - npc.wy);
+      if (dist < 22) {
+        if (npc !== CITY.lastNpc) {
+          CITY.lastNpc = npc;
+          talkNpc(npc);
+        }
+        break;
+      }
+    }
   }
 }
 
@@ -4788,36 +4625,73 @@ function claimLabBonus() {
 function openArena() {
   if (CITY.dialogOpen) return;
   CITY.dialogOpen = true;
+  renderArenaMenu();
+}
 
+/* Rendert das Arena-Menü (ohne dialogOpen-Guard – für Re-Render aus dem Kampf) */
+function renderArenaMenu() {
   const badges   = state.arenaBadges || 0;
   const wins     = state.arenaWins   || 0;
   const teamOk   = state.team.length >= 1;
   const trainerLevel = state.trainer ? state.trainer.level : 1;
+  const gymProgress  = state.gymProgress || 0;
 
-  // Badge-Anzeige: 8 Slots, gefüllte als 🏅, leere als ○
+  // Orden-Anzeige: 8 Slots, gefüllte als 🏅, leere als ○
   const badgeRow = Array.from({ length: 8 }, (_, i) =>
     i < badges ? "🏅" : "○"
   ).join(" ");
 
-  const nextBadgeIn = teamOk ? (3 - (wins % 3)) : "?";
+  // Arenaleiter-Liste: Status je Leiter (besiegt / verfügbar / gesperrt)
+  const leaderRows = GYM_LEADERS.map((L, i) => {
+    const N = i + 1;
+    const defeated = gymProgress >= N;
+    const levelOk  = trainerLevel >= N * 3;
+    const prevOk   = N === 1 || gymProgress >= N - 1;
+    const unlocked = levelOk && prevOk;
+    const col = TYPE_COLOR[L.type] || "#888";
+    const typeChip = '<span style="display:inline-block;background:' + col +
+      ';color:#fff;font-size:6px;padding:2px 4px;border-radius:4px">' + (TYPE_DE[L.type] || L.type) + '</span>';
+
+    let statusHTML;
+    if (defeated) {
+      statusHTML = '<span style="font-size:7px;color:#50c878">✅ Besiegt</span>';
+    } else if (unlocked && teamOk) {
+      statusHTML = '<button class="btn green" style="width:auto;margin:0;padding:5px 8px;font-size:7px" ' +
+        'onclick="startGymBattle(' + i + ')">Herausfordern</button>';
+    } else if (!teamOk) {
+      statusHTML = '<span style="font-size:7px;color:#c02820">Team nötig</span>';
+    } else if (!levelOk) {
+      statusHTML = '<span style="font-size:7px;color:#a8b8c8">🔒 ab Lv.' + (N * 3) + '</span>';
+    } else {
+      statusHTML = '<span style="font-size:7px;color:#a8b8c8">🔒 erst Leiter ' + (N - 1) + '</span>';
+    }
+
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;' +
+      'padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.08)">' +
+      '<div style="min-width:0">' +
+        '<div style="font-size:8px;color:#e8f0f8">' + N + '. ' + esc(L.name) + '</div>' +
+        '<div style="margin-top:2px">' + typeChip + '</div>' +
+      '</div>' + statusHTML +
+    '</div>';
+  }).join("");
 
   openCityModal(
     '<h3>⚔️ Arena</h3>' +
 
     '<div class="panel dark" style="margin-bottom:10px">' +
-      '<div style="font-size:8px;color:var(--gold);margin-bottom:6px">🏅 DEINE BADGES</div>' +
+      '<div style="font-size:8px;color:var(--gold);margin-bottom:6px">🏅 DEINE ORDEN</div>' +
       '<div style="font-size:12px;letter-spacing:2px;margin-bottom:6px">' + badgeRow + '</div>' +
       '<div style="font-size:7px;color:#a8b8c8;line-height:2">' +
         'Trainer-Level: ' + trainerLevel + '<br>' +
-        'Arena-Siege: ' + wins + '<br>' +
-        'Nächstes Badge in: ' + nextBadgeIn + ' Sieg' + (nextBadgeIn === 1 ? "" : "en") +
+        'Orden: ' + badges + '/8 · Arena-Siege: ' + wins +
       '</div>' +
     '</div>' +
 
+    '<div style="font-size:8px;color:var(--gold);margin-bottom:4px">ARENALEITER</div>' +
+    '<div class="panel dark" style="margin-bottom:10px;padding:2px 4px">' + leaderRows + '</div>' +
+
     (teamOk
-      ? '<button class="btn green" onclick="startArenaBattle()">' +
-          '⚔️ Kampf beginnen!' +
-        '</button>'
+      ? '<button class="btn" onclick="startArenaBattle()">🎯 Freies Training</button>'
       : '<p style="font-size:8px;color:#c02820;margin-top:8px">' +
           'Du brauchst mindestens 1 Pokémon im Team.' +
         '</p>'
@@ -4829,28 +4703,10 @@ function openArena() {
    ARENA-KAMPFSYSTEM (Phase 3) — rundenbasiert, DOM-basierte UI
    Vollständig getrennt vom Echtzeit-BT-System.
    ===================================================================== */
-async function generateEnemyTeam(size) {
-  // Durchschnittslevel des Spieler-Teams
-  const teamMons = state.team.map(u => getMon(u)).filter(Boolean);
-  const avgLevel = teamMons.length
-    ? Math.round(teamMons.reduce((s, m) => s + m.level, 0) / teamMons.length)
-    : 5;
-
-  // Dex-IDs aus dem aktuellen Zonen-Pool
-  const zone = zoneById(state.currentZone);
-  const pool = zone.pool;
-
-  // size zufällige, unterschiedliche Pokémon wählen
-  const chosen = [];
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
-  for (const dex of shuffled) {
-    if (chosen.length >= size) break;
-    if (!chosen.some(c => c.dex === dex)) chosen.push({ dex });
-  }
-
-  // Für jedes Pokémon: Daten + Battle-Daten laden
-  const enemies = await Promise.all(chosen.map(async c => {
-    const level = Math.max(2, avgLevel + Math.floor(Math.random() * 7) - 3);
+// Baut ein Feind-Team aus festen Vorgaben [{dex, level}] (Arenaleiter & Training)
+async function buildEnemyTeam(specs) {
+  return Promise.all(specs.map(async c => {
+    const level = c.level;
     const [pdata, btdata, sdata] = await Promise.all([
       getPokemonData(c.dex),
       getBattleData(c.dex),
@@ -4873,31 +4729,36 @@ async function generateEnemyTeam(size) {
       fainted: false
     };
   }));
-
-  return enemies;
 }
 
-async function startArenaBattle() {
-  if (!state.team.length) {
-    toast("Du brauchst mindestens 1 Pokémon im Team!");
-    return;
+// Freies Training: zufälliges Gegner-Team aus dem aktuellen Zonen-Pool,
+// Level am Team-Durchschnitt orientiert.
+async function generateEnemyTeam(size) {
+  const teamMons = state.team.map(u => getMon(u)).filter(Boolean);
+  const avgLevel = teamMons.length
+    ? Math.round(teamMons.reduce((s, m) => s + m.level, 0) / teamMons.length)
+    : 5;
+  const pool = zoneById(state.currentZone).pool;
+  const specs = [];
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  for (const dex of shuffled) {
+    if (specs.length >= size) break;
+    if (!specs.some(c => c.dex === dex)) {
+      specs.push({ dex, level: Math.max(2, avgLevel + Math.floor(Math.random() * 7) - 3) });
+    }
   }
+  return buildEnemyTeam(specs);
+}
 
-  // Ladeindikator während generateEnemyTeam läuft
-  openCityModal('<h3>⚔️ Arena</h3><div style="text-align:center;padding:20px">Lade Gegner…</div>');
-
-  // Gegner-Trainer zufällig wählen
-  const trainerIdx = Math.floor(Math.random() * ARENA_TRAINERS.length);
-  const trainer = ARENA_TRAINERS[trainerIdx];
-
-  // Spieler-Team aufbauen (aus state.team, aktuelle HP aus BT.fighters – nur gelesen)
-  const playerTeam = (await Promise.all(state.team.map(async uid => {
+// Baut das Spieler-Team für den rundenbasierten Arena-Kampf aus state.team.
+// Aktuelle HP werden (falls vorhanden) aus den BT-Fightern übernommen.
+async function buildPlayerTeam() {
+  return (await Promise.all(state.team.map(async uid => {
     const m = getMon(uid);
     if (!m) return null;
     const fighter = BT.fighters.find(f => f.uid === uid);
     const [btdata, sdata] = await Promise.all([getBattleData(m.dex), getPokemonStats(m.dex)]);
     const maxHp = 20 + m.level * 3;
-    // Aktuelle HP aus BT-Fighter übernehmen (skaliert auf Arena-HP-System)
     const currentHp = fighter
       ? Math.round((fighter.hp / fighter.maxHp) * maxHp)
       : maxHp;
@@ -4913,20 +4774,30 @@ async function startArenaBattle() {
       moves:  (btdata.moves || [
         { name:"Tackle", type:"normal", power:40 }
       ]).slice(0, 4),
-      // Mega-Boost fließt direkt in die Kampfwerte des Spieler-Pokémon ein
-      atk:    Math.round((btdata.atk || 60) * megaAtkMultiplier(m)),
+      atk:    (btdata.atk || 60),
       def:    (sdata["defense"] || 55),
-      spAtk:  Math.round((btdata.spAtk || sdata["special-attack"] || 60) * megaSpAtkMultiplier(m)),
+      spAtk:  (btdata.spAtk || sdata["special-attack"] || 60),
       spDef:  (sdata["special-defense"] || 55),
       fainted: false
     };
   }))).filter(Boolean);
+}
 
-  // Feind-Team generieren (3 Pokémon, oder weniger wenn Spieler-Team kleiner)
-  const enemySize = Math.min(3, state.team.length);
-  const enemyTeam = await generateEnemyTeam(enemySize);
+// Freies Training: zufälliger Trainer + zufälliges Gegner-Team (keine Orden)
+async function startArenaBattle() {
+  if (!state.team.length) {
+    toast("Du brauchst mindestens 1 Pokémon im Team!");
+    return;
+  }
+  openCityModal('<h3>⚔️ Arena</h3><div style="text-align:center;padding:20px">Lade Gegner…</div>');
+
+  const trainer = ARENA_TRAINERS[Math.floor(Math.random() * ARENA_TRAINERS.length)];
+  const playerTeam = await buildPlayerTeam();
+  const enemySize  = Math.min(3, state.team.length);
+  const enemyTeam  = await generateEnemyTeam(enemySize);
 
   CITY.battle = {
+    mode:       "training",
     phase:      "select",
     trainer,
     playerTeam,
@@ -4937,7 +4808,45 @@ async function startArenaBattle() {
     turn:       0,
     result:     null
   };
+  renderArenaBattle();
+}
 
+// Arenaleiter-Kampf: festes Team, Sieg gibt einen Orden
+async function startGymBattle(idx) {
+  if (!state.team.length) {
+    toast("Du brauchst mindestens 1 Pokémon im Team!");
+    return;
+  }
+  const leader = GYM_LEADERS[idx];
+  if (!leader) return;
+  // Freischaltung erneut prüfen (Schutz gegen veraltete UI)
+  const N = idx + 1;
+  const trainerLevel = state.trainer ? state.trainer.level : 1;
+  const prevOk = N === 1 || (state.gymProgress || 0) >= N - 1;
+  if (trainerLevel < N * 3 || !prevOk) {
+    toast("Dieser Arenaleiter ist noch gesperrt.");
+    return;
+  }
+
+  openCityModal('<h3>⚔️ ' + esc(leader.name) + '</h3>' +
+    '<div style="text-align:center;padding:20px">Lade Gegner…</div>');
+
+  const playerTeam = await buildPlayerTeam();
+  const enemyTeam  = await buildEnemyTeam(leader.team);
+
+  CITY.battle = {
+    mode:       "gym",
+    leaderIdx:  idx,
+    phase:      "select",
+    trainer:    leader,
+    playerTeam,
+    enemyTeam,
+    playerIdx:  0,
+    enemyIdx:   0,
+    log:        [{ text: leader.greeting, color: "#f8c030" }],
+    turn:       0,
+    result:     null
+  };
   renderArenaBattle();
 }
 
@@ -5085,21 +4994,25 @@ function arenaExecuteTurn(moveIndex) {
 
 function arenaGrantRewards() {
   const b = CITY.battle;
+  const isGym = b.mode === "gym";
   state.arenaWins = (state.arenaWins || 0) + 1;
 
-  // Badge alle 3 Siege, max 8 Badges
-  const newBadgeAt = state.arenaWins % 3 === 0;
-  if (newBadgeAt && (state.arenaBadges || 0) < 8) {
-    state.arenaBadges = (state.arenaBadges || 0) + 1;
-    toast("🏅 Neues Badge erhalten! (" + state.arenaBadges + "/8)");
+  // Orden nur bei Arenaleiter-Kämpfen – und nur beim ersten Sieg gegen diesen Leiter
+  if (isGym) {
+    const N = b.leaderIdx + 1;
+    if ((state.gymProgress || 0) < N) {
+      state.gymProgress = N;
+      state.arenaBadges = Math.max(state.arenaBadges || 0, N);
+      toast("🏅 Arena-Orden erhalten! (" + state.arenaBadges + "/8)");
+    }
   }
 
-  // Münzen-Belohnung: 30–60 Münzen je nach Trainer-Level
-  const coinReward = 30 + (state.trainer ? state.trainer.level * 2 : 0);
+  // Münzen-Belohnung: Arenaleiter geben mehr
+  const coinReward = (isGym ? 60 : 30) + (state.trainer ? state.trainer.level * 2 : 0);
   state.coins = (state.coins || 0) + coinReward;
 
   // EXP für alle Spieler-Pokémon die noch stehen
-  const expGain = 40 + b.enemyTeam.reduce((s, e) => s + e.level, 0);
+  const expGain = (isGym ? 60 : 40) + b.enemyTeam.reduce((s, e) => s + e.level, 0);
   grantTeamExp(expGain, true);
 
   b.log.push({
@@ -5181,7 +5094,12 @@ function renderArenaBattle() {
       '<div style="text-align:center;font-size:10px;color:' + (won ? "#50c878" : "#e04038") +
       ';margin:8px 0">' + (won ? "🏆 SIEG!" : "💀 NIEDERLAGE") + '</div>' +
       '<button class="btn" style="margin-top:6px" onclick="endArenaBattle()">Schließen</button>';
-    if (won) {
+    if (b.mode === "gym") {
+      // Zurück ins Arena-Menü (nächsten Leiter wählen)
+      resultHTML +=
+        '<button class="btn green" style="margin-top:6px" ' +
+        'onclick="CITY.battle=null;renderArenaMenu()">Zur Arena</button>';
+    } else if (won) {
       resultHTML +=
         '<button class="btn green" style="margin-top:6px" ' +
         'onclick="CITY.battle=null;startArenaBattle()">Nochmal kämpfen</button>';
@@ -5275,11 +5193,22 @@ function initBattle() {
     "border:3px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.4)";
   lb.onclick = legendAttack;
   document.getElementById("battle").appendChild(lb);
+  // ANGELN-Button (Phase 3b) – erscheint, wenn ein Team-Pokémon am Wasser wartet
+  const fb = document.createElement("button");
+  fb.id = "fish-btn";
+  fb.textContent = "🎣 ANGELN";
+  fb.style.cssText = "position:absolute;bottom:44px;right:8px;z-index:6;display:none;" +
+    "font-family:inherit;font-size:9px;color:#fff;background:linear-gradient(180deg,#38b0e0,#1868a8);" +
+    "border:3px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.4)";
+  fb.onclick = startFishing;
+  document.getElementById("battle").appendChild(fb);
+  BT.fishBtn = fb;
   updateZoneUI();
   ensureMap();
   syncFighters();
   BT.cam.x = Math.max(0, Math.min(BT.mapW - BT.W, BT.mapW / 2 - BT.W / 2));
   BT.cam.y = Math.max(0, Math.min(BT.mapH - BT.H, BT.mapH / 2 - BT.H / 2));
+  // Start-Tab ist "habits" → Battle-Canvas sichtbar → Loop starten
   startBattleLoop();
 }
 function resizeBattle() {
@@ -5343,6 +5272,97 @@ function spawnWild(now) {
   BT.wilds.push(w);
   getPokemonData(dex).then(d => { w.name = d.name; w.types = d.types; });
 }
+
+/* =====================================================================
+   ANGELN (Phase 3b)
+   ===================================================================== */
+// Steht mindestens ein (nicht besiegtes) Team-Pokémon direkt an einem Wasser-Tile (Typ 5)?
+function anyFighterNearWater() {
+  const ts = BT.tileSize;
+  for (const f of BT.fighters) {
+    if (f.faintT > 0) continue;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (tileIdAt(f.wx + dc * ts, f.wy + dr * ts) === 5) return true;
+    }
+  }
+  return false;
+}
+
+// Prüft jeden Frame Voraussetzungen & Button-Sichtbarkeit, steuert die Wartephase
+const FISH_COOLDOWN_MS = 5 * 60 * 1000;   // 5 Minuten
+function updateFishing(dt, now) {
+  // Laufende 10-s-Wartephase
+  if (BT.fishing) {
+    if (BT.fishBtn) BT.fishBtn.style.display = "none";
+    BT.fishWaitT -= dt;
+    if (BT.fishWaitT <= 0) resolveFishing(now);
+    return;
+  }
+  // Angeln nur in Gras-/Meer-Biomen, mit Team, außerhalb eines Legenden-Events, Cooldown vorbei
+  const biome  = BT.mapBiome;
+  const cooled = (Date.now() - (state.lastFishTime || 0)) >= FISH_COOLDOWN_MS;
+  const canFish = (biome === "grass" || biome === "sea") && state.team.length && !BT.legendActive && cooled;
+  if (!canFish) {
+    BT.fishTimer = 0;
+    if (BT.fishReady) { BT.fishReady = false; if (BT.fishBtn) BT.fishBtn.style.display = "none"; }
+    return;
+  }
+  // Zeit am Wasser aufaddieren (Reset, sobald kein Pokémon mehr am Wasser steht)
+  if (anyFighterNearWater()) BT.fishTimer += dt; else BT.fishTimer = 0;
+  const ready = BT.fishTimer >= 3;
+  if (ready !== BT.fishReady) {
+    BT.fishReady = ready;
+    if (BT.fishBtn) BT.fishBtn.style.display = ready ? "block" : "none";
+  }
+}
+
+function startFishing() {
+  if (BT.fishing || !BT.fishReady) return;
+  BT.fishing   = true;
+  BT.fishWaitT = 10;
+  BT.fishReady = false;
+  BT.fishTimer = 0;
+  if (BT.fishBtn) BT.fishBtn.style.display = "none";
+  addLog("🎣 Angel ausgeworfen – warte auf einen Biss …");
+  toast("🎣 Angel ausgeworfen! Warte ~10 s …");
+}
+
+function resolveFishing(now) {
+  BT.fishing   = false;
+  BT.fishTimer = 0;
+  state.lastFishTime = Date.now();   // Cooldown startet
+  save();
+  spawnFishWild(now);
+}
+
+// Erzeugt ein wildes Wasser-Pokémon direkt beim Lead-Pokémon (sofort im Kampf)
+function spawnFishWild(now) {
+  const zone = zoneById(state.currentZone);
+  const dex  = pick(fishPoolForZone(zone.id));
+  state.seen = state.seen || {}; state.seen[dex] = true;
+  const avg   = state.team.length ? Math.max(3, Math.round(teamLevelSum() / state.team.length)) : 5;
+  const level = Math.max(3, Math.round(avg * (0.8 + Math.random() * 0.5)));
+  const maxHp = 20 + level * 3;
+  const speed = 20 + Math.random() * 8;
+  // Begehbare Position nahe am Lead-Pokémon (damit sofort entdeckt)
+  const lead = BT.fighters[0];
+  let sx = BT.mapW / 2, sy = BT.mapH / 2;
+  if (lead) {
+    const p = findWalkableNear(lead.wx + (Math.random() < .5 ? -1 : 1) * 28,
+                               lead.wy + (Math.random() < .5 ? -1 : 1) * 28);
+    sx = p.x; sy = p.y;
+  }
+  const w = { dex, level, name: "#" + dex, types: [], wx: sx, wy: sy, dir: -1, speed,
+    discovered: true, hp: maxHp, maxHp, cd: 2600, hitFlash: 0,
+    catchWindowNotified: false, catchWindowOpen: false, catchWindowTimer: 0, fished: true };
+  BT.wilds.push(w);
+  getPokemonData(dex).then(d => {
+    w.name = d.name; w.types = d.types;
+    addLog("🎣 Ein wildes " + d.name + " beißt an!");
+    toast("🎣 Ein wildes " + d.name + " beißt an!");
+  });
+}
+
 const WILD_TARGET = 12;   // Zielanzahl gleichzeitiger Wilder auf der Karte
 function ensureWildCount(now) {
   if (!state.team.length) return;
@@ -5476,8 +5496,7 @@ function doAttack(f) {
   const crit = Math.random() < critChance;
   // Physisch → nutzt Atk-Stat, Speziell → nutzt SpAtk-Stat
   const isSpecial = (move.category === "special");
-  let statBase    = isSpecial ? (f.data.spAtk || 60) : (f.data.atk || 60);
-  statBase *= isSpecial ? megaSpAtkMultiplier(m) : megaAtkMultiplier(m); // Mega-Boost
+  const statBase  = isSpecial ? (f.data.spAtk || 60) : (f.data.atk || 60);
   // Formel: level-Anteil + stat-Skalierung + power-Multiplikator
   let dmg = (3 + m.level * 0.4 + statBase * 0.05) * ((move.power || 40) / 50) * eff * (crit ? 1.5 : 1);
   dmg *= happinessMultiplier(m); // Zuneigung des Angreifers
@@ -5627,25 +5646,27 @@ function hideMovePicker() {
 
 /* ---- Game-Loop ---- */
 function battleLoop(ts) {
-  if (!BT.running) return;                       // pausiert (City-Tab aktiv oder App im Hintergrund)
+  if (!BT.running) return;        // Loop pausiert (Battle-Tab unsichtbar)
   const dt = Math.min(0.05, (ts - (BT.last || ts)) / 1000);
   BT.last = ts;
   updateBattle(dt, ts);
   drawBattle(ts);
-  requestAnimationFrame(battleLoop);
+  BT.raf = requestAnimationFrame(battleLoop);
 }
 
-// Start/Stop analog zu startCityLoop()/stopCityLoop().
-// Läuft nur, wenn die Battle-Karte sichtbar ist (nicht auf dem Stadt-Tab)
-// UND die App im Vordergrund ist.
+/* Battle-Loop starten (nur wenn Battle-Canvas sichtbar) */
 function startBattleLoop() {
-  if (BT.running) return;
+  if (BT.running || !BT.cv) return;
   BT.running = true;
-  BT.last = 0;                                   // dt-Reset, damit kein Riesen-dt entsteht
-  requestAnimationFrame(battleLoop);
+  BT.last = 0;                    // dt-Baseline zurücksetzen → kein riesiges dt
+  BT.raf = requestAnimationFrame(battleLoop);
 }
+
+/* Battle-Loop stoppen (Tab unsichtbar / City überlagert) */
 function stopBattleLoop() {
   BT.running = false;
+  if (BT.raf) { cancelAnimationFrame(BT.raf); BT.raf = null; }
+  if (BT.fishBtn) BT.fishBtn.style.display = "none";   // Angel-Button ausblenden
 }
 
 function updateBattle(dt, now) {
@@ -5684,6 +5705,9 @@ function updateBattle(dt, now) {
 
   // Kamera rahmt Team-Anker (und im Kampf zusätzlich das fokussierte Wild)
   updateCamera();
+
+  // Angeln: Button-Sichtbarkeit & Wartephase
+  updateFishing(dt, now);
 
   // Ball-Animation
   if (BT.ballAnim && BT.wild) {
@@ -5725,28 +5749,56 @@ function updateLegendButton() {
 }
 
 /* ---- Mehrere parallele 1v1-Kämpfe: Team bleibt als Gruppe zusammen (Anker führt, Follower an der Leine) ---- */
-const LEASH = 100;          // Follower bekämpfen nur Wilde in diesem Radius um den Anker
-function updateWildBattles(dt, now) {
-  const anchor = BT.fighters.find(f => f.faintT <= 0) || BT.fighters[0];
-  const acx = anchor ? anchor.wx : BT.mapW / 2, acy = anchor ? anchor.wy : BT.mapH / 2;
+// Liegt ein Wild im sichtbaren Kampffenster (Kamera-Viewport, optional mit Rand)?
+function wildInView(wd, margin) {
+  margin = margin || 0;
+  const sx = wd.wx - BT.cam.x, sy = wd.wy - BT.cam.y;
+  return sx >= -margin && sx <= BT.W + margin && sy >= -margin && sy <= BT.H + margin;
+}
 
-  // 1) Zielzuweisung: freier Kämpfer nimmt das nächste freie, nicht-legendäre Wild.
-  //    Anker darf überall jagen (führt), Follower nur Wilde nahe am Anker → Gruppe bleibt zusammen.
+function updateWildBattles(dt, now) {
+  // Anführer ist immer fighters[0], unabhängig vom faintT-Status
+  // (damit der Ankerpunkt stabil bleibt — nicht dynamisch per faintT-Filter)
+  const leader = BT.fighters[0];
+  const slot1  = BT.fighters[1] || null;
+  const slot2  = BT.fighters[2] || null;
+
+  // ---- Zielzuweisung: Slot-basiert, nicht Distanz-basiert ----
+  // Slot 0 → nächstes freies Wild (überall auf der Karte)
+  // Slot 1 → nächstes freies Wild (nur wenn Slot 0 bereits ein Ziel hat oder kämpft)
+  // Slot 2 → nächstes freies Wild (nur wenn Slot 0 und 1 bereits Ziele haben)
+  // Geklaime Wilds werden nicht doppelt vergeben.
+
   const claimed = new Set();
-  BT.fighters.forEach(f => { if (f.faintT <= 0 && f.target) claimed.add(f.target); });
-  BT.fighters.forEach(f => {
+  BT.fighters.forEach(f => { if (f.faintT <= 0 && f.target && f.target.hp > 0 && BT.wilds.includes(f.target)) claimed.add(f.target); });
+
+  BT.fighters.forEach((f, slotIdx) => {
     if (f.faintT > 0) { f.target = null; return; }
-    const isAnchor = f === anchor;
+
+    // Ziel-Gültigkeit prüfen
     if (f.target) {
-      const gone = f.target.hp <= 0 || BT.wilds.indexOf(f.target) < 0;
-      const tooFar = !isAnchor && Math.hypot(f.target.wx - acx, f.target.wy - acy) > LEASH + 30;
-      if (gone || tooFar) { claimed.delete(f.target); f.target = null; }
+      const gone = f.target.hp <= 0 || !BT.wilds.includes(f.target);
+      if (gone) { claimed.delete(f.target); f.target = null; }
     }
+
+    // Kein Ziel → neues suchen
     if (!f.target) {
+      // Slot 1 sucht nur, wenn Slot 0 bereits kämpft oder wartet
+      // Slot 2 sucht nur, wenn Slot 0 UND Slot 1 bereits kämpfen oder warten
+      const leaderEngaged = leader && (leader.target || BT.anchorWaiting);
+      const slot1Engaged  = !slot1 || slot1.target || slot1.faintT > 0;
+
+      if (slotIdx === 1 && !leaderEngaged) return;   // Slot 1 wartet auf Anführer
+      if (slotIdx === 2 && (!leaderEngaged || !slot1Engaged)) return; // Slot 2 wartet auf Slot 0+1
+
+      // Slot 1 & 2 dürfen NUR Wilde angreifen, die im Kampffenster (Kamera-Viewport)
+      // sichtbar sind bzw. gerade hineinkommen → das Team bleibt komplett im Bild.
+      // Slot 0 (Anführer) jagt weiterhin frei und führt die Gruppe.
+      const windowOnly = (slotIdx === 1 || slotIdx === 2);
       let best = null, bd = Infinity;
       for (const wd of BT.wilds) {
         if (wd.legendary || claimed.has(wd)) continue;
-        if (!isAnchor && Math.hypot(wd.wx - acx, wd.wy - acy) > LEASH) continue; // Follower: nur nahe Wilde
+        if (windowOnly && !wildInView(wd, 24)) continue; // nur Wilde im/am Kampffenster
         const d = Math.hypot(wd.wx - f.wx, wd.wy - f.wy);
         if (d < bd) { bd = d; best = wd; }
       }
@@ -5754,23 +5806,60 @@ function updateWildBattles(dt, now) {
     }
   });
 
-  // 2) Bewegung + Angriff je Kämpfer; fangbares Wild mit niedrigstem HP-Anteil fürs Ball-Menü merken
+  // ---- Warte-Logik für den Anführer ----
+  // Hat der Anführer kein Ziel mehr, aber Follower kämpfen noch?
+  const followersFighting = BT.fighters.slice(1).some(f => f.faintT <= 0 && f.target && f.target.hp > 0);
+
+  if (leader && leader.faintT <= 0 && !leader.target) {
+    if (followersFighting) {
+      // Anführer ist fertig, Follower kämpfen noch → Wartezustand
+      if (!BT.anchorWaiting) {
+        BT.anchorWaiting = true;
+        BT.anchorWaitPos = { wx: leader.wx, wy: leader.wy };
+      }
+    } else {
+      // Alle fertig → Wartezustand aufheben
+      BT.anchorWaiting = false;
+      BT.anchorWaitPos = null;
+    }
+  } else if (leader && leader.target) {
+    // Anführer kämpft → kein Wartezustand
+    BT.anchorWaiting = false;
+    BT.anchorWaitPos = null;
+  }
+
+  // Ankerpunkt: Wenn Anführer wartet, bleibt anchorWaitPos fix → Follower-Kämpfe werden NICHT abgebrochen
+  const acx = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wx : (leader ? leader.wx : BT.mapW / 2);
+  const acy = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wy : (leader ? leader.wy : BT.mapH / 2);
+
+  // ---- Bewegung + Angriff je Kämpfer ----
   let focus = null, focusRatio = Infinity;
-  BT.fighters.forEach(f => {
+
+  BT.fighters.forEach((f, slotIdx) => {
     if (f.faintT > 0) return;
     const w = f.target;
+
     if (!w) {
       f.hp = Math.min(f.maxHp, f.hp + 4 * dt);
-      if (f === anchor) { patrol(f, dt); }                  // Anker streift & führt die Gruppe
-      else if (Math.hypot(f.wx - acx, f.wy - acy) > 70) approach(f, acx, acy, 58 * dt); // zum Team aufschließen
-      else patrolNear(f, acx, acy, 55, dt);                 // locker beim Team bleiben
+      if (slotIdx === 0) {
+        if (BT.anchorWaiting && BT.anchorWaitPos) {
+          // Anführer wartet: bleibt an seiner Warteposition stehen (kleine Idle-Bewegung)
+          patrolNear(f, BT.anchorWaitPos.wx, BT.anchorWaitPos.wy, 30, dt);
+        } else {
+          patrol(f, dt);   // Anführer streift normal
+        }
+      } else {
+        // Follower ohne Ziel: zum Anker aufschließen
+        if (Math.hypot(f.wx - acx, f.wy - acy) > 70) approach(f, acx, acy, 58 * dt);
+        else patrolNear(f, acx, acy, 55, dt);
+      }
       return;
     }
+
     const dist = Math.hypot(f.wx - w.wx, f.wy - w.wy);
     if (!w.discovered && dist < 90) { w.discovered = true; addLog("Ein wildes " + w.name + " erscheint!"); }
-    if (dist > 36) approach(f, w.wx, w.wy, 58 * dt); // nur bis auf Angriffsreichweite heran
+    if (dist > 36) approach(f, w.wx, w.wy, 58 * dt);
     if (dist < 40) {
-      // Catch-Window-Timer herunterzählen
       if (w.catchWindowOpen) {
         w.catchWindowTimer -= dt;
         if (w.catchWindowTimer <= 0) {
@@ -5778,29 +5867,37 @@ function updateWildBattles(dt, now) {
           if (w.hp > 0) addLog(w.name + ": Fangfenster vorbei!");
         }
       }
-      // Angriff sperren während Catch-Window offen oder Ball in der Luft
       const blocked = w.catchWindowOpen || BT.ballAnim;
       if (!blocked) {
         f.cd -= dt * 1000;
         if (f.cd <= 0) { f.cd = 1200; doAttack(f); }
       }
     }
-    if (w.hp > 0 && w.discovered) { const rr = w.hp / w.maxHp; if (rr < 0.35 && rr < focusRatio) { focusRatio = rr; focus = w; } }
+    if (w.hp > 0 && w.discovered) {
+      const rr = w.hp / w.maxHp;
+      if (rr < 0.35 && rr < focusRatio) { focusRatio = rr; focus = w; }
+    }
   });
 
-  // 3) Jedes entdeckte Wild greift seinen Gegner an
+  // ---- Wilde greifen ihre jeweiligen Gegner an ----
   BT.wilds.forEach(w => {
     if (w.legendary || !w.discovered || w.hp <= 0) return;
     w.hitFlash = Math.max(0, w.hitFlash - dt);
     const opp = BT.fighters.find(f => f.target === w && f.faintT <= 0);
     if (!opp || BT.ballAnim) return;
     const dx = opp.wx - w.wx, dy = opp.wy - w.wy, d = Math.hypot(dx, dy) || 1;
-    if (d > 36) { const s = Math.min(w.speed * dt, d), nx = w.wx + dx / d * s, ny = w.wy + dy / d * s; if (isWalkable(nx, w.wy)) w.wx = nx; if (isWalkable(w.wx, ny)) w.wy = ny; w.dir = dx < 0 ? -1 : 1; }
+    if (d > 36) {
+      const s = Math.min(w.speed * dt, d);
+      const nx = w.wx + dx / d * s, ny = w.wy + dy / d * s;
+      if (isWalkable(nx, w.wy)) w.wx = nx;
+      if (isWalkable(w.wx, ny)) w.wy = ny;
+      w.dir = dx < 0 ? -1 : 1;
+    }
     w.cd -= dt * 1000;
     if (w.cd <= 0 && d < 48) { w.cd = 2600 + Math.random() * 600; wildHit(w, opp); }
   });
 
-  // 4) Fokussiertes fangbares Wild fürs Ball-Menü (während Wurf-Animation nicht wechseln)
+  // ---- Fangbares Wild für Ball-Menü ----
   if (!BT.ballAnim) {
     BT.wild = focus;
     BT.activeFighterUid = focus ? (BT.fighters.find(f => f.target === focus) || {}).uid : null;
@@ -6119,6 +6216,11 @@ function repositionFighters() {
     f.wx = p.x; f.wy = p.y; newPatrolTargetWorld(f);
   });
   BT.wilds = []; BT.wild = null; BT.activeFighterUid = null; BT.combatPause = -1;
+  BT.anchorWaiting = false;
+  BT.anchorWaitPos = null;
+  // Angel-Status zurücksetzen (Biome/Zone hat gewechselt)
+  BT.fishing = false; BT.fishTimer = 0; BT.fishReady = false;
+  if (BT.fishBtn) BT.fishBtn.style.display = "none";
   BT.cam.x = Math.max(0, Math.min(BT.mapW - BT.W, BT.mapW / 2 - BT.W / 2));
   BT.cam.y = Math.max(0, Math.min(BT.mapH - BT.H, BT.mapH / 2 - BT.H / 2));
 }
@@ -7634,7 +7736,7 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
   // Modal könnte inzwischen geschlossen worden sein
   if (!document.getElementById("mon-detail-modal").classList.contains("open")) return;
 
-  const spriteUrl = SPRITE(monSpriteId(mon), mon.shiny);
+  const spriteUrl = SPRITE(mon.dex, mon.shiny);
   const displayName = monName(mon, pdata.name);
 
   const tabs = [
@@ -7890,47 +7992,9 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
       '</div>';
   }
 
-  // Mega-Evolution-Block (nur für Mega-fähige Pokémon)
-  let megaEvoHTML = "";
-  if (MEGA_MAP[mon.dex]) {
-    const megaInfo = MEGA_MAP[mon.dex];
-    const active = isMegaActive(mon);
-    const remainingH = active ? Math.ceil((mon.megaUntil - Date.now()) / 3600000) : 0;
-    const megaSprite = SPRITE(megaInfo.megaDex, false);
-
-    megaEvoHTML =
-      '<div style="height:10px"></div>' +
-      '<label style="font-size:8px;color:#606050;display:block;margin-bottom:4px">Mega-Evolution</label>' +
-      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
-        '<img src="' + megaSprite + '" alt="" style="width:48px;height:48px;image-rendering:pixelated' +
-          (active ? '' : ';filter:grayscale(1);opacity:.5') + '" onerror="this.style.opacity=.2">' +
-        '<div>' +
-          '<div style="font-size:8px;color:' + (active ? '#c060d8' : 'var(--white)') + '">' +
-            esc(megaInfo.name) +
-            (active ? '<span class="mega-stone-badge">AKTIV</span>' : '') +
-          '</div>' +
-          '<div style="font-size:7px;color:#909080">' +
-            (active
-              ? '⏱ Noch ~' + remainingH + 'h aktiv · ATK ×1.3 · SP.ATK ×1.2'
-              : (mon.megaStone
-                  ? '💎 Mega-Stein verfügbar'
-                  : '🎯 ' + (mon.focusSessionCount || 0) + '/10 Fokus-Sessions')) +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      (mon.megaStone && !active
-        ? '<button class="btn" style="background:linear-gradient(135deg,#3060a8,#c060d8);margin-bottom:4px"' +
-          ' onclick="activateMegaEvolution(\'' + mon.uid + '\')">💎 Mega-Entwickeln!</button>'
-        : '') +
-      (active
-        ? '<div style="font-size:7px;color:#909080;text-align:center">Wird durch Fokus-Sessions täglich erneuert.</div>'
-        : '');
-  }
-
   const inTeam = state.team.includes(mon.uid);
   const footer =
     stoneEvoHTML +
-    megaEvoHTML +
     '<div style="height:10px"></div>' +
     (inTeam
       ? '<button class="btn" onclick="toggleTeam(\'' + mon.uid + '\');renderMonDetailModal(getMon(\'' + mon.uid + '\'),\'' + activeTab + '\')">Aus Team nehmen</button>'
@@ -8412,6 +8476,7 @@ document.getElementById("city-modal-bg").addEventListener("click", e => {
 
 loadAll();
 currentDay = todayStr();
+freezePausedStreaks();   // pausierte Tages-Streaks beim Start einfrieren
 ensureTodayStats();
 updateHeader();
 renderAll();
@@ -8425,20 +8490,6 @@ if (!state.trainer) {
   startOnboarding();          // Erststart → Onboarding
 } else {
   checkWeeklyEvent();         // Legenden-Event der Woche prüfen
-}
-
-// Hängende Fokus-Session wiederherstellen (App war zwischenzeitlich geschlossen)
-if (state.focus) {
-  const remaining = state.focus.durationMs - (Date.now() - state.focus.startTime);
-  if (remaining > 0) {
-    // Session noch aktiv → Overlay sofort öffnen
-    openFocusOverlay();
-    renderFocusActive();
-  } else {
-    // Zeit während geschlossener App abgelaufen → als abgeschlossen behandeln
-    openFocusOverlay();
-    setTimeout(() => completeFocusSession(), 100);
-  }
 }
 </script>
 </body>
