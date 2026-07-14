@@ -139,6 +139,7 @@ h2:first-child{margin-top:0}
   margin-top:16px;padding:12px;
   background:var(--panel,#fff);border:3px solid var(--line);border-radius:10px;
 }
+#tab-analyse h2{margin-top:18px}
 .backup-box h3{font-size:10px;margin:0 0 6px}
 .backup-box p{font-size:8px;line-height:1.5;color:#555;margin:0 0 10px}
 .backup-btns{display:flex;flex-direction:column;gap:0}
@@ -205,10 +206,7 @@ h2:first-child{margin-top:0}
   overflow:hidden;touch-action:manipulation;
 }
 #battle canvas{display:block;width:100%;height:100%}
-#battle .route-label{
-  position:absolute;top:4px;left:8px;font-size:7px;color:#e8ffe0;
-  text-shadow:1px 1px 0 rgba(0,0,0,.5);z-index:2;pointer-events:none;
-}
+#battle .route-label{display:none}
 #move-label{
   position:absolute;bottom:8px;left:8px;z-index:3;display:none;
   font-size:8px;color:#fff;background:rgba(24,32,40,.85);
@@ -246,41 +244,6 @@ h2:first-child{margin-top:0}
   border:2px solid rgba(0,0,0,.4);border-radius:5px;line-height:1.5;
 }
 
-/* ===== CITY CANVAS (überlagert #battle) ===== */
-#city {
-  position: fixed;
-  bottom: 56px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  height: 200px;
-  z-index: 16;            /* einen höher als #battle (z-index:15) */
-  border-top: 3px solid var(--line);
-  background: #78c850;
-  overflow: hidden;
-  touch-action: none;
-}
-#city canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-#city-dialog {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  right: 8px;
-  z-index: 3;
-  font-size: 8px;
-  color: var(--ink);
-  background: var(--panel);
-  border: 3px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 10px;
-  line-height: 1.8;
-}
-
 /* ===== City Modal ===== */
 #city-modal h3 {
   font-size: 10px;
@@ -288,10 +251,45 @@ h2:first-child{margin-top:0}
   color: #a02820;
 }
 /* shop-grid und shop-card sind bereits definiert — keine Dopplung */
-/* Sicherstellen dass city-modal-bg über dem city-canvas liegt */
+/* city-modal-bg liegt über allem */
 #city-modal-bg {
-  z-index: 60;   /* über allem — city ist z-index:16 */
+  z-index: 60;
 }
+
+/* ===== City-Menü ===== */
+.city-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.city-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--panel);
+  border: 3px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 12px;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 2px 0 rgba(0,0,0,.35);
+  font-family: inherit;
+  color: var(--white);
+  transition: transform .08s;
+}
+.city-menu-btn:active { transform: translateY(2px); box-shadow: none; }
+.city-menu-btn--available {
+  border-color: var(--hpgreen);
+  background: linear-gradient(135deg, var(--panel) 70%, rgba(80,200,120,.15));
+}
+.city-menu-btn--claimed {
+  opacity: 0.55;
+}
+.city-menu-icon { font-size: 28px; flex: none; }
+.city-menu-label { font-size: 10px; color: var(--white); margin-bottom: 3px; }
+.city-menu-hint  { font-size: 7px;  color: #8898b0; line-height: 1.6; }
 
 /* ===== Bottom nav ===== */
 nav{
@@ -598,7 +596,7 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 
 /* ===== Zonen-Wechsel (Canvas) ===== */
 #zone-switch{
-  position:absolute;top:2px;right:8px;z-index:3;display:flex;align-items:center;gap:4px;
+  position:absolute;top:2px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:4px;
   background:rgba(24,32,40,.8);border:2px solid var(--line);border-radius:6px;padding:2px 4px;
 }
 #zone-switch button{
@@ -721,6 +719,83 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border-color: var(--line); cursor: not-allowed;
 }
 .pp-edit-btn { background: var(--bg2); color: var(--white); }
+
+/* ===== Aufgaben-Panel ===== */
+#tasks-panel { padding: 0; overflow: hidden; }
+#tasks-panel .dl-header #tasks-toggle-icon { margin-left: auto; font-size: 10px; }
+#tasks-panel.collapsed #tasks-toggle-icon { transform: rotate(-90deg); display: inline-block; }
+#tasks-status-icons { font-size: 9px; letter-spacing: 1px; margin-left: 4px; }
+#tasks-body { padding: 10px; }
+#tasks-panel.collapsed #tasks-body { display: none; }
+
+.task-add-btn { margin-bottom: 10px; width: 100%; }
+
+.task-card {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--bg); border: 2px solid var(--line);
+  border-radius: 6px; padding: 8px; margin-bottom: 6px;
+}
+.task-card.done-card { opacity: 0.5; }
+.task-check {
+  width: 22px; height: 22px; flex: none;
+  border: 3px solid var(--line); border-radius: 5px;
+  background: var(--panel2); color: var(--ink);
+  font-size: 13px; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-check.checked { background: var(--hpgreen); border-color: #287848; color: #fff; }
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-size: 9px; color: var(--white); margin-bottom: 3px; word-break: break-word; }
+.task-title.done-text { text-decoration: line-through; color: #606060; }
+.task-due { font-size: 7px; margin-bottom: 4px; }
+.task-due--overdue { color: #e04038; }
+.task-due--today    { color: var(--gold); }
+.task-due--future   { color: #8898b0; }
+.task-actions { flex: none; display: flex; gap: 5px; }
+.task-edit-btn {
+  font-family: inherit; font-size: 9px;
+  border: 2px solid var(--line); border-radius: 6px;
+  padding: 5px 7px; cursor: pointer;
+  background: var(--bg2); color: var(--white);
+}
+
+.subtask-list { margin-top: 5px; padding-left: 4px; }
+.subtask-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 4px;
+}
+.subtask-check {
+  width: 16px; height: 16px; flex: none;
+  border: 2px solid var(--line); border-radius: 4px;
+  background: var(--panel2); color: var(--ink);
+  font-size: 10px; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.subtask-check.checked { background: var(--hpgreen); border-color: #287848; color: #fff; }
+.subtask-title { font-size: 8px; color: #a8b8c8; }
+.subtask-title.done-text { text-decoration: line-through; color: #606060; }
+
+.task-done-section { margin-top: 10px; }
+.task-done-header {
+  font-size: 7px; color: #606060; cursor: pointer;
+  margin-bottom: 5px; user-select: none;
+}
+
+/* Modal-Subtask-Liste */
+.modal-subtask-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 5px;
+}
+.modal-subtask-input {
+  flex: 1; font-family: inherit; font-size: 10px;
+  border: 2px solid var(--line); border-radius: 5px;
+  padding: 5px; background: #fff; color: var(--ink);
+}
+.modal-subtask-remove {
+  font-family: inherit; font-size: 9px; color: var(--white);
+  border: 2px solid var(--line); border-radius: 5px;
+  padding: 4px 7px; background: var(--red); cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -757,6 +832,16 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
         </div>
       </div>
 
+      <div class="panel dark" id="tasks-panel">
+        <div class="dl-header" onclick="toggleTasksPanel()">
+          &#9989; AUFGABEN <span id="tasks-toggle-icon">&#9662;</span>
+          <span id="tasks-status-icons"></span>
+        </div>
+        <div id="tasks-body">
+          <!-- wird per renderTasks() befüllt -->
+        </div>
+      </div>
+
       <div id="habit-list"></div>
       <button class="btn green" onclick="openHabitModal()">+ Neuer Habit</button>
 
@@ -768,23 +853,15 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <!-- TAB: TEAM -->
     <section class="tab" id="tab-team">
       <div id="trainer-card"></div>
-      <div class="panel dark" id="week-stats"></div>
 
       <h2>&#9654; Dein Team (max. 3)</h2>
-      <p class="muted" style="margin-bottom:10px">Team-Pokémon leveln passiv: ca. 3 Level pro Tag. Jeder erledigte Habit gibt sofort +0.5 Level. Unten auf Route 1 kämpft dein Team gegen wilde Pokémon – tippe ein Team-Pokémon auf dem Feld an, um seinen nächsten Move zu wählen!</p>
+      <p class="muted" style="margin-bottom:10px">Team-Pokémon leveln passiv: ca. 3 Level pro Tag. Jeder erledigte Habit gibt sofort +0.5 Level.</p>
       <div id="team-list"></div>
 
-      <h2>&#9654; Sichtungen</h2>
-      <div class="panel dark"><div class="log" id="encounter-log"><div>Noch keine Sichtungen …</div></div></div>
-
-      <h2>&#9654; ⚙️ Einstellungen</h2>
-      <div class="settings-btns">
-        <button class="btn" onclick="openTrainerModal()">✎ Trainer-Name ändern</button>
-        <button class="btn green" onclick="exportData()">📤 Daten exportieren</button>
-        <button class="btn" onclick="document.getElementById('import-file').click()">📥 Daten importieren</button>
-        <input type="file" id="import-file" accept="application/json" style="display:none" onchange="importData(event)">
-        <button class="btn red" onclick="resetAll()">🗑 Alles zurücksetzen</button>
-      </div>
+      <h2>&#9654; Pokémon-Box</h2>
+      <p class="muted" style="margin-bottom:10px">Tippe ein Pokémon an, um Details zu sehen, es umzubenennen und zwischen Team &amp; Box zu tauschen.</p>
+      <div class="box-grid" id="box-grid"></div>
+      <div id="box-empty" class="empty-slot" style="margin-top:10px">Deine Box ist leer. Hake Habits ab, um Pokémon zu fangen!</div>
     </section>
 
     <!-- TAB: BOX -->
@@ -792,11 +869,6 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <h2>&#9654; Items</h2>
       <p class="muted" style="margin-bottom:8px">Bälle wirfst du direkt auf Route 1, sobald ein wildes Pokémon unter 35% HP fangbar wird (grüner Rahmen).</p>
       <div id="item-list"></div>
-
-      <h2>&#9654; Pokémon-Box</h2>
-      <p class="muted" style="margin-bottom:10px">Tippe ein Pokémon an, um Details zu sehen, es umzubenennen und zwischen Team &amp; Box zu tauschen.</p>
-      <div class="box-grid" id="box-grid"></div>
-      <div id="box-empty" class="empty-slot" style="margin-top:10px">Deine Box ist leer. Hake Habits ab, um Pokémon zu fangen!</div>
     </section>
 
     <!-- TAB: POKÉDEX -->
@@ -813,17 +885,19 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 
     <!-- TAB: ANALYSE -->
     <section class="tab" id="tab-analyse">
+      <h2>&#9654; DIESE WOCHE</h2>
+      <div class="panel dark" id="week-stats"></div>
+
       <h2>&#9654; TRAINER-ANALYSE</h2>
       <div id="analyse-content"></div>
-      <!-- Datensicherung: Backup exportieren / importieren -->
-      <div class="backup-box">
-        <h3>&#128190; DATENSICHERUNG</h3>
-        <p>Sichere deinen Fortschritt als Datei oder stelle ihn wieder her.</p>
-        <div class="backup-btns">
-          <button class="btn green" onclick="exportBackup()">&#11015; Backup exportieren</button>
-          <button class="btn" onclick="document.getElementById('import-file').click()">&#11014; Backup importieren</button>
-        </div>
-        <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
+
+      <div class="backup-box" id="settings-backup-box">
+        <h3>⚙️ EINSTELLUNGEN &amp; DATENSICHERUNG</h3>
+        <button class="btn" onclick="openTrainerModal()">✎ Trainer-Name ändern</button>
+        <button class="btn green" onclick="exportBackup()">📤 Daten exportieren</button>
+        <button class="btn" onclick="document.getElementById('backup-import-file').click()">📥 Daten importieren</button>
+        <input type="file" id="backup-import-file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
+        <button class="btn red" onclick="resetAll()">🗑 Alles zurücksetzen</button>
       </div>
     </section>
   </main>
@@ -843,19 +917,12 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <div id="move-picker"></div>
   </div>
 
-  <!-- City canvas (überlagert #battle, wenn City-Tab aktiv) -->
-  <div id="city" style="display:none">
-    <canvas id="city-canvas"></canvas>
-    <div id="city-dialog" style="display:none"></div>
-  </div>
-
   <!-- Bottom nav -->
   <nav>
     <button class="active" data-tab="habits" onclick="switchTab('habits')"><span class="ic">&#128203;</span>Habits</button>
     <button data-tab="team" onclick="switchTab('team')"><span class="ic">&#9876;&#65039;</span>Team</button>
     <button data-tab="box" onclick="switchTab('box')"><span class="ic">&#127890;</span>Box</button>
     <button data-tab="city" onclick="switchTab('city')"><span class="ic">🏙️</span>Stadt</button>
-    <button data-tab="dex" onclick="switchTab('dex')"><span class="ic">&#128214;</span>Dex</button>
     <button data-tab="analyse" onclick="switchTab('analyse')"><span class="ic">&#128202;</span>Analyse</button>
   </nav>
 
@@ -1024,6 +1091,26 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <div style="height:12px"></div>
       <button class="btn green" onclick="saveContact()">✓ Eintragen</button>
       <button class="btn" onclick="closeModal('contact-modal')">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Aufgabe anlegen / bearbeiten modal -->
+  <div class="modal-bg" id="task-modal">
+    <div class="modal">
+      <h3 id="task-modal-title">Neue Aufgabe</h3>
+      <label>Titel</label>
+      <input id="task-title-input" maxlength="60" placeholder="z.B. Bewerbung schreiben">
+      <label>Fällig bis (optional)</label>
+      <div class="reminder-row">
+        <input type="date" id="task-due-input">
+        <button type="button" class="mini-btn" onclick="document.getElementById('task-due-input').value=''">✕</button>
+      </div>
+      <div id="task-subtasks-list" style="margin-top:10px"></div>
+      <button class="btn" style="margin-top:6px" onclick="addSubtaskInModal()">+ Unteraufgabe</button>
+      <div style="height:12px"></div>
+      <button class="btn green" onclick="saveTask()">Speichern</button>
+      <button class="btn red" onclick="closeModal('task-modal')">Abbrechen</button>
+      <button class="btn red" id="task-delete-btn" onclick="deleteTask()" style="display:none;margin-top:6px">🗑 Löschen</button>
     </div>
   </div>
 
@@ -1251,6 +1338,19 @@ const TYPE_COLOR = { normal:"#a8a878", fire:"#f08030", water:"#6890f0", grass:"#
   flying:"#a890f0", psychic:"#f85888", bug:"#a8b820", rock:"#b8a038", ghost:"#705898",
   dragon:"#7038f8", dark:"#705848", steel:"#b8b8d0", fairy:"#ee99ac" };
 
+// Statusattacken → stat-Boni { atk, def, spAtk, spDef, speed } als Multiplikator-Deltas
+// Dauer in Sekunden. Name muss exakt dem deutschen Move-Namen aus der PokeAPI entsprechen.
+const STAT_MOVE_EFFECTS = {
+  "Schwertanz":      { dur: 12, atk: 2.0 },
+  "Drachentanz":     { dur: 10, atk: 1.1, speed: 1.1 },
+  "Schnellbewegung": { dur:  8, speed: 2.0 },
+  "Naseweis":        { dur: 10, spAtk: 1.5 },
+  "Härtner":         { dur: 12, def: 1.5 },
+  "Rüstungspolier.": { dur: 10, def: 1.5 },
+  "Rückenwind":      { dur:  8, speed: 2.0 },
+  "Fluch":           { dur: 15, atk: 1.3, def: 1.3, speed: 0.5 }
+};
+
 /* ---------- Volle Typen-Effektivitäts-Tabelle (alle 18 Typen) ----------
    TYPE_CHART[angreifer][verteidiger] = Multiplikator (nur Abweichungen von 1) */
 const TYPE_CHART = {
@@ -1319,11 +1419,23 @@ function defaultState() {
     lastFishTime: 0,   // Zeitstempel des letzten Angel-Versuchs (Cooldown)
     shopSeed: "",      // Datum des aktuellen Shop-Angebots
     shopStock: [],     // Array von 6 item-keys aus SHOP_ITEMS
-    dailyLog: {}      // { "YYYY-MM-DD": { sleep, gym, food, note } }
+    dailyLog: {},     // { "YYYY-MM-DD": { sleep, gym, food, note } }
                       // sleep: { bedtime:"HH:MM", waketime:"HH:MM", feeling:1-5 } | null
                       // gym:   { strength:1-5, feeling:1-5 } | null
                       // food:  { preWorkoutCarbs:bool, kcal:num|null, macro:"high-carb"|"low-carb"|"protein"|"mixed"|null } | null
                       // note:  { text:"", tags:["#legday", ...] } | null
+    tasks: []
+    // Jedes Element hat diese Struktur:
+    // {
+    //   id: string,           // uid()
+    //   title: string,        // max. 60 Zeichen
+    //   dueDate: string|null, // "YYYY-MM-DD" oder null
+    //   done: boolean,        // false = offen, true = erledigt
+    //   doneAt: string|null,  // "YYYY-MM-DD" des Abhakens, oder null
+    //   subtasks: [           // Array, darf leer sein
+    //     { id: string, title: string, done: boolean }
+    //   ]
+    // }
   };
 }
 
@@ -1354,6 +1466,7 @@ function loadAll() {
   if (!state.shopSeed) state.shopSeed = "";
   if (!state.shopStock) state.shopStock = [];
   if (state.dailyLog === undefined) state.dailyLog = {};
+  if (!state.tasks) state.tasks = [];
   if (state.lastSeen === undefined) state.lastSeen = Date.now();
   if (!state.people) state.people = [];
   if (!state.stackBonusGiven) state.stackBonusGiven = {};
@@ -2088,6 +2201,7 @@ function checkDayRollover() {
     freezePausedStreaks();   // pausierte Tages-Streaks einfrieren, bevor Rescue prüft
     ensureTodayStats();
     renderAll();
+    checkDueTasks();
     checkStreakRescue();
     checkWeeklyEvent();
     updateDailyHappiness();
@@ -2396,23 +2510,17 @@ function switchTab(name) {
   document.getElementById("tab-" + name).classList.add("active");
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
 
-  // City-Canvas ein-/ausblenden
-  const cityDiv = document.getElementById("city");
+  // Battle-Loop stoppen wenn City aktiv (kein Canvas-Konflikt mehr nötig,
+  // aber Battle läuft im Hintergrund weiter wenn anderer Tab aktiv ist)
   if (name === "city") {
-    cityDiv.style.display = "block";
-    startCityLoop();
-    stopBattleLoop();          // City überlagert den Battle-Canvas
-  } else {
-    cityDiv.style.display = "none";
-    stopCityLoop();
-    // Battle-Canvas wieder sichtbar → Loop nur bei sichtbarem Dokument starten
-    if (document.visibilityState === "visible") startBattleLoop();
+    renderCityMenu();
   }
+  if (document.visibilityState === "visible") startBattleLoop();
 
   if (name === "habits") renderPeople();
-  if (name === "team") { renderStats(); renderTrainerCard(); }
+  if (name === "team") { renderTrainerCard(); renderTeam(); renderBox(); }
   if (name === "dex") renderDex();
-  if (name === "analyse") renderAnalyse();
+  if (name === "analyse") { renderStats(); renderAnalyse(); }
   // "shop" ist entfernt, "city" braucht kein renderCity() — der Loop übernimmt
 }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
@@ -3570,19 +3678,23 @@ function useCandyOn(uidv) {
    ===================================================================== */
 function refreshShopIfNeeded() {
   const today = todayStr();
-  if (state.shopSeed === today && state.shopStock.length === 6) return;
+  // Bestand für heute nur behalten, wenn er vollständig ist UND den Pokéball enthält
+  // (der Pokéball muss immer verfügbar sein – auch für ältere, vor dieser Regel gespeicherte Bestände).
+  if (state.shopSeed === today && state.shopStock.length === 6 && state.shopStock.includes("pokeball")) return;
   state.shopSeed = today;
   // Seeded Random aus dem Datums-String → jeden Tag ein anderes, aber stabiles Angebot.
   // Positionsgewichteter Seed, damit sich aufeinanderfolgende Tage deutlich unterscheiden.
   let seed = today.split("").reduce((a, c, i) => (a + c.charCodeAt(0) * (i + 1) * 31) % 233280, 7);
   function seededRand() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
   // Echter (seeded) Fisher-Yates-Shuffle – gleichmäßig verteilt, kein verzerrtes sort()
-  const keys = Object.keys(SHOP_ITEMS);
+  // Pokéball ist ausgenommen – er ist immer verfügbar (fester Slot).
+  const keys = Object.keys(SHOP_ITEMS).filter(k => k !== "pokeball");
   for (let i = keys.length - 1; i > 0; i--) {
     const j = Math.floor(seededRand() * (i + 1));
     [keys[i], keys[j]] = [keys[j], keys[i]];
   }
-  state.shopStock = keys.slice(0, 6);
+  // Pokéball fest auf Slot 1, restliche 5 Slots aus dem gemischten Rest.
+  state.shopStock = ["pokeball"].concat(keys.slice(0, 5));
   save();
 }
 
@@ -3684,8 +3796,7 @@ document.addEventListener("visibilitychange", () => {
   } else {
     // Fortsetzen: Offline-Zeit gutschreiben, Loop je nach Tab wieder starten
     processOffline();
-    if (CITY.active) { CITY.last = 0; }          // City-dt-Baseline zurücksetzen
-    else startBattleLoop();
+    startBattleLoop();
   }
 });
 setInterval(checkDayRollover, 20000);
@@ -3693,19 +3804,6 @@ setInterval(checkDayRollover, 20000);
 /* =====================================================================
    ENCOUNTER LOG
    ===================================================================== */
-function addLog(text) {
-  const time = new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
-  state.log.unshift({ t: time, text });
-  state.log = state.log.slice(0, 10);
-  save();
-  renderLog();
-}
-function renderLog() {
-  const el = document.getElementById("encounter-log");
-  if (!state.log.length) { el.innerHTML = "<div>Noch keine Sichtungen …</div>"; return; }
-  el.innerHTML = state.log.map(e => "<div>[" + e.t + "] " + esc(e.text) + "</div>").join("");
-}
-
 /* =====================================================================
    CANVAS-KAMPFSYSTEM (Route 1)
    ===================================================================== */
@@ -3717,6 +3815,8 @@ const BT = {
   floats: [],         // {x,y,text,color,t,size}  (Welt-Koordinaten)
   sparkles: [],       // {x,y,vx,vy,t}             (Welt-Koordinaten)
   bursts: [],         // {x,y,t,color,particles:[{x,y,vx,vy,life}]}
+  silCache: {},       // key: dex + "_" + (shiny?"s":"n") + "_" + hexColor → Offscreen-Canvas (96×96)
+  auraDust: [],       // {x,y,vy,t,life,color}  (Welt-Koordinaten) — Pixel-Partikel der physischen Aura
   typeVfx: null,      // { type, t, dur, wx, wy, attackerWx, attackerWy }  Welt-Koordinaten
   ballAnim: null,     // {t,phase,itemKey,mult,sx,sy}  (sx,sy = Screen-Start)
   spawnAt: 0,
@@ -3746,144 +3846,13 @@ const BT = {
    CITY (Stadt-Tab: eigener Canvas, überlagert #battle)
    ===================================================================== */
 const CITY = {
-  cv: null,           // canvas-Element
-  ctx: null,          // 2d-Kontext
-  dpr: 1,
-  W: 360,             // Viewport-Breite (wird in resizeCity() gesetzt)
-  H: 200,             // Viewport-Höhe (fix)
-  mapW: 480,          // Gesamtbreite der Stadt in Pixeln
-  mapH: 600,          // Gesamthöhe der Stadt in Pixeln
-  cam: { x: 0, y: 200 },   // Kamera-Offset (startet mittig-unten)
-  player: {
-    wx: 240,          // Weltposition X (Mitte)
-    wy: 420,          // Weltposition Y (Eingang, unten)
-    dir: 0,           // 0=down, 1=left, 2=right, 3=up
-    step: 0,          // Animationsschritt für Lauf-Bob
-    moving: false
-  },
-  touch: { active: false, sx: 0, sy: 0, dx: 0, dy: 0 },
-  keys: { up:false, down:false, left:false, right:false },
-  mouse: { active:false, sx:0, sy:0, dx:0, dy:0 },
-  buildings: [],      // wird in initCity() befüllt
-  active: false,      // true wenn City-Tab geöffnet
-  raf: null,          // requestAnimationFrame-Handle
-  last: 0,
-  dialogQ: [],        // Warteschlange für NPC-Dialoge
-  dialogOpen: false,
-  lastBuilding: null, // zuletzt betretenes Gebäude – Sperre gegen Sofort-Retrigger
-  lastNpc: null,      // zuletzt angesprochener NPC – Sperre gegen Dialog-Retrigger
-  martFilter: "all",  // aktiver PokéMart-Filter
-  labBonusDate: "",   // Datum, an dem der Labor-Bonus zuletzt geholt wurde
-  martReopenOk: false, // erlaubt openMart() trotz dialogOpen-Guard (Re-Render)
-  labReopenOk: false,  // erlaubt openLab() trotz dialogOpen-Guard (Re-Render)
-  battle: null         // null = kein Arena-Kampf aktiv; sonst Kampf-State-Objekt
+  martFilter: "all",    // aktiver PokéMart-Filter
+  labBonusDate: "",     // Datum, an dem der Labor-Bonus zuletzt geholt wurde
+  martReopenOk: false,  // erlaubt openMart() trotz dialogOpen-Guard (Re-Render)
+  labReopenOk:  false,  // erlaubt openLab() trotz dialogOpen-Guard (Re-Render)
+  dialogOpen: false,    // Guard gegen Doppel-Öffnen von Modals
+  battle: null          // null = kein Arena-Kampf aktiv; sonst Kampf-State-Objekt
 };
-
-const CITY_BUILDINGS = [
-  // Mittlere Hauptstraße, Canal-Stil wie im Referenzbild
-  // Linke Seite
-  {
-    type: "mart",
-    label: "PokéMart",
-    wx: 40, wy: 80,
-    w: 90, h: 70,
-    color: "#3060c8",
-    roofColor: "#1840a0",
-    enterX: 85, enterY: 150,
-    enterRadius: 24,
-    onEnter: "openMart"
-  },
-  {
-    type: "center",
-    label: "Pokémon Center",
-    wx: 40, wy: 200,
-    w: 90, h: 70,
-    color: "#e04038",
-    roofColor: "#a02018",
-    enterX: 85, enterY: 270,
-    enterRadius: 24,
-    onEnter: "openCenter"
-  },
-  {
-    type: "lab",
-    label: "Prof. Labor",
-    wx: 40, wy: 330,
-    w: 90, h: 70,
-    color: "#c8b040",
-    roofColor: "#a09030",
-    enterX: 85, enterY: 400,
-    enterRadius: 24,
-    onEnter: "openLab"
-  },
-  // Rechte Seite
-  {
-    type: "arena",
-    label: "Arena",
-    wx: 340, wy: 140,
-    w: 100, h: 90,
-    color: "#802020",
-    roofColor: "#601010",
-    enterX: 390, enterY: 230,
-    enterRadius: 28,
-    onEnter: "openArena"
-  },
-  {
-    type: "house1",
-    label: "Haus",
-    wx: 350, wy: 300,
-    w: 70, h: 55,
-    color: "#d8c898",
-    roofColor: "#8060a0",
-    enterX: 385, enterY: 355,
-    enterRadius: 20,
-    onEnter: null
-  }
-];
-
-const CITY_NPCS = [
-  {
-    id: "npc_kid",
-    wx: 200, wy: 310,
-    color: "#e04038",        // Shirt-Farbe für einfachen Sprite
-    hairColor: "#f8c030",
-    dir: 0,                  // schaut nach unten (zum Spieler)
-    label: "Kind",
-    dialogs: [
-      "Ich hab heute 3 Habits geschafft! Schaffst du alle?",
-      "Mein Lieblings-Pokémon ist Bisaflor. Was ist deins?",
-      "Weißt du, dass man jeden Tag trainieren sollte?"
-    ],
-    lastDialog: -1           // Index des zuletzt gezeigten Dialogs
-  },
-  {
-    id: "npc_oldman",
-    wx: 160, wy: 480,
-    color: "#808080",
-    hairColor: "#f8f8f8",
-    dir: 2,                  // schaut nach rechts
-    label: "Alter Mann",
-    dialogs: [
-      "Früher habe ich täglich 10 Pokémon gefangen. Die Jugend von heute…",
-      "Gute Gewohnheiten sind wie Pokémon — einmal etabliert, kämpfen sie für dich.",
-      "Der PokéMart hat heute neue Angebote. Ich war schon dort!"
-    ],
-    lastDialog: -1
-  },
-  {
-    id: "npc_girl",
-    wx: 290, wy: 390,
-    color: "#f85888",
-    hairColor: "#404040",
-    dir: 1,                  // schaut nach links
-    label: "Mädchen",
-    dialogs: [
-      "Die Arena wartet! Bist du bereit für den Kampf?",
-      "Ich trainiere jeden Tag — mein Streak ist schon bei 14 Tagen!",
-      "Tipp: Im Pokémon Center kann man sein Team heilen."
-    ],
-    lastDialog: -1
-  }
-];
 
 /* ---- Arena-Trainer-Roster (Phase 3) ---- */
 const ARENA_TRAINERS = [
@@ -3979,465 +3948,6 @@ const GYM_LEADERS = [
     team:[{dex:28,level:57},{dex:51,level:58},{dex:105,level:61}] }
 ];
 
-/* ---- Init & Resize ---- */
-function initCity() {
-  CITY.cv = document.getElementById("city-canvas");
-  CITY.ctx = CITY.cv.getContext("2d");
-  resizeCity();
-  window.addEventListener("resize", resizeCity);
-  CITY.cv.addEventListener("touchstart", cityTouchStart, { passive: true });
-  CITY.cv.addEventListener("touchmove", cityTouchMove, { passive: false });
-  CITY.cv.addEventListener("touchend", cityTouchEnd, { passive: true });
-  window.addEventListener("keydown", cityKeyDown);
-  window.addEventListener("keyup",   cityKeyUp);
-  CITY.cv.addEventListener("mousedown",  cityMouseDown);
-  window.addEventListener("mousemove",   cityMouseMove);
-  window.addEventListener("mouseup",     cityMouseUp);
-  CITY.buildings = CITY_BUILDINGS;
-  CITY.martFilter = "all";
-  CITY.labBonusDate = "";
-}
-
-function resizeCity() {
-  const w = CITY.cv?.parentElement?.clientWidth || 360;
-  CITY.dpr = window.devicePixelRatio || 1;
-  CITY.W = w;
-  CITY.H = 200;
-  if (!CITY.cv) return;
-  CITY.cv.width = w * CITY.dpr;
-  CITY.cv.height = CITY.H * CITY.dpr;
-  CITY.ctx.setTransform(CITY.dpr, 0, 0, CITY.dpr, 0, 0);
-  CITY.ctx.imageSmoothingEnabled = false;
-  clampCityCam();
-}
-
-function clampCityCam() {
-  CITY.cam.x = Math.max(0, Math.min(CITY.mapW - CITY.W, CITY.cam.x));
-  CITY.cam.y = Math.max(0, Math.min(CITY.mapH - CITY.H, CITY.cam.y));
-}
-
-/* ---- Touch-Steuerung (Joystick-Drag-Stil) ---- */
-function cityTouchStart(e) {
-  const t = e.touches[0];
-  CITY.touch = { active: true, sx: t.clientX, sy: t.clientY, dx: 0, dy: 0 };
-}
-
-function cityTouchMove(e) {
-  e.preventDefault();
-  if (!CITY.touch.active) return;
-  const t = e.touches[0];
-  CITY.touch.dx = t.clientX - CITY.touch.sx;
-  CITY.touch.dy = t.clientY - CITY.touch.sy;
-}
-
-function cityTouchEnd() {
-  CITY.touch = { active: false, sx: 0, sy: 0, dx: 0, dy: 0 };
-  CITY.player.moving = false;
-}
-
-/* ---- Keyboard-Steuerung (WASD / Pfeiltasten) ---- */
-function cityKeyDown(e) {
-  if (!CITY.active) return;
-  // Nur wenn City-Tab aktiv — keine Interferenz mit anderen Tabs
-  const k = CITY.keys;
-  if (e.key === "ArrowUp"    || e.key === "w" || e.key === "W") k.up    = true;
-  if (e.key === "ArrowDown"  || e.key === "s" || e.key === "S") k.down  = true;
-  if (e.key === "ArrowLeft"  || e.key === "a" || e.key === "A") k.left  = true;
-  if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") k.right = true;
-  // Pfeiltasten sollen nicht die Seite scrollen wenn City aktiv
-  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
-    e.preventDefault();
-  }
-}
-
-function cityKeyUp(e) {
-  const k = CITY.keys;
-  if (e.key === "ArrowUp"    || e.key === "w" || e.key === "W") k.up    = false;
-  if (e.key === "ArrowDown"  || e.key === "s" || e.key === "S") k.down  = false;
-  if (e.key === "ArrowLeft"  || e.key === "a" || e.key === "A") k.left  = false;
-  if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") k.right = false;
-}
-
-/* ---- Mouse-Drag-Steuerung (Desktop) ---- */
-function cityMouseDown(e) {
-  e.preventDefault();
-  CITY.mouse = {
-    active: true,
-    sx: e.clientX, sy: e.clientY,
-    dx: 0, dy: 0
-  };
-}
-
-function cityMouseMove(e) {
-  if (!CITY.mouse.active) return;
-  CITY.mouse.dx = e.clientX - CITY.mouse.sx;
-  CITY.mouse.dy = e.clientY - CITY.mouse.sy;
-}
-
-function cityMouseUp() {
-  CITY.mouse = { active:false, sx:0, sy:0, dx:0, dy:0 };
-  CITY.player.moving = false;
-}
-
-/* ---- Spieler-Bewegung & Kollision ---- */
-function isCityWalkable(x, y) {
-  const PR = 8;   // Spieler-Radius für Kollision
-  for (const b of CITY.buildings) {
-    if (x + PR > b.wx + 4 && x - PR < b.wx + b.w - 4 &&
-        y + PR > b.wy + 4 && y - PR < b.wy + b.h - 4) return false;
-  }
-  if (x < 8 || x > CITY.mapW - 8 || y < 8 || y > CITY.mapH - 8) return false;
-  return true;
-}
-
-function updateCity(dt) {
-  const SPEED = 60;
-  const p = CITY.player;
-  const t = CITY.touch;
-  let dx = 0, dy = 0;
-
-  // --- Touch ---
-  if (t.active) {
-    const dead = 10;   // Deadzone in Pixeln
-    if (Math.abs(t.dx) > dead || Math.abs(t.dy) > dead) {
-      const len = Math.hypot(t.dx, t.dy);
-      dx = (t.dx / len) * SPEED * dt;
-      dy = (t.dy / len) * SPEED * dt;
-    }
-  }
-
-  // --- Mouse-Drag ---
-  const m = CITY.mouse;
-  if (m.active) {
-    const dead = 10;
-    if (Math.abs(m.dx) > dead || Math.abs(m.dy) > dead) {
-      const len = Math.hypot(m.dx, m.dy);
-      dx = (m.dx / len) * SPEED * dt;
-      dy = (m.dy / len) * SPEED * dt;
-    }
-  }
-
-  // --- Keyboard (WASD / Pfeiltasten) ---
-  const k = CITY.keys;
-  if (k.up)    dy -= SPEED * dt;
-  if (k.down)  dy += SPEED * dt;
-  if (k.left)  dx -= SPEED * dt;
-  if (k.right) dx += SPEED * dt;
-
-  // Diagonale normalisieren (damit Diagonalbewegung nicht schneller ist)
-  if (dx !== 0 && dy !== 0) {
-    const len = Math.hypot(dx, dy);
-    dx = (dx / len) * SPEED * dt;
-    dy = (dy / len) * SPEED * dt;
-  }
-
-  const moving = dx !== 0 || dy !== 0;
-  p.moving = moving;
-
-  if (moving) {
-    // Richtung bestimmen
-    if (Math.abs(dx) > Math.abs(dy)) {
-      p.dir = dx < 0 ? 1 : 2;
-    } else {
-      p.dir = dy < 0 ? 3 : 0;
-    }
-    // Schritt-Animation
-    p.step += dt * 8;
-
-    // Axis-separate Kollision (wie im BT-System)
-    if (isCityWalkable(p.wx + dx, p.wy)) p.wx += dx;
-    if (isCityWalkable(p.wx, p.wy + dy)) p.wy += dy;
-  }
-
-  // Kamera dem Spieler folgen (sanft)
-  const targetCamX = p.wx - CITY.W / 2;
-  const targetCamY = p.wy - CITY.H / 2;
-  CITY.cam.x += (targetCamX - CITY.cam.x) * 0.15;
-  CITY.cam.y += (targetCamY - CITY.cam.y) * 0.15;
-  clampCityCam();
-
-  // Betretens-Sperre lösen, sobald der Spieler den zuletzt betretenen Radius
-  // (Gebäude bzw. NPC) verlassen hat — verhindert Sofort-Retrigger nach dem Schließen.
-  if (CITY.lastBuilding) {
-    const lb = CITY.lastBuilding;
-    if (Math.hypot(p.wx - lb.enterX, p.wy - lb.enterY) > lb.enterRadius + 10) {
-      CITY.lastBuilding = null;
-    }
-  }
-  if (CITY.lastNpc) {
-    const ln = CITY.lastNpc;
-    if (Math.hypot(p.wx - ln.wx, p.wy - ln.wy) > 22 + 10) {
-      CITY.lastNpc = null;
-    }
-  }
-
-  // Gebäude-Näheprüfung (Eintreten) — nur wenn kein Dialog offen
-  if (!CITY.dialogOpen) {
-    for (const b of CITY.buildings) {
-      const dist = Math.hypot(p.wx - b.enterX, p.wy - b.enterY);
-      if (dist < b.enterRadius) {
-        // Nur auslösen, wenn nicht bereits durch dieses Gebäude gesperrt
-        if (b !== CITY.lastBuilding && b.onEnter && typeof window[b.onEnter] === "function") {
-          CITY.lastBuilding = b;
-          window[b.onEnter]();
-        }
-        break;
-      }
-    }
-  }
-
-  // NPC-Näheprüfung (nur wenn kein Dialog offen)
-  if (!CITY.dialogOpen) {
-    for (const npc of CITY_NPCS) {
-      const dist = Math.hypot(p.wx - npc.wx, p.wy - npc.wy);
-      if (dist < 22) {
-        if (npc !== CITY.lastNpc) {
-          CITY.lastNpc = npc;
-          talkNpc(npc);
-        }
-        break;
-      }
-    }
-  }
-}
-
-/* ---- Render ---- */
-function drawCity(now) {
-  const ctx = CITY.ctx;
-  const W = CITY.W, H = CITY.H;
-  const cam = CITY.cam;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Boden: Hellgrünes Gras
-  ctx.fillStyle = "#78c850";
-  ctx.fillRect(0, 0, W, H);
-
-  // Hauptweg (vertical, mittig) — wie Kanal im Referenzbild
-  const roadLeft = CITY.mapW / 2 - 30 - cam.x;
-  ctx.fillStyle = "#d8c898";   // Sandweg
-  ctx.fillRect(roadLeft, 0, 60, H);
-  // Weglinien
-  ctx.strokeStyle = "#c0b080";
-  ctx.lineWidth = 1;
-  ctx.setLineDash([6, 6]);
-  ctx.beginPath();
-  ctx.moveTo(CITY.mapW / 2 - cam.x, 0);
-  ctx.lineTo(CITY.mapW / 2 - cam.x, H);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Gras-Texturtupfer (deterministisch aus Position)
-  for (let gx = 0; gx < CITY.mapW; gx += 24) {
-    for (let gy = 0; gy < CITY.mapH; gy += 24) {
-      const sx = gx - cam.x, sy = gy - cam.y;
-      if (sx < -24 || sx > W + 24 || sy < -24 || sy > H + 24) continue;
-      const h = ((gx * 131 + gy * 57) >>> 0);
-      // Nicht auf dem Weg zeichnen
-      if (gx > CITY.mapW / 2 - 34 && gx < CITY.mapW / 2 + 34) continue;
-      ctx.fillStyle = (h % 3 === 0) ? "#68b840" : (h % 5 === 0) ? "#88d860" : "#78c850";
-      ctx.fillRect(sx + (h % 8), sy + (h % 6), 4, 4);
-    }
-  }
-
-  // Gebäude zeichnen (Y-Sort: von oben nach unten)
-  const sorted = [...CITY.buildings].sort((a, b) => (a.wy + a.h) - (b.wy + b.h));
-
-  for (const b of sorted) {
-    const sx = b.wx - cam.x, sy = b.wy - cam.y;
-    if (sx + b.w < 0 || sx > W || sy + b.h < 0 || sy > H) continue;
-    drawCityBuilding(ctx, b, sx, sy);
-  }
-
-  // Y-Sort: NPCs und Spieler zusammen
-  const entities = [
-    { y: CITY.player.wy, draw: () => drawCityPlayer(ctx, now) },
-    ...CITY_NPCS.map(npc => ({
-      y: npc.wy,
-      draw: () => drawCityNpc(ctx, npc)
-    }))
-  ];
-  entities.sort((a, b) => a.y - b.y);
-  entities.forEach(e => e.draw());
-
-  // Steuerungs-Hint (nur wenn Spieler sich noch nie bewegt hat)
-  if (!CITY.player.moving && CITY.player.step === 0) {
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillRect(0, H - 22, W, 22);
-    ctx.fillStyle = "#f8f8f8";
-    ctx.font = "5px 'Press Start 2P', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("WASD / Pfeiltasten oder Touch-Drag zum Bewegen", W / 2, H - 8);
-    ctx.textAlign = "left";
-  }
-}
-
-function drawCityBuilding(ctx, b, sx, sy) {
-  const roofH = Math.round(b.h * 0.35);
-
-  // Schatten
-  ctx.fillStyle = "rgba(0,0,0,0.18)";
-  ctx.fillRect(sx + 4, sy + 4, b.w, b.h);
-
-  // Hauptwand
-  ctx.fillStyle = b.color;
-  ctx.fillRect(sx, sy + roofH, b.w, b.h - roofH);
-
-  // Dach
-  ctx.fillStyle = b.roofColor;
-  ctx.fillRect(sx, sy, b.w, roofH);
-
-  // Dach-Outline oben
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.fillRect(sx, sy, b.w, 3);
-
-  // Fenster (2 Fenster nebeneinander)
-  const winY = sy + roofH + 8;
-  const winW = Math.max(12, Math.round(b.w * 0.22));
-  const winH = 10;
-  const gap = Math.round((b.w - winW * 2) / 3);
-  ctx.fillStyle = "#d8f0f8";
-  ctx.fillRect(sx + gap, winY, winW, winH);
-  ctx.fillRect(sx + gap * 2 + winW, winY, winW, winH);
-  ctx.fillStyle = "rgba(0,0,0,0.2)";
-  ctx.fillRect(sx + gap + winW / 2, winY, 1, winH);
-  ctx.fillRect(sx + gap * 2 + winW + winW / 2, winY, 1, winH);
-
-  // Tür (mittig unten)
-  const doorW = Math.max(10, Math.round(b.w * 0.18));
-  const doorH = Math.round((b.h - roofH) * 0.45);
-  const doorX = sx + Math.round((b.w - doorW) / 2);
-  const doorY = sy + b.h - doorH;
-  ctx.fillStyle = "#604830";
-  ctx.fillRect(doorX, doorY, doorW, doorH);
-
-  // Label
-  ctx.fillStyle = "rgba(0,0,0,0.7)";
-  ctx.fillRect(sx + 2, sy + roofH - 12, b.w - 4, 11);
-  ctx.fillStyle = "#f8f8f8";
-  ctx.font = "5px 'Press Start 2P', monospace";
-  ctx.textAlign = "center";
-  ctx.fillText(b.label, sx + b.w / 2, sy + roofH - 4);
-  ctx.textAlign = "left";
-}
-
-function drawCityPlayer(ctx, now) {
-  const p = CITY.player;
-  const sx = Math.round(p.wx - CITY.cam.x);
-  const sy = Math.round(p.wy - CITY.cam.y);
-
-  // Einfacher Trainer-Sprite (Canvas-gezeichnet, GBA-Stil)
-  // Bob-Animation beim Laufen
-  const bob = p.moving ? Math.sin(p.step) * 2 : 0;
-  const sy2 = sy + bob;
-
-  // Körper
-  ctx.fillStyle = "#3060c8";      // blaues Oberteil
-  ctx.fillRect(sx - 5, sy2 - 10, 10, 8);
-
-  // Kopf
-  ctx.fillStyle = "#f8c8a0";      // Hautton
-  ctx.fillRect(sx - 4, sy2 - 18, 8, 8);
-
-  // Haare
-  ctx.fillStyle = "#382018";
-  ctx.fillRect(sx - 4, sy2 - 18, 8, 3);
-
-  // Beine (animiert)
-  if (p.moving) {
-    const legSwing = Math.sin(p.step) * 2;
-    ctx.fillStyle = "#c04838";
-    ctx.fillRect(sx - 4, sy2 - 2, 4, 6 + legSwing);   // linkes Bein
-    ctx.fillRect(sx, sy2 - 2, 4, 6 - legSwing);        // rechtes Bein
-  } else {
-    ctx.fillStyle = "#c04838";
-    ctx.fillRect(sx - 4, sy2 - 2, 4, 6);
-    ctx.fillRect(sx, sy2 - 2, 4, 6);
-  }
-
-  // Richtungs-Augen (nur wenn facing down oder up)
-  if (p.dir === 0) {
-    ctx.fillStyle = "#282030";
-    ctx.fillRect(sx - 2, sy2 - 13, 2, 2);
-    ctx.fillRect(sx + 1, sy2 - 13, 2, 2);
-  }
-}
-
-function drawCityNpc(ctx, npc) {
-  const sx = Math.round(npc.wx - CITY.cam.x);
-  const sy = Math.round(npc.wy - CITY.cam.y);
-
-  // Außerhalb Viewport: überspringen
-  if (sx < -20 || sx > CITY.W + 20 || sy < -20 || sy > CITY.H + 20) return;
-
-  // Schatten
-  ctx.fillStyle = "rgba(0,0,0,0.2)";
-  ctx.beginPath();
-  ctx.ellipse(sx, sy + 4, 6, 3, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Körper
-  ctx.fillStyle = npc.color;
-  ctx.fillRect(sx - 5, sy - 10, 10, 8);
-
-  // Kopf
-  ctx.fillStyle = "#f8c8a0";
-  ctx.fillRect(sx - 4, sy - 18, 8, 8);
-
-  // Haare
-  ctx.fillStyle = npc.hairColor;
-  ctx.fillRect(sx - 4, sy - 18, 8, 3);
-
-  // Beine (statisch)
-  ctx.fillStyle = "#404878";
-  ctx.fillRect(sx - 4, sy - 2, 4, 6);
-  ctx.fillRect(sx, sy - 2, 4, 6);
-
-  // Ausrufezeichen wenn Spieler nah
-  const dist = Math.hypot(CITY.player.wx - npc.wx, CITY.player.wy - npc.wy);
-  if (dist < 40) {
-    ctx.fillStyle = "#f8c030";
-    ctx.font = "bold 10px monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("!", sx, sy - 22);
-    ctx.textAlign = "left";
-  }
-}
-
-/* ---- Game Loop ---- */
-function cityLoop(ts) {
-  if (!CITY.active) return;
-  const dt = Math.min(0.05, (ts - (CITY.last || ts)) / 1000);
-  CITY.last = ts;
-  updateCity(dt);
-  drawCity(ts);
-  CITY.raf = requestAnimationFrame(cityLoop);
-}
-
-function startCityLoop() {
-  if (CITY.raf) return;
-  CITY.active = true;
-  CITY.last = 0;
-  CITY.raf = requestAnimationFrame(cityLoop);
-}
-
-function stopCityLoop() {
-  CITY.active = false;
-  if (CITY.raf) { cancelAnimationFrame(CITY.raf); CITY.raf = null; }
-}
-
-function showCityDialog(text) {
-  if (CITY.dialogOpen) return;
-  CITY.dialogOpen = true;
-  const el = document.getElementById("city-dialog");
-  el.textContent = text;
-  el.style.display = "block";
-  setTimeout(() => {
-    el.style.display = "none";
-    CITY.dialogOpen = false;
-  }, 2500);
-}
-
 /* ---- Gemeinsames City-Modal ---- */
 function openCityModal(htmlContent) {
   document.getElementById("city-modal-content").innerHTML = htmlContent;
@@ -4447,22 +3957,65 @@ function openCityModal(htmlContent) {
 
 function closeCityModal() {
   document.getElementById("city-modal-bg").classList.remove("open");
-  CITY.dialogOpen = false;
 }
 
-/* ---- NPC-Dialog ---- */
-function talkNpc(npc) {
-  // Nächsten Dialog in Rotation wählen
-  npc.lastDialog = (npc.lastDialog + 1) % npc.dialogs.length;
-  const text = npc.label + ": \"" + npc.dialogs[npc.lastDialog] + "\"";
-  showCityDialog(text);
+/* ---- Stadt-Menü (ohne Canvas) ---- */
+function renderCityMenu() {
+  const today = todayStr();
+  const bonusAvailable = CITY.labBonusDate !== today;
+
+  document.getElementById("tab-city").innerHTML =
+    '<h2>&#9654; STADT</h2>' +
+
+    '<div class="city-menu">' +
+
+      '<button class="city-menu-btn" onclick="openMart()">' +
+        '<span class="city-menu-icon">🛒</span>' +
+        '<div class="city-menu-label">PokéMart</div>' +
+        '<div class="city-menu-hint">Items & TMs kaufen</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn" onclick="openCenter()">' +
+        '<span class="city-menu-icon">🏥</span>' +
+        '<div class="city-menu-label">Pokémon Center</div>' +
+        '<div class="city-menu-hint">Team heilen · Pokédex</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn" onclick="openArena()">' +
+        '<span class="city-menu-icon">🏆</span>' +
+        '<div class="city-menu-label">Arena</div>' +
+        '<div class="city-menu-hint">Orden kämpfen · Training</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn' + (bonusAvailable ? ' city-menu-btn--available' : ' city-menu-btn--claimed') + '" onclick="claimDailyReward()">' +
+        '<span class="city-menu-icon">' + (bonusAvailable ? '🎁' : '✅') + '</span>' +
+        '<div class="city-menu-label">Daily-Belohnung</div>' +
+        '<div class="city-menu-hint">' + (bonusAvailable ? '+20 EXP fürs Team abholen' : 'Heute bereits abgeholt') + '</div>' +
+      '</button>' +
+
+    '</div>';
+}
+
+function claimDailyReward() {
+  const today = todayStr();
+  if (CITY.labBonusDate === today) {
+    toast("✅ Heute bereits abgeholt. Morgen wieder verfügbar.");
+    return;
+  }
+  if (!state.team.length) {
+    toast("⚠ Du brauchst mindestens 1 Pokémon im Team!");
+    return;
+  }
+  CITY.labBonusDate = today;
+  grantTeamExp(20, true);
+  toast("🎁 Daily-Belohnung: +20 EXP fürs Team!");
+  save();
+  renderCityMenu();   // Button-Label sofort auf "bereits abgeholt" wechseln
 }
 
 /* ---- Gebäude-Handler (Phase 2) ---- */
 function openMart() {
-  if (CITY.dialogOpen && !CITY.martReopenOk) return;
   CITY.martReopenOk = false;
-  CITY.dialogOpen = true;
 
   refreshShopIfNeeded();
   const coins = state.coins || 0;
@@ -4538,9 +4091,6 @@ function martBuy(key) {
 }
 
 function openCenter() {
-  if (CITY.dialogOpen) return;
-  CITY.dialogOpen = true;
-
   // Team-HP vollständig heilen (BT.fighters HP auf maxHp setzen)
   let healed = false;
   BT.fighters.forEach(f => {
@@ -4575,9 +4125,7 @@ function openCenter() {
 }
 
 function openLab() {
-  if (CITY.dialogOpen && !CITY.labReopenOk) return;
   CITY.labReopenOk = false;
-  CITY.dialogOpen = true;
 
   const trainerName = state.trainer ? state.trainer.name : "Trainer";
   const today = todayStr();
@@ -4623,8 +4171,6 @@ function claimLabBonus() {
 }
 
 function openArena() {
-  if (CITY.dialogOpen) return;
-  CITY.dialogOpen = true;
   renderArenaMenu();
 }
 
@@ -5174,6 +4720,30 @@ function imgFor(dex, shiny) {
   return BT.images[key];
 }
 
+/* Eingefärbte Silhouette eines Sprites (für die physische Attacken-Aura, DBZ-Stil).
+   Ergebnis wird pro (dex, shiny, farbe) gecacht. Nur drawImage + source-in – tainted-safe. */
+function getSilhouette(dex, shiny, hexColor) {
+  const key = dex + "_" + (shiny ? "s" : "n") + "_" + hexColor;
+  if (BT.silCache[key]) return BT.silCache[key];
+  const img = imgFor(dex, shiny);
+  if (!img.complete || !img.naturalWidth) return null;   // Sprite noch nicht geladen
+  try {
+    const c = document.createElement("canvas");
+    c.width = 96; c.height = 96;
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(img, 0, 0, 96, 96);
+    g.globalCompositeOperation = "source-in";
+    g.fillStyle = hexColor;
+    g.fillRect(0, 0, 96, 96);
+    g.globalCompositeOperation = "source-over";
+    BT.silCache[key] = c;
+    return c;
+  } catch (e) {
+    return null;   // z. B. tainted canvas — Aura wird dann übersprungen
+  }
+}
+
 function initBattle() {
   BT.cv = document.getElementById("battle-canvas");
   BT.ctx = BT.cv.getContext("2d");
@@ -5210,6 +4780,24 @@ function initBattle() {
   BT.cam.y = Math.max(0, Math.min(BT.mapH - BT.H, BT.mapH / 2 - BT.H / 2));
   // Start-Tab ist "habits" → Battle-Canvas sichtbar → Loop starten
   startBattleLoop();
+  
+  const rb = document.createElement("button");
+  rb.id = "reset-battle-btn";
+  rb.textContent = "🔄";
+  rb.style.cssText = "position:absolute;top:4px;right:8px;z-index:6;" +
+    "font-family:inherit;font-size:10px;color:#fff;background:rgba(24,32,40,.7);" +
+    "border:2px solid var(--line);border-radius:6px;padding:4px 6px;cursor:pointer";
+  rb.onclick = () => {
+    BT.wilds.forEach(w => { w.hp = 0; });
+    BT.wilds = []; BT.wild = null;
+    BT.fighters.forEach(f => { f.target = null; f.hp = f.maxHp; f.faintT = 0; });
+    BT.anchorWaiting = false; BT.anchorWaitPos = null;
+    BT.ballAnim = null; BT.typeVfx = null;
+    repositionFighters();
+  };
+  document.getElementById("battle").appendChild(rb);
+  
+  
 }
 function resizeBattle() {
   const w = BT.cv.parentElement.clientWidth || 360;
@@ -5237,7 +4825,10 @@ function syncFighters() {
       dir: 1, lx: 1, ly: 0,
       hp: maxHp, maxHp, lastLevel: m.level,
       bob: Math.random() * 6, cd: 1200 + i * 600,
-      data: null, lunge: 0, hitFlash: 0, faintT: 0
+      data: null, lunge: 0, hitFlash: 0, faintT: 0,
+      auraT: -1,          // -1 = inaktiv; sonst Sekunden seit Aura-Start (physische Attacke)
+      auraColor: null,    // Hex aus TYPE_COLOR, z. B. "#f08030"
+      statBoosts: []      // [{ atk, def, spAtk, spDef, speed, remaining }]  — aktive Stat-Boni
     };
     newPatrolTargetWorld(f);
     BT.fighters.push(f);
@@ -5268,7 +4859,7 @@ function spawnWild(now) {
     sx = wx; sy = wy; found = true;
   }
   const w = { dex, level, name: "#" + dex, types: [], wx: sx, wy: sy, dir: -1, speed,
-    discovered: false, hp: maxHp, maxHp, cd: 2600, hitFlash: 0, catchWindowNotified: false, catchWindowOpen: false, catchWindowTimer: 0 };
+    discovered: false, hp: maxHp, maxHp, cd: 2600, hitFlash: 0 };
   BT.wilds.push(w);
   getPokemonData(dex).then(d => { w.name = d.name; w.types = d.types; });
 }
@@ -5323,7 +4914,6 @@ function startFishing() {
   BT.fishReady = false;
   BT.fishTimer = 0;
   if (BT.fishBtn) BT.fishBtn.style.display = "none";
-  addLog("🎣 Angel ausgeworfen – warte auf einen Biss …");
   toast("🎣 Angel ausgeworfen! Warte ~10 s …");
 }
 
@@ -5354,16 +4944,16 @@ function spawnFishWild(now) {
   }
   const w = { dex, level, name: "#" + dex, types: [], wx: sx, wy: sy, dir: -1, speed,
     discovered: true, hp: maxHp, maxHp, cd: 2600, hitFlash: 0,
-    catchWindowNotified: false, catchWindowOpen: false, catchWindowTimer: 0, fished: true };
+    fished: true };
   BT.wilds.push(w);
   getPokemonData(dex).then(d => {
     w.name = d.name; w.types = d.types;
-    addLog("🎣 Ein wildes " + d.name + " beißt an!");
     toast("🎣 Ein wildes " + d.name + " beißt an!");
   });
 }
 
 const WILD_TARGET = 12;   // Zielanzahl gleichzeitiger Wilder auf der Karte
+const FOLLOWER_RADIUS = 160;   // max. Abstand (px) der Follower vom Anführer
 function ensureWildCount(now) {
   if (!state.team.length) return;
   if (BT.wilds.length < WILD_TARGET && now > BT.spawnAt) {
@@ -5485,8 +5075,44 @@ function doAttack(f) {
   const move = f.data.moves[idx] || { name:"Tackle", type:"normal", power:40 };
   m.moveIdx = (idx + 1) % 4; // 1→2→3→4→1
   saveSoon();
-  // lunge nur bei physischen und Normal-Attacken (Spezial-Attacken bekommen die Typ-VFX)
-  if (move.category !== 'special') f.lunge = 0.3;
+
+  // ── STATUS-ATTACKE ────────────────────────────────────────────────────
+  if (move.category === 'status') {
+    const effect = STAT_MOVE_EFFECTS[move.name];
+    if (effect) {
+      // Vorhandenen Boost desselben Moves auffrischen, sonst neu anlegen
+      f.statBoosts = f.statBoosts || [];
+      const existing = f.statBoosts.find(b => b.src === move.name);
+      if (existing) {
+        existing.remaining = effect.dur;   // Dauer auffrischen
+      } else {
+        f.statBoosts.push({
+          src: move.name,
+          remaining: effect.dur,
+          atk:   effect.atk   || 1,
+          def:   effect.def   || 1,
+          spAtk: effect.spAtk || 1,
+          spDef: effect.spDef || 1,
+          speed: effect.speed || 1
+        });
+      }
+      // Float + Move-Label
+      showMoveLabel(move);
+      addFloat(f.wx, f.wy - 44, "↑ " + move.name, "#a0f0a0", 9);
+    }
+    // Keine Aura, kein Lunge, kein Schaden
+    return;
+  }
+  // ── ENDE STATUS-ATTACKE ───────────────────────────────────────────────
+
+  // Aura + Lunge nur bei physischen Attacken (Spezial → Typ-VFX, Status → keine Bewegung).
+  // Die Lunge wird verzögert in updateBattle beim Übergang Charge→Full ausgelöst, damit die
+  // Auflade-Phase der Aura sichtbar ist, bevor das Pokémon losspringt.
+  if (move.category !== 'special' && move.category !== 'status') {
+    f.lunge = 0.3;
+    f.auraT = 0;
+    f.auraColor = TYPE_COLOR[move.type] || "#a8a878";
+  }
   // Lunge-Richtung = zum wilden Pokémon
   { const dx = w.wx - f.wx, dy = w.wy - f.wy, d = Math.hypot(dx, dy) || 1; f.lx = dx / d; f.ly = dy / d; }
 
@@ -5497,8 +5123,10 @@ function doAttack(f) {
   // Physisch → nutzt Atk-Stat, Speziell → nutzt SpAtk-Stat
   const isSpecial = (move.category === "special");
   const statBase  = isSpecial ? (f.data.spAtk || 60) : (f.data.atk || 60);
+  // Stat-Boni anwenden
+  const atkMult   = isSpecial ? getStatMult(f, 'spAtk') : getStatMult(f, 'atk');
   // Formel: level-Anteil + stat-Skalierung + power-Multiplikator
-  let dmg = (3 + m.level * 0.4 + statBase * 0.05) * ((move.power || 40) / 50) * eff * (crit ? 1.5 : 1);
+  let dmg = (3 + m.level * 0.4 + statBase * 0.05) * atkMult * ((move.power || 40) / 50) * eff * (crit ? 1.5 : 1);
   dmg *= happinessMultiplier(m); // Zuneigung des Angreifers
   dmg = eff === 0 ? 0 : Math.max(1, Math.round(dmg));
   w.hp = Math.max(0, w.hp - dmg);
@@ -5528,14 +5156,7 @@ function doAttack(f) {
     else if (eff < 1) addFloat(w.wx, topY - 16, "Schwach… ×" + eff, "#a8a8a8", 8);
   }
 
-  // Catch-Window: 2-Sekunden-Fenster öffnen wenn Wild unter 35% HP fällt
-  const catchable35 = w && !w.legendary && (w.hp / w.maxHp) < 0.35;
-  if (catchable35 && !w.catchWindowNotified) {
-    w.catchWindowNotified = true;
-    w.catchWindowOpen = true;
-    w.catchWindowTimer = 2.0;
-    addLog(w.name + " kann jetzt gefangen werden! (2 Sek.)");
-  }
+  // Catch-Window entfernt: Angriffe pausieren bereits durch ballAnim + Ball-Shake-Phase.
 
   if (w.hp <= 0) {
     const now = performance.now();
@@ -5544,7 +5165,6 @@ function doAttack(f) {
     grantTeamExp(15 + w.level, false);
     state.coins = (state.coins || 0) + 2;   // Münzen für besiegtes Wild
     addFloat(w.wx, topY - 30, "+" + (15 + w.level) + " EXP", "#f8c030", 9);
-    addLog(w.name + " wurde besiegt! (+" + (15 + w.level) + " EXP fürs Team)");
     killWild(w, now);
   }
 }
@@ -5594,12 +5214,10 @@ function resolveBall(now) {
   if (success) {
     burstSparkles(w.wx, w.wy);
     addFloat(w.wx, w.wy - 44, "Gefangen!", "#f8c030", 10);
-    addLog(w.name + " wurde mit " + ITEMS[a.itemKey].name + " gefangen!");
     addPokemon(w.dex, w.name, false);
     killWild(w, now);
   } else {
     addFloat(w.wx, w.wy - 44, "Ausgebrochen!", "#f8f8f8", 9);
-    addLog(w.name + " ist aus dem " + ITEMS[a.itemKey].name + " ausgebrochen!");
     w.hitFlash = 0.3;
     w.catchWindowOpen = false;
     w.catchWindowTimer = 0;
@@ -5691,6 +5309,29 @@ function updateBattle(dt, now) {
     f.bob += dt * 6;
     f.lunge = Math.max(0, f.lunge - dt);
     f.hitFlash = Math.max(0, f.hitFlash - dt);
+    // Stat-Boosts: Timer herunterzählen, abgelaufene entfernen
+    if (f.statBoosts && f.statBoosts.length) {
+      f.statBoosts.forEach(b => { b.remaining -= dt; });
+      f.statBoosts = f.statBoosts.filter(b => b.remaining > 0);
+    }
+    // Physische-Attacken-Aura: Timer hochzählen, Lunge verzögert beim Übergang Charge→Full auslösen
+    if (f.auraT >= 0) {
+      const prev = f.auraT;
+      f.auraT += dt;
+      // Lunge wird direkt in doAttack gesetzt (AURA_CHARGE = 0, kein verzögerter Trigger nötig)
+      if (f.auraT >= AURA_TOTAL) { f.auraT = -1; f.auraColor = null; }
+      // Aufsteigende Pixel-Partikel spawnen (nur bei sichtbarer Aura)
+      if (f.auraT >= 0 && auraLevel(f) > 0.15 && Math.random() < 0.6 && BT.auraDust.length < 40) {
+        BT.auraDust.push({
+          x: f.wx + (Math.random() - 0.5) * 30,
+          y: f.wy + 4,
+          vy: -(35 + Math.random() * 55),
+          t: 0,
+          life: 0.45 + Math.random() * 0.35,
+          color: f.auraColor
+        });
+      }
+    }
   });
 
   // Roamende Wilde wandern – nur aktiv gebundene (entdeckte Ziele + Legende) bleiben im Kampf
@@ -5724,6 +5365,9 @@ function updateBattle(dt, now) {
   BT.floats = BT.floats.filter(fl => fl.t < 1.3);
   BT.sparkles.forEach(s => { s.t += dt; s.x += s.vx * dt; s.y += s.vy * dt; s.vy += 120 * dt; });
   BT.sparkles = BT.sparkles.filter(s => s.t < 0.9);
+  // Aura-Pixel-Partikel (aufsteigend) – Update mit echtem dt, Zeichnen in drawBattle
+  BT.auraDust.forEach(p => { p.t += dt; p.y += p.vy * dt; });
+  BT.auraDust = BT.auraDust.filter(p => p.t < p.life);
 
   BT.bursts.forEach(b => {
     b.t += dt;
@@ -5840,7 +5484,7 @@ function updateWildBattles(dt, now) {
     const w = f.target;
 
     if (!w) {
-      f.hp = Math.min(f.maxHp, f.hp + 4 * dt);
+      f.hp = Math.min(f.maxHp, f.hp + (slotIdx === 0 ? 4 : 4) * dt);
       if (slotIdx === 0) {
         if (BT.anchorWaiting && BT.anchorWaitPos) {
           // Anführer wartet: bleibt an seiner Warteposition stehen (kleine Idle-Bewegung)
@@ -5857,20 +5501,21 @@ function updateWildBattles(dt, now) {
     }
 
     const dist = Math.hypot(f.wx - w.wx, f.wy - w.wy);
-    if (!w.discovered && dist < 90) { w.discovered = true; addLog("Ein wildes " + w.name + " erscheint!"); }
+    if (!w.discovered && dist < 90) { w.discovered = true; }
     if (dist > 36) approach(f, w.wx, w.wy, 58 * dt);
+    // Regeneration außerhalb der Schlagreichweite: solange ein Kämpfer nur auf sein
+    // Ziel zuläuft (noch nicht "im Kampf"), heilt er weiter. Wichtig v.a. für den
+    // Anführer (Slot 0), der Wilde auf der ganzen Karte jagt und sonst nie zur Ruhe
+    // kommt – so regeneriert er sich wie die Slots 2 & 3.
+    if (dist >= 40) {
+      f.hp = Math.min(f.maxHp, f.hp + (slotIdx === 0 ? 6 : 4) * dt);
+    }
     if (dist < 40) {
-      if (w.catchWindowOpen) {
-        w.catchWindowTimer -= dt;
-        if (w.catchWindowTimer <= 0) {
-          w.catchWindowOpen = false;
-          if (w.hp > 0) addLog(w.name + ": Fangfenster vorbei!");
-        }
-      }
-      const blocked = w.catchWindowOpen || BT.ballAnim;
+      const blocked = BT.ballAnim;
       if (!blocked) {
-        f.cd -= dt * 1000;
-        if (f.cd <= 0) { f.cd = 1200; doAttack(f); }
+        const speedMult = getStatMult(f, 'speed');
+        f.cd -= dt * 1000 * speedMult;
+        if (f.cd <= 0) { f.cd = Math.round(1200 / speedMult); doAttack(f); }
       }
     }
     if (w.hp > 0 && w.discovered) {
@@ -5878,6 +5523,29 @@ function updateWildBattles(dt, now) {
       if (rr < 0.35 && rr < focusRatio) { focusRatio = rr; focus = w; }
     }
   });
+
+  // ---- Harte Positions-Beschränkung: Follower bleiben im FOLLOWER_RADIUS um den Anführer ----
+  if (leader && leader.faintT <= 0) {
+    BT.fighters.forEach((f, slotIdx) => {
+      if (slotIdx === 0 || f.faintT > 0) return;
+      const dx = f.wx - leader.wx, dy = f.wy - leader.wy;
+      const dist = Math.hypot(dx, dy);
+      if (dist > FOLLOWER_RADIUS) {
+        const scale = FOLLOWER_RADIUS / dist;
+        f.wx = leader.wx + dx * scale;
+        f.wy = leader.wy + dy * scale;
+        // Zielposition ebenfalls innerhalb des Radius halten
+        if (f.targetWx !== undefined) {
+          const tdx = f.targetWx - leader.wx, tdy = f.targetWy - leader.wy;
+          const td = Math.hypot(tdx, tdy);
+          if (td > FOLLOWER_RADIUS) {
+            f.targetWx = leader.wx + tdx / td * FOLLOWER_RADIUS;
+            f.targetWy = leader.wy + tdy / td * FOLLOWER_RADIUS;
+          }
+        }
+      }
+    });
+  }
 
   // ---- Wilde greifen ihre jeweiligen Gegner an ----
   BT.wilds.forEach(w => {
@@ -5955,6 +5623,13 @@ function drawBattle(now) {
     ctx.fillStyle = fl.color; ctx.fillText(fl.text, fx, fy);
     ctx.globalAlpha = 1;
   });
+  // Aura-Pixel-Partikel (Welt → Screen) — Update erfolgt in updateBattle
+  BT.auraDust.forEach(p => {
+    const [R, G, B] = hexToRgbBurst(p.color);
+    ctx.fillStyle = `rgba(${R},${G},${B},${(1 - p.t / p.life) * 0.9})`;
+    ctx.fillRect(Math.round(p.x - BT.cam.x), Math.round(p.y - BT.cam.y), 3, 3);
+  });
+
   // Burst-Effekte (Welt → Screen)
   BT.bursts.forEach(b => {
     const sx = b.x - BT.cam.x;
@@ -6065,7 +5740,7 @@ function drawBall(ctx, x, y) {
    ===================================================================== */
 /* ---- Tile-Eigenschaften pro Biom (solide = blockiert, overhead = über Pokémon) ---- */
 const TILE_SOLID = {
-  grass: new Set([3, 5, 6]), cave: new Set([1, 2, 3, 4]), sea: new Set([2, 4]),
+  grass: new Set([3, 5, 6]), cave: new Set([1, 2, 3]), sea: new Set([2, 4]),
   volcano: new Set([1, 2, 3]), snow: new Set([2, 3, 4]), mystic: new Set([1, 2, 5])
 };
 const TILE_OVERHEAD = { grass: new Set([3]), snow: new Set([4]), mystic: new Set([1]) };
@@ -6125,14 +5800,18 @@ function separateEntities() {
 
 /* ---- Kamera: rahmt die ganze Team-Gruppe (Mittelpunkt aller lebenden Kämpfer) ---- */
 function updateCamera() {
-  const alive = BT.fighters.filter(f => f.faintT <= 0);
-  const grp = alive.length ? alive : BT.fighters;
-  if (!grp.length) return;
-  let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
-  grp.forEach(f => { minx = Math.min(minx, f.wx); maxx = Math.max(maxx, f.wx); miny = Math.min(miny, f.wy); maxy = Math.max(maxy, f.wy); });
-  let fx = (minx + maxx) / 2, fy = (miny + maxy) / 2;
-  // Im Legenden-Kampf die Legende mit einrahmen
-  if (BT.legendActive && BT.wild) { fx = (fx + BT.wild.wx) / 2; fy = (fy + BT.wild.wy) / 2; }
+  // Kamera folgt ausschließlich dem Anführer (fighters[0]).
+  // Das hält alle Follower im Bild, da sie per FOLLOWER_RADIUS am Anführer gebunden sind.
+  const leader = BT.fighters[0];
+  if (!leader) return;
+
+  // Im Legenden-Kampf Kompromiss zwischen Anführer und Legende
+  let fx = leader.wx, fy = leader.wy;
+  if (BT.legendActive && BT.wild) {
+    fx = (leader.wx + BT.wild.wx) / 2;
+    fy = (leader.wy + BT.wild.wy) / 2;
+  }
+
   const tx = Math.max(0, Math.min(BT.mapW - BT.W, fx - BT.W / 2));
   const ty = Math.max(0, Math.min(BT.mapH - BT.H, fy - BT.H / 2));
   BT.cam.x += (tx - BT.cam.x) * 0.12;
@@ -6154,12 +5833,51 @@ function tryStep(e, dx, dy) {
   if (isWalkable(e.wx, e.wy + dy)) { e.wy += dy; if (Math.abs(dy) > 0.01) moved = true; }
   return moved;
 }
+function tryStepWithSlide(e, dx, dy) {
+  // Versuch 1: Direktbewegung (axis-separated, wie bisher)
+  let movedX = false, movedY = false;
+  if (Math.abs(dx) > 0.001 && isWalkable(e.wx + dx, e.wy)) { e.wx += dx; movedX = true; }
+  if (Math.abs(dy) > 0.001 && isWalkable(e.wx, e.wy + dy)) { e.wy += dy; movedY = true; }
+  if (movedX || movedY) return true;
+
+  // Versuch 2: Wandgleiten — probiere seitliche Vektoren
+  const len = Math.hypot(dx, dy) || 1;
+  const ANGLES = [30, -30, 60, -60, 90, -90];
+  for (const deg of ANGLES) {
+    const rad = deg * Math.PI / 180;
+    const cos = Math.cos(rad), sin = Math.sin(rad);
+    const sx = (dx * cos - dy * sin), sy = (dx * sin + dy * cos);
+    const sl = Math.hypot(sx, sy) || 1;
+    const ndx = sx / sl * len, ndy = sy / sl * len;
+    let mx = false, my = false;
+    if (Math.abs(ndx) > 0.001 && isWalkable(e.wx + ndx, e.wy)) { e.wx += ndx; mx = true; }
+    if (Math.abs(ndy) > 0.001 && isWalkable(e.wx, e.wy + ndy)) { e.wy += ndy; my = true; }
+    if (mx || my) return true;
+  }
+  return false;
+}
 function patrol(f, dt) {
   const d = Math.hypot(f.targetWx - f.wx, f.targetWy - f.wy);
-  if (d < 10) { newPatrolTargetWorld(f); return; }
-  const step = 30 * dt, dx = (f.targetWx - f.wx) / d * step, dy = (f.targetWy - f.wy) / d * step;
+  if (d < 10) { f.stuckTicks = 0; newPatrolTargetWorld(f); return; }
+  const step = 30 * dt;
+  const dx = (f.targetWx - f.wx) / d * step;
+  const dy = (f.targetWy - f.wy) / d * step;
   if (Math.abs(dx) > 0.02) f.dir = dx < 0 ? -1 : 1;
-  if (!tryStep(f, dx, dy)) newPatrolTargetWorld(f);
+  const moved = tryStepWithSlide(f, dx, dy);
+  if (!moved) {
+    f.stuckTicks = (f.stuckTicks || 0) + 1;
+    if (f.stuckTicks > 20) {
+      // Notfall-Teleport zur nächsten freien Position
+      const p = findWalkableNear(f.wx, f.wy);
+      f.wx = p.x; f.wy = p.y;
+      f.stuckTicks = 0;
+      newPatrolTargetWorld(f);
+    } else if (f.stuckTicks > 8) {
+      newPatrolTargetWorld(f);
+    }
+  } else {
+    f.stuckTicks = 0;
+  }
 }
 function patrolNear(f, cx, cy, radius, dt) {
   if (f.targetWx === undefined || Math.hypot(f.targetWx - cx, f.targetWy - cy) > radius ||
@@ -6176,10 +5894,24 @@ function patrolNear(f, cx, cy, radius, dt) {
 function approach(f, tx, ty, step) {
   const d = Math.hypot(tx - f.wx, ty - f.wy);
   if (d < 1) return;
-  const dx = (tx - f.wx) / d * step, dy = (ty - f.wy) / d * step;
+  const dx = (tx - f.wx) / d * step;
+  const dy = (ty - f.wy) / d * step;
   if (Math.abs(dx) > 0.02) f.dir = dx < 0 ? -1 : 1;
   f.lx = (tx - f.wx) / d; f.ly = (ty - f.wy) / d;
-  tryStep(f, dx, dy);
+  const moved = tryStepWithSlide(f, dx, dy);
+  if (!moved) {
+    f.approachStuck = (f.approachStuck || 0) + 1;
+    if (f.approachStuck > 15) {
+      // Weiche seitlich aus: abwechselnd links/rechts
+      f.approachSide = (f.approachSide || 0) + 1;
+      const side = (f.approachSide % 2 === 0) ? 1 : -1;
+      const pdx = -dy / (d || 1) * step * side;
+      const pdy =  dx / (d || 1) * step * side;
+      tryStepWithSlide(f, pdx, pdy);
+    }
+  } else {
+    f.approachStuck = 0;
+  }
 }
 function wanderWild(w, dt) {
   w.hitFlash = Math.max(0, w.hitFlash - dt);
@@ -6191,7 +5923,24 @@ function wanderWild(w, dt) {
   }
   w.wt -= dt;
   const d = Math.hypot(w.wtx - w.wx, w.wty - w.wy);
-  if (d > 2) { const step = 16 * dt, dx = (w.wtx - w.wx) / d * step, dy = (w.wty - w.wy) / d * step; if (Math.abs(dx) > 0.02) w.dir = dx < 0 ? -1 : 1; if (isWalkable(w.wx + dx, w.wy)) w.wx += dx; if (isWalkable(w.wx, w.wy + dy)) w.wy += dy; }
+  if (d > 2) {
+    const step = 16 * dt;
+    const dx = (w.wtx - w.wx) / d * step;
+    const dy = (w.wty - w.wy) / d * step;
+    if (Math.abs(dx) > 0.02) w.dir = dx < 0 ? -1 : 1;
+    const moved = tryStepWithSlide(w, dx, dy);
+    if (!moved) {
+      w.wildStuck = (w.wildStuck || 0) + 1;
+      if (w.wildStuck > 12) {
+        const p = findWalkableNear(w.wx, w.wy);
+        w.wx = p.x; w.wy = p.y;
+        w.wildStuck = 0;
+        w.wt = 0; // neues Wanderziel sofort
+      }
+    } else {
+      w.wildStuck = 0;
+    }
+  }
 }
 function wildHit(w, f) {
   const dmg = Math.max(1, Math.round(w.legendary ? (w.atk || 40) / 20 : 3 + w.level * 0.5));
@@ -6199,6 +5948,13 @@ function wildHit(w, f) {
   f.hitFlash = 0.25;
   addFloat(f.wx, f.wy - 30, String(dmg), "#f8f8f8", 8);
   if (f.hp <= 0) { f.faintT = 8; addFloat(f.wx, f.wy - 44, "K.O.!", "#e04038", 9); }
+}
+
+/* Gibt den kombinierten Multiplikator für einen Stat-Slot ('atk','def','spAtk','spDef','speed')
+   aus allen aktiven statBoosts des Fighters zurück. */
+function getStatMult(f, stat) {
+  if (!f.statBoosts || !f.statBoosts.length) return 1;
+  return f.statBoosts.reduce((acc, b) => acc * (b[stat] || 1), 1);
 }
 
 /* ---- Map-Generierung (einmalig pro Biom, gecacht) ---- */
@@ -6259,6 +6015,24 @@ function genCave(T) {
     if (T[idx] === 1) { const edge = T[idx - 1] === 0 || T[idx + 1] === 0 || T[idx - C] === 0 || T[idx + C] === 0;
       if (edge && Math.random() < 0.06) T[idx] = 2; else if (Math.random() < 0.03) T[idx] = 3; }
     else if (Math.random() < 0.03) T[idx] = 4; }
+  // Erosion-Pass: isolierte Felsen ohne walkable Nachbarn öffnen
+  // Damit entstehen keine geschlossenen Kammern und Pokémon können sich frei bewegen
+  for (let pass = 0; pass < 2; pass++) {
+    for (let r = 1; r < R - 1; r++) {
+      for (let c = 1; c < C - 1; c++) {
+        const t = T[r * C + c];
+        if (t === 0) continue; // bereits frei
+        // Zähle freie (walkable = Tile 0) orthogonale Nachbarn
+        let freeNeighbors = 0;
+        if (T[(r-1)*C+c] === 0) freeNeighbors++;
+        if (T[(r+1)*C+c] === 0) freeNeighbors++;
+        if (T[r*C+(c-1)] === 0) freeNeighbors++;
+        if (T[r*C+(c+1)] === 0) freeNeighbors++;
+        // Isolierter Fels (≤1 freier Nachbar) → öffnen
+        if (freeNeighbors <= 1) T[r * C + c] = 0;
+      }
+    }
+  }
 }
 function genSea(T) {
   const C = BT.cols, R = BT.rows;
@@ -6391,6 +6165,67 @@ function drawTileTop(ctx, biome, t, x, y, now) {
 }
 
 /* ---- Rendering: Pokémon ---- */
+/* ===== Physische-Attacken-Aura (Silhouetten im DBZ-Stil) ===== */
+const AURA_CHARGE = 0;   // Ramp-up: Aura fährt hoch, Pokémon steht noch
+const AURA_FULL   = 0.30;   // volle Aura — exakt die Lunge-Dauer
+const AURA_FADE   = 0.12;   // Ausblenden nach Rückkehr zur Ausgangsposition
+const AURA_TOTAL  = AURA_CHARGE + AURA_FULL + AURA_FADE;  // 0.83
+
+function auraLevel(f) {
+  if (f.auraT < 0) return 0;
+  if (f.auraT < AURA_CHARGE) return f.auraT / AURA_CHARGE;               // linear 0→1
+  if (f.auraT < AURA_CHARGE + AURA_FULL) return 1;                       // volle Aura
+  if (f.auraT < AURA_TOTAL) return 1 - (f.auraT - AURA_CHARGE - AURA_FULL) / AURA_FADE;  // Fade
+  return 0;
+}
+
+// Referenz-Look aus abgenommener Demo: Sprite 96px, Aura-Dicke 8, Puls 100%.
+const AURA_THICK_RATIO = 8 / 96;   // ≈ 0.0833 → bei S=42 ergibt das ~3.5px
+const AURA_PULSE       = 1.0;      // Puls 100%, fest
+
+/* Zeichnet die eingefärbte Silhouetten-Aura HINTER dem Sprite.
+   cx, cy, S sind identisch zu drawFighters Sprite-Draw (inkl. Lunge & Bob). */
+function drawFighterAura(ctx, f, m, cx, cy, S, now) {
+  const lvl = auraLevel(f);
+  if (lvl <= 0.01 || !f.auraColor) return;
+  const sil = getSilhouette(m.dex, m.shiny, f.auraColor);
+  if (!sil) return;
+
+  const y = cy - S + 6;   // Sprite-Ziel-Y (wie in drawFighter)
+  const pulse = 1 + Math.sin(now / 90) * 0.10 * AURA_PULSE + Math.sin(now / 53) * 0.05 * AURA_PULSE;
+
+  // Layer 1 — radialer Glow (rotationssymmetrisch, VOR der Flip-Transformation)
+  const [R, G, B] = hexToRgbBurst(f.auraColor);
+  const gr = ctx.createRadialGradient(cx, y + S / 2, 0, cx, y + S / 2, S * 0.72 * pulse);
+  gr.addColorStop(0,    `rgba(${R},${G},${B},${0.30 * lvl})`);
+  gr.addColorStop(0.55, `rgba(${R},${G},${B},${0.12 * lvl})`);
+  gr.addColorStop(1,    `rgba(${R},${G},${B},0)`);
+  ctx.fillStyle = gr;
+  ctx.beginPath(); ctx.arc(cx, y + S / 2, S * 0.72 * pulse, 0, Math.PI * 2); ctx.fill();
+
+  // Flip-Transformation spiegelbildlich zu drawFighter
+  ctx.save();
+  let x;
+  if (f.dir < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); x = -S / 2; }
+  else x = cx - S / 2;
+
+  // Layer 2 — 8 versetzte Silhouetten-Kopien
+  const th = S * AURA_THICK_RATIO * pulse;
+  ctx.globalAlpha = 0.55 * lvl;
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + now / 400;
+    const wob = 1 + Math.sin(now / 70 + i * 2.1) * 0.25 * AURA_PULSE;
+    ctx.drawImage(sil, x + Math.cos(a) * th * wob, y + Math.sin(a) * th * wob - th * 0.4, S, S);
+  }
+
+  // Layer 3 — heller Saum (minimal skalierte Typ-farbene Kopie, KEIN Weiß)
+  ctx.globalAlpha = 0.85 * lvl;
+  const sc = 1 + 0.03 * pulse;
+  ctx.drawImage(sil, x - S * (sc - 1) / 2, y - S * (sc - 1) / 2 - 1, S * sc, S * sc);
+
+  ctx.restore();   // stellt globalAlpha = 1 wieder her
+}
+
 function drawFighter(ctx, f, now) {
   const m = getMon(f.uid); if (!m) return;
   const sx = f.wx - BT.cam.x, sy = f.wy - BT.cam.y;
@@ -6399,6 +6234,7 @@ function drawFighter(ctx, f, now) {
   const lunge = f.lunge > 0 ? Math.sin((0.3 - f.lunge) / 0.3 * Math.PI) * 8 : 0;
   const cx = sx + (f.lx || 0) * lunge, cy = sy + bob + (f.ly || 0) * lunge, S = 42;
   ctx.fillStyle = "rgba(0,0,0,.22)"; ctx.beginPath(); ctx.ellipse(sx, sy + 4, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
+  drawFighterAura(ctx, f, m, cx, cy, S, now);   // Silhouetten-Aura hinter dem Sprite (physische Attacke)
   const img = imgFor(m.dex, m.shiny);
   ctx.save();
   if (f.hitFlash > 0) ctx.filter = "brightness(2.2)";
@@ -6408,6 +6244,15 @@ function drawFighter(ctx, f, now) {
   }
   ctx.restore();
   drawHpBar(ctx, sx, cy - S + 2, f.hp, f.maxHp, m.happiness);
+  // Aktive Stat-Boosts als kleine farbige Punkte über der HP-Bar anzeigen
+  if (f.statBoosts && f.statBoosts.length) {
+    f.statBoosts.forEach((b, i) => {
+      ctx.fillStyle = "#a0f0a0";
+      ctx.beginPath();
+      ctx.arc(sx - 8 + i * 5, cy - S + 0, 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
   if (f.uid === BT.activeFighterUid && BT.wild && BT.wild.discovered) { ctx.strokeStyle = "#f8f8a0"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(sx, sy + 2, 3, 0, Math.PI * 2); ctx.stroke(); }
 }
 function drawWild(ctx, w, now) {
@@ -7469,7 +7314,7 @@ function startLegendEncounter() {
   BT.wilds.push(w); BT.wild = w; BT.legendActive = true; BT.ballAnim = null;
   BT.activeFighterUid = lead ? lead.uid : null; BT.combatPause = -1;
   state.seen = state.seen || {}; state.seen[ev.dexId] = true;
-  getPokemonData(ev.dexId).then(d => { w.name = d.name; w.types = d.types; addLog("⚡ " + d.name + " (Lv." + ev.level + ") fordert dich heraus!"); });
+  getPokemonData(ev.dexId).then(d => { w.name = d.name; w.types = d.types; });
   toast("⚡ Tippe auf ⚔ ATTACKIEREN, um dein Team angreifen zu lassen!");
 }
 function legendAttack() {
@@ -7481,7 +7326,6 @@ function legendAttack() {
 }
 function onLegendDefeated(w) {
   if (state.weeklyEvent) { state.weeklyEvent.defeated = true; save(); }
-  addLog("⚡ " + w.name + " wurde geschwächt! Wirf jetzt einen Ball!");
   openLegendCatch();
 }
 const LEGEND_BALL_RATE = { meisterball: 0.60, hyperball: 0.30, superball: 0.15, pokeball: 0.05 };
@@ -8243,34 +8087,6 @@ async function chooseStarter(dex) {
 /* =====================================================================
    DATENEXPORT / IMPORT / RESET
    ===================================================================== */
-function exportData() {
-  const blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "habitdex_backup_" + todayStr() + ".json";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  toast("📤 Backup heruntergeladen.");
-}
-function importData(ev) {
-  const file = ev.target.files && ev.target.files[0];
-  if (!file) return;
-  if (!confirm("Alle aktuellen Daten werden überschrieben. Fortfahren?")) { ev.target.value = ""; return; }
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      if (!data || typeof data !== "object" || !Array.isArray(data.habits)) throw new Error("ungültig");
-      const def = defaultState();
-      for (const k in def) if (data[k] === undefined) data[k] = def[k];
-      localStorage.setItem("habitdex_state", JSON.stringify(data));
-      toast("📥 Import erfolgreich – App wird neu geladen …");
-      setTimeout(() => location.reload(), 600);
-    } catch (e) { toast("❌ Import fehlgeschlagen: ungültige Datei."); }
-  };
-  reader.readAsText(file);
-  ev.target.value = "";
-}
 function resetAll() {
   if (!confirm("WIRKLICH alles löschen? Dieser Schritt kann nicht rückgängig gemacht werden.")) return;
   if (!confirm("Letzte Warnung: Alle Habits, Pokémon und Fortschritte werden unwiderruflich gelöscht!")) return;
@@ -8460,18 +8276,270 @@ function checkPeopleReminders() {
   });
 }
 
+/* =====================================================================
+   AUFGABEN (Tasks)
+   ===================================================================== */
+
+let editingTaskId = null;
+let modalSubtasks = [];      // temporäre Subtask-Liste im Modal (nicht persistiert)
+let tasksDoneOpen = false;   // Erledigt-Sektion im Panel auf/zu (nicht persistiert)
+
+/* ---- Panel Toggle ---- */
+function toggleTasksPanel() {
+  const panel = document.getElementById("tasks-panel");
+  const open = !panel.classList.toggle("collapsed");
+  localStorage.setItem("habitdex_tasksopen", open ? "1" : "0");
+  renderTasks();
+}
+
+/* ---- Render ---- */
+function renderTasks() {
+  const body = document.getElementById("tasks-body");
+  if (!body) return;
+
+  // Collapse-Zustand wiederherstellen (default: offen)
+  const panel = document.getElementById("tasks-panel");
+  const open = localStorage.getItem("habitdex_tasksopen") !== "0";
+  panel.classList.toggle("collapsed", !open);
+
+  // Status-Icons im Header
+  const openCount = (state.tasks || []).filter(t => !t.done).length;
+  const overdue = (state.tasks || []).filter(t => !t.done && t.dueDate && t.dueDate < todayStr()).length;
+  const statusEl = document.getElementById("tasks-status-icons");
+  if (statusEl) {
+    statusEl.textContent = overdue > 0 ? "⚠ " + overdue : openCount > 0 ? openCount + " offen" : "✅";
+  }
+
+  const tasks = state.tasks || [];
+  const open_tasks = tasks
+    .filter(t => !t.done)
+    .sort((a, b) => {
+      // null dueDate ans Ende
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return a.dueDate.localeCompare(b.dueDate);
+    });
+  const done_tasks = tasks.filter(t => t.done).slice(0, 7);
+
+  let html = '<button class="btn green task-add-btn" onclick="openTaskModal()">+ Neue Aufgabe</button>';
+
+  if (!open_tasks.length && !done_tasks.length) {
+    html += '<p class="muted">Noch keine Aufgaben. Füge einmalige Aufgaben hinzu, die du erledigen möchtest.</p>';
+  }
+
+  open_tasks.forEach(t => { html += renderTaskCard(t); });
+
+  if (done_tasks.length) {
+    html += '<div class="task-done-section">' +
+      '<div class="task-done-header" onclick="toggleTasksDone()">' +
+        (tasksDoneOpen ? "▾" : "▸") + " Erledigt (" + done_tasks.length + ")" +
+      '</div>';
+    if (tasksDoneOpen) {
+      done_tasks.forEach(t => { html += renderTaskCard(t); });
+    }
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+}
+
+function renderTaskCard(t) {
+  const today = todayStr();
+  const checkCls = t.done ? " checked" : "";
+  const titleCls = t.done ? " done-text" : "";
+  const cardCls = t.done ? " done-card" : "";
+
+  let dueLine = "";
+  if (t.dueDate) {
+    let dueCls = "task-due--future";
+    let label = "Fällig: " + t.dueDate;
+    if (!t.done) {
+      if (t.dueDate < today) { dueCls = "task-due--overdue"; label = "⚠ Überfällig seit " + t.dueDate; }
+      else if (t.dueDate === today) { dueCls = "task-due--today"; label = "⏰ Heute fällig"; }
+    }
+    dueLine = '<div class="task-due ' + dueCls + '">' + label + '</div>';
+  }
+
+  let subtasksHtml = "";
+  if (t.subtasks && t.subtasks.length) {
+    subtasksHtml = '<div class="subtask-list">';
+    t.subtasks.forEach(s => {
+      const sCls = s.done ? " checked" : "";
+      const sTitleCls = s.done ? " done-text" : "";
+      subtasksHtml +=
+        '<div class="subtask-row">' +
+          '<button class="subtask-check' + sCls + '" onclick="toggleSubtask(\'' + t.id + '\',\'' + s.id + '\')">' +
+            (s.done ? "✓" : "") +
+          '</button>' +
+          '<span class="subtask-title' + sTitleCls + '">' + esc(s.title) + '</span>' +
+        '</div>';
+    });
+    subtasksHtml += '</div>';
+  }
+
+  return '<div class="task-card' + cardCls + '">' +
+    '<button class="task-check' + checkCls + '" onclick="toggleTask(\'' + t.id + '\')">' +
+      (t.done ? "✓" : "") +
+    '</button>' +
+    '<div class="task-body">' +
+      '<div class="task-title' + titleCls + '">' + esc(t.title) + '</div>' +
+      dueLine +
+      subtasksHtml +
+    '</div>' +
+    (!t.done
+      ? '<div class="task-actions"><button class="task-edit-btn" onclick="openTaskModal(\'' + t.id + '\')">✎</button></div>'
+      : '') +
+  '</div>';
+}
+
+/* ---- Toggle ---- */
+function toggleTask(id) {
+  const t = (state.tasks || []).find(x => x.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  t.doneAt = t.done ? todayStr() : null;
+  save();
+  renderTasks();
+}
+
+function toggleSubtask(taskId, subId) {
+  const t = (state.tasks || []).find(x => x.id === taskId);
+  if (!t) return;
+  const s = (t.subtasks || []).find(x => x.id === subId);
+  if (!s) return;
+  s.done = !s.done;
+  save();
+  renderTasks();
+}
+
+function toggleTasksDone() {
+  tasksDoneOpen = !tasksDoneOpen;
+  renderTasks();
+}
+
+/* ---- Modal ---- */
+function openTaskModal(id) {
+  editingTaskId = id || null;
+  const title = document.getElementById("task-modal-title");
+  const titleIn = document.getElementById("task-title-input");
+  const dueIn = document.getElementById("task-due-input");
+  const delBtn = document.getElementById("task-delete-btn");
+
+  if (editingTaskId) {
+    const t = (state.tasks || []).find(x => x.id === editingTaskId);
+    if (!t) { editingTaskId = null; return; }
+    title.textContent = "Aufgabe bearbeiten";
+    titleIn.value = t.title;
+    dueIn.value = t.dueDate || "";
+    modalSubtasks = (t.subtasks || []).map(s => ({ id: s.id, title: s.title, done: s.done }));
+    delBtn.style.display = "block";
+  } else {
+    title.textContent = "Neue Aufgabe";
+    titleIn.value = "";
+    dueIn.value = "";
+    modalSubtasks = [];
+    delBtn.style.display = "none";
+  }
+
+  renderModalSubtasks();
+  openModal("task-modal");
+}
+
+function renderModalSubtasks() {
+  const list = document.getElementById("task-subtasks-list");
+  if (!list) return;
+  if (!modalSubtasks.length) { list.innerHTML = ""; return; }
+  list.innerHTML = modalSubtasks.map((s, i) =>
+    '<div class="modal-subtask-row">' +
+      '<input class="modal-subtask-input" maxlength="50" value="' + esc(s.title) + '"' +
+        ' oninput="modalSubtasks[' + i + '].title=this.value.trim().slice(0,50)">' +
+      '<button class="modal-subtask-remove" onclick="removeSubtaskInModal(' + i + ')">✕</button>' +
+    '</div>'
+  ).join("");
+}
+
+function addSubtaskInModal() {
+  modalSubtasks.push({ id: uid(), title: "", done: false });
+  renderModalSubtasks();
+  // Fokus auf neues Input setzen
+  const inputs = document.querySelectorAll(".modal-subtask-input");
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function removeSubtaskInModal(i) {
+  modalSubtasks.splice(i, 1);
+  renderModalSubtasks();
+}
+
+function saveTask() {
+  const titleIn = document.getElementById("task-title-input");
+  const dueIn = document.getElementById("task-due-input");
+  const title = titleIn.value.trim().slice(0, 60);
+  if (!title) { toast("Bitte einen Titel eingeben."); return; }
+
+  const dueDate = dueIn.value || null;
+
+  // Subtasks: leere Titel rausfiltern
+  const subtasks = modalSubtasks.filter(s => s.title.trim()).map(s => ({
+    id: s.id,
+    title: s.title.trim().slice(0, 50),
+    done: s.done
+  }));
+
+  if (!state.tasks) state.tasks = [];
+
+  if (editingTaskId) {
+    const t = state.tasks.find(x => x.id === editingTaskId);
+    if (t) { t.title = title; t.dueDate = dueDate; t.subtasks = subtasks; }
+  } else {
+    state.tasks.push({
+      id: uid(),
+      title,
+      dueDate,
+      done: false,
+      doneAt: null,
+      subtasks
+    });
+  }
+
+  save();
+  closeModal("task-modal");
+  renderTasks();
+}
+
+function deleteTask() {
+  if (!editingTaskId) return;
+  if (!confirm("Aufgabe wirklich löschen?")) return;
+  state.tasks = (state.tasks || []).filter(x => x.id !== editingTaskId);
+  save();
+  closeModal("task-modal");
+  renderTasks();
+}
+
+/* ---- Fälligkeits-Check beim Start / Tageswechsel ---- */
+function checkDueTasks() {
+  if (!state.tasks) return;
+  const today = todayStr();
+  const overdue = state.tasks.filter(t => !t.done && t.dueDate && t.dueDate <= today);
+  if (overdue.length === 1) {
+    setTimeout(() => toast("⚠ 1 Aufgabe ist heute fällig oder überfällig."), 3500);
+  } else if (overdue.length > 1) {
+    setTimeout(() => toast("⚠ " + overdue.length + " Aufgaben sind fällig oder überfällig."), 3500);
+  }
+}
+
 function renderAll() {
-  renderHabits(); renderDailyLog(); renderPeople(); renderGoals(); renderTeam(); renderBox(); renderItems(); renderLog(); renderStats();
+  renderHabits(); renderDailyLog(); renderPeople(); renderTasks(); renderGoals(); renderTeam(); renderBox(); renderItems(); renderStats();
   renderTrainerCard();
   if (document.getElementById("tab-dex").classList.contains("active")) renderDex();
 }
 document.querySelectorAll(".modal-bg").forEach(m => {
   m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); });
 });
-// City-Modal: Hintergrund-Klick muss zusätzlich CITY.dialogOpen zurücksetzen,
-// sonst bleiben Gebäude/NPCs nach dem Schließen blockiert.
+// City-Modal: Hintergrund-Klick schließt das Modal und bricht einen laufenden Arena-Kampf ab.
 document.getElementById("city-modal-bg").addEventListener("click", e => {
-  if (e.target.id === "city-modal-bg") { CITY.dialogOpen = false; CITY.battle = null; }
+  if (e.target.id === "city-modal-bg") { CITY.battle = null; closeCityModal(); }
 });
 
 loadAll();
@@ -8481,9 +8549,9 @@ ensureTodayStats();
 updateHeader();
 renderAll();
 checkPeopleReminders();
+checkDueTasks();
 processOffline();
 initBattle();
-initCity();
 checkStreakRescue();
 scheduleAllReminders();
 if (!state.trainer) {
