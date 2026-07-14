@@ -518,6 +518,83 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 .an-tag{color:var(--expblue)}
 .an-words{color:var(--white);line-height:2}
 .an-hint{color:#8898b0}
+.an-label{color:var(--white);font-size:7px;flex:none}
+
+/* ===== Input-Log Tab ===== */
+.il-type-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;margin-bottom:4px}
+.il-type-btn{
+  font-family:inherit;font-size:7px;color:var(--ink);cursor:pointer;
+  border:2px solid var(--line);border-radius:5px;background:var(--panel2);
+  padding:6px 8px;opacity:.55;
+}
+.il-type-btn.sel{opacity:1;border-color:#204878}
+.il-type-btn[data-t="artikel"].sel{background:#3878c8;color:#fff}
+.il-type-btn[data-t="buch"].sel{background:#287848;color:#fff}
+.il-type-btn[data-t="podcast"].sel{background:#a05820;color:#fff}
+.il-type-btn[data-t="video"].sel{background:#a02820;color:#fff}
+.il-type-btn[data-t="sonstiges"].sel{background:#505068;color:#fff}
+.il-tags-preview{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0 2px}
+.il-tag-chip{
+  font-size:7px;background:var(--bg2);color:var(--gold);
+  border:1px solid var(--gold);border-radius:4px;padding:3px 6px;
+  cursor:pointer;display:flex;align-items:center;gap:3px;
+}
+.il-tag-chip::after{content:"×";color:#a8b8c8}
+.il-info-banner{
+  background:var(--bg2);border:2px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:10px;font-size:7px;line-height:2;color:#a8b8c8;
+  cursor:pointer;
+}
+.il-info-banner.collapsed .il-info-body{display:none}
+.il-info-title{color:var(--gold);font-size:8px;margin-bottom:6px;display:flex;justify-content:space-between}
+.il-filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.il-filter-btn{
+  font-family:inherit;font-size:7px;color:var(--white);cursor:pointer;
+  border:2px solid var(--line);border-radius:5px;background:var(--bg2);
+  padding:5px 7px;opacity:.6;
+}
+.il-filter-btn.sel{opacity:1;background:var(--blue);border-color:#204878}
+.il-search{
+  font-family:inherit;font-size:8px;width:100%;padding:6px 8px;margin-bottom:8px;
+  background:var(--bg2);color:var(--white);
+  border:2px solid var(--line);border-radius:6px;
+}
+.il-entry{
+  background:var(--bg2);border:2px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:8px;
+}
+.il-entry-header{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:5px}
+.il-entry-title{font-size:9px;color:var(--white);flex:1}
+.il-entry-date{font-size:7px;color:#8898b0;flex:none}
+.il-entry-source{font-size:7px;color:#8898b0;margin-bottom:5px}
+.il-badge{
+  display:inline-block;font-size:6px;padding:2px 5px;border-radius:3px;
+  margin-right:4px;margin-bottom:4px;color:#fff;
+}
+.il-badge-artikel{background:#3878c8}
+.il-badge-buch{background:#287848}
+.il-badge-podcast{background:#a05820}
+.il-badge-video{background:#a02820}
+.il-badge-sonstiges{background:#505068}
+.il-entry-takeaway{
+  font-size:8px;color:var(--white);line-height:1.7;
+  margin:6px 0;padding:6px 8px;
+  background:rgba(0,0,0,.2);border-left:2px solid var(--gold);border-radius:0 4px 4px 0;
+  cursor:pointer;
+}
+.il-entry-takeaway.collapsed{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+.il-entry-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.il-entry-tag{
+  font-size:7px;background:var(--bg);color:var(--expblue);
+  border:1px solid var(--expblue);border-radius:4px;padding:2px 5px;cursor:pointer;
+}
+.il-entry-del{
+  font-family:inherit;font-size:7px;color:#8898b0;background:none;
+  border:1px solid var(--line);border-radius:4px;padding:3px 6px;cursor:pointer;
+  margin-top:6px;
+}
 
 /* ===== Tages-Notiz Absenden + Notizspeicher ===== */
 .dl-note-sent{font-size:9px;color:var(--hpgreen);padding:6px 0;line-height:1.8}
@@ -540,6 +617,38 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border:1px solid var(--gold);border-radius:4px;padding:2px 5px}
 .note-divider{border:none;border-top:1px solid var(--line);margin:2px 0}
 .note-search-row{margin-bottom:2px}
+
+/* ===== Tages-Log Sektions-Header (Morgens / GYM / Abends) ===== */
+.dl-section-header {
+  font-size: 8px; color: var(--ink); font-weight: bold;
+  background: var(--panel2); border-radius: 5px;
+  padding: 5px 7px; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 5px;
+}
+.dl-gym-toggle-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 0;
+}
+.dl-gym-body {
+  margin-top: 10px; padding-top: 8px;
+  border-top: 2px dashed var(--line);
+}
+.dl-gym-body.hidden { display: none; }
+.dl-select {
+  font-family: inherit; font-size: 8px; color: var(--ink);
+  border: 3px solid var(--line); border-radius: 6px;
+  background: var(--panel2); padding: 5px 6px; cursor: pointer;
+}
+.dl-weight-input {
+  font-family: inherit; font-size: 9px; color: var(--ink); width: 80px;
+  text-align: right; border: 3px solid var(--line); border-radius: 6px;
+  background: #fff; padding: 5px;
+}
+.alcohol-btn {
+  font-family: inherit; font-size: 8px; color: var(--ink); cursor: pointer;
+  border: 2px solid var(--line); border-radius: 5px; background: var(--panel2);
+  padding: 6px 8px; opacity: .55;
+}
+.alcohol-btn.on { opacity: 1; background: var(--blue); color: #fff; border-color: #204878; }
 
 /* ===== Trainer-Profil ===== */
 #trainer-card{
@@ -883,6 +992,11 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <!-- TAB: CITY -->
     <section class="tab" id="tab-city"></section>
 
+    <!-- TAB: INPUT-LOG -->
+    <section class="tab" id="tab-inputlog">
+      <div id="inputlog-content"></div>
+    </section>
+
     <!-- TAB: ANALYSE -->
     <section class="tab" id="tab-analyse">
       <h2>&#9654; DIESE WOCHE</h2>
@@ -923,8 +1037,32 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <button data-tab="team" onclick="switchTab('team')"><span class="ic">&#9876;&#65039;</span>Team</button>
     <button data-tab="box" onclick="switchTab('box')"><span class="ic">&#127890;</span>Box</button>
     <button data-tab="city" onclick="switchTab('city')"><span class="ic">🏙️</span>Stadt</button>
+    <button data-tab="inputlog" onclick="switchTab('inputlog')"><span class="ic">&#128218;</span>Input</button>
     <button data-tab="analyse" onclick="switchTab('analyse')"><span class="ic">&#128202;</span>Analyse</button>
   </nav>
+
+  <!-- Input-Log modal -->
+  <div class="modal-bg" id="inputlog-modal">
+    <div class="modal">
+      <h3 id="inputlog-modal-title">&#128218; Neuer Eintrag</h3>
+      <label>Titel</label>
+      <input id="il-title-input" maxlength="100" placeholder="z.B. Warum Japan stagniert">
+      <label>Quelle</label>
+      <input id="il-source-input" maxlength="100" placeholder="z.B. Economist, Lex Fridman Podcast">
+      <label>Typ</label>
+      <div class="il-type-row" id="il-type-row"></div>
+      <label>Tags <span style="font-size:7px;color:#909080">(min. 1 — #wirtschaft #ki #fitness)</span></label>
+      <input id="il-tags-input" maxlength="200" placeholder="#tag eingeben und Enter drücken">
+      <div class="il-tags-preview" id="il-tags-preview"></div>
+      <label>Takeaway <span style="font-size:7px;color:#909080">— deine Schlussfolgerung, nicht die des Autors</span></label>
+      <textarea id="il-takeaway-input" maxlength="300" placeholder="Ein Satz: Was nimmst du mit?"></textarea>
+      <label>Datum</label>
+      <input type="date" id="il-date-input">
+      <div style="height:12px"></div>
+      <button class="btn green" onclick="saveInputLogEntry()">Speichern</button>
+      <button class="btn red" onclick="closeModal('inputlog-modal')">Abbrechen</button>
+    </div>
+  </div>
 
   <!-- Habit modal -->
   <div class="modal-bg" id="habit-modal">
@@ -1424,7 +1562,9 @@ function defaultState() {
                       // gym:   { strength:1-5, feeling:1-5 } | null
                       // food:  { preWorkoutCarbs:bool, kcal:num|null, macro:"high-carb"|"low-carb"|"protein"|"mixed"|null } | null
                       // note:  { text:"", tags:["#legday", ...] } | null
-    tasks: []
+    tasks: [],
+    inputLog: []
+    // Jedes Element: { id, title, source, type, tags:[], takeaway, date:"YYYY-MM-DD" }
     // Jedes Element hat diese Struktur:
     // {
     //   id: string,           // uid()
@@ -1604,7 +1744,7 @@ function importBackup(event) {
 
 // Liefert (und initialisiert bei Bedarf) den Tages-Log-Eintrag für ein Datum "YYYY-MM-DD"
 function getDailyLog(date) {
-  if (!state.dailyLog[date]) state.dailyLog[date] = { sleep: null, gym: null, food: null, note: null };
+  if (!state.dailyLog[date]) state.dailyLog[date] = { sleep: null, gym: null, food: null, note: null, energy: null, alcohol: null, bodyWeight: null };
   return state.dailyLog[date];
 }
 
@@ -1622,8 +1762,8 @@ function pruneOldLogs() {
    ===================================================================== */
 function dlSectionDefault(section) {
   if (section === "sleep") return { bedtime: "", waketime: "", feeling: null };
-  if (section === "gym")   return { strength: null, feeling: null };
-  if (section === "food")  return { preWorkoutCarbs: false, kcal: null, macro: null };
+  if (section === "gym")   return { strength: null, feeling: null, preWorkoutCarbs: false, macro: null, mealTiming: null };
+  if (section === "food")  return { kcal: null };
   if (section === "note")  return { text: "", tags: [] };
   return {};
 }
@@ -1635,6 +1775,14 @@ function saveDailyLogField(section, key, value) {
   if (section === "note" && key === "text") {
     log.note.tags = value.match(/#\w+/g) || [];
   }
+  pruneOldLogs();
+  save();
+  renderDailyLog();
+}
+
+function saveDailyLogTopLevel(key, value) {
+  const log = getDailyLog(todayStr());
+  log[key] = value;
   pruneOldLogs();
   save();
   renderDailyLog();
@@ -1692,13 +1840,29 @@ function renderDailyLog() {
   const gym   = log.gym   || dlSectionDefault("gym");
   const food  = log.food  || dlSectionDefault("food");
   const note  = log.note  || dlSectionDefault("note");
+  const energy     = log.energy     != null ? log.energy     : null;
+  const alcohol    = log.alcohol    != null ? log.alcohol    : null;
+  const bodyWeight = log.bodyWeight != null ? log.bodyWeight : null;
+  // GYM-Toggle-Zustand: true wenn Nutzer heute Gym war
+  const gymActive = !!(gym.strength != null || gym.feeling != null || gym.preWorkoutCarbs || gym.macro || gym.mealTiming
+    || (log.food && (log.food.preWorkoutCarbs || log.food.macro)));  // Fallback alte Logs
 
   const dur = sleepDuration(sleep.bedtime, sleep.waketime);
   const macros = [["high-carb","High Carb"],["low-carb","Low Carb"],["protein","Protein"],["mixed","Mixed"]];
+  const mealTimings = [["fasted","Nüchtern"],["lt1","< 1h"],["1to2","1–2h"],["2to3","2–3h"],["gt3","> 3h"]];
+  const alcoholOpts = [[0,"0"],[1,"1"],[2,"2"],[3,"3+"]];
+
+  // Aktuelle carbs/macro: gym-Objekt hat Vorrang, food-Objekt als Legacy-Fallback
+  const carbs = gym.preWorkoutCarbs || (log.food && log.food.preWorkoutCarbs) || false;
+  const macro = gym.macro || (log.food && log.food.macro) || null;
 
   body.innerHTML =
-    // ---- Schlaf ----
+
+    // ======== 🌅 MORGENS ========
     '<div class="dl-section">' +
+      '<div class="dl-section-header">&#127749; MORGENS</div>' +
+
+      // Schlaf
       '<div class="dl-title">&#127769; SCHLAF</div>' +
       '<div class="dl-row">' +
         '<span class="dl-label">Bettgehzeit</span>' +
@@ -1711,40 +1875,80 @@ function renderDailyLog() {
         '<span class="dl-label">Befinden nach 30min</span>' +
         dlRatingRow("sleep", "feeling", sleep.feeling) +
       '</div>' +
+
+      // Energielevel
+      '<div class="dl-row">' +
+        '<span class="dl-label">Energielevel</span>' +
+        '<div class="dl-rating">' +
+          [1,2,3,4,5].map(i => {
+            const on = energy === i ? " on" + i : "";
+            return '<button class="rate-btn' + on + '" onclick="saveDailyLogTopLevel(\'energy\',' + (energy === i ? "null" : i) + ')">' + i + '</button>';
+          }).join("") +
+        '</div>' +
+      '</div>' +
+
+      // Körpergewicht
+      '<div class="dl-row">' +
+        '<span class="dl-label">Gewicht</span>' +
+        '<input type="number" class="dl-weight-input" inputmode="decimal" step="0.1" min="30" max="200" placeholder="kg" value="' + (bodyWeight != null ? bodyWeight : "") + '" onchange="saveDailyLogTopLevel(\'bodyWeight\',this.value===\'\'?null:parseFloat(this.value))">' +
+        '<span class="dl-label">kg</span>' +
+      '</div>' +
+
     '</div>' +
 
-    // ---- Gym ----
+    // ======== 🏋️ GYM (conditional) ========
     '<div class="dl-section">' +
-      '<div class="dl-title">&#127947; GYM</div>' +
-      '<div class="dl-row">' +
-        '<span class="dl-label">Kraft</span>' + dlRatingRow("gym", "strength", gym.strength) +
+      '<div class="dl-gym-toggle-row">' +
+        '<button class="dl-check' + (gymActive ? " on" : "") + '" id="dl-gym-toggle" onclick="toggleGymSection()">' + (gymActive ? "&#10003;" : "") + '</button>' +
+        '<span class="dl-label" style="font-size:8px">&#127947; Heute im Gym</span>' +
       '</div>' +
-      '<div class="dl-row">' +
-        '<span class="dl-label">Workout-Gefühl</span>' + dlRatingRow("gym", "feeling", gym.feeling) +
+      '<div class="dl-gym-body' + (gymActive ? "" : " hidden") + '" id="dl-gym-body">' +
+        '<div class="dl-row">' +
+          '<span class="dl-label">Kraft</span>' + dlRatingRow("gym", "strength", gym.strength) +
+        '</div>' +
+        '<div class="dl-row">' +
+          '<span class="dl-label">Workout-Gefühl</span>' + dlRatingRow("gym", "feeling", gym.feeling) +
+        '</div>' +
+        '<div class="dl-row">' +
+          '<span class="dl-label">Essen vor Training</span>' +
+          '<select class="dl-select" onchange="saveDailyLogField(\'gym\',\'mealTiming\',this.value===\'\'?null:this.value)">' +
+            '<option value="">—</option>' +
+            mealTimings.map(([v,l]) => '<option value="' + v + '"' + (gym.mealTiming === v ? " selected" : "") + '>' + l + '</option>').join("") +
+          '</select>' +
+        '</div>' +
+        '<div class="dl-row">' +
+          '<button class="dl-check' + (carbs ? " on" : "") + '" onclick="saveDailyLogField(\'gym\',\'preWorkoutCarbs\',' + (!carbs) + ')">' + (carbs ? "&#10003;" : "") + '</button>' +
+          '<span class="dl-label">Carbs vor Training</span>' +
+        '</div>' +
+        '<div class="dl-row">' +
+          '<span class="dl-label">Makro</span>' +
+          macros.map(m => '<button class="macro-btn' + (macro === m[0] ? " on" : "") + '" onclick="saveDailyLogField(\'gym\',\'macro\',' + (macro === m[0] ? "null" : "'" + m[0] + "'") + ')">' + m[1] + '</button>').join("") +
+        '</div>' +
       '</div>' +
     '</div>' +
 
-    // ---- Food ----
+    // ======== 🌙 ABENDS ========
     '<div class="dl-section">' +
-      '<div class="dl-title">&#129382; PRE-WORKOUT</div>' +
-      '<div class="dl-row">' +
-        '<button class="dl-check' + (food.preWorkoutCarbs ? " on" : "") + '" onclick="saveDailyLogField(\'food\',\'preWorkoutCarbs\',' + (!food.preWorkoutCarbs) + ')">' + (food.preWorkoutCarbs ? "&#10003;" : "") + '</button>' +
-        '<span class="dl-label">Carbs vor Training</span>' +
-      '</div>' +
+      '<div class="dl-section-header">&#127769; ABENDS</div>' +
+
+      // Kalorien
       '<div class="dl-row">' +
         '<span class="dl-label">Kalorien</span>' +
         '<input type="number" class="dl-kcal" inputmode="numeric" value="' + (food.kcal != null ? food.kcal : "") + '" onchange="saveDailyLogField(\'food\',\'kcal\',this.value===\'\'?null:Number(this.value))">' +
         '<span class="dl-label">kcal</span>' +
       '</div>' +
-      '<div class="dl-row">' +
-        '<span class="dl-label">Makro</span>' +
-        macros.map(m => '<button class="macro-btn' + (food.macro === m[0] ? " on" : "") + '" onclick="saveDailyLogField(\'food\',\'macro\',' + (food.macro === m[0] ? "null" : "'" + m[0] + "'") + ')">' + m[1] + '</button>').join("") +
-      '</div>' +
-    '</div>' +
 
-    // ---- Notiz ----
-    '<div class="dl-section">' +
-      '<div class="dl-title">&#128221; NOTIZ</div>' +
+      // Alkohol
+      '<div class="dl-row">' +
+        '<span class="dl-label">Alkohol</span>' +
+        '<div style="display:flex;gap:5px">' +
+          alcoholOpts.map(([v,l]) => '<button class="alcohol-btn' + (alcohol === v ? " on" : "") + '" onclick="saveDailyLogTopLevel(\'alcohol\',' + (alcohol === v ? "null" : v) + ')">' + l + '</button>').join("") +
+        '</div>' +
+        '<span class="dl-label">Drinks</span>' +
+      '</div>' +
+
+      // Notiz
+      '<div class="dl-title" style="margin-top:8px">&#128221; NOTIZ</div>' +
       (note.text && note.text.trim()
         ? '<div class="dl-note-prev">&#128221; Heute: ' + esc(note.text) + '</div>'
         : '') +
@@ -1755,10 +1959,24 @@ function renderDailyLog() {
   // ---- Status-Icons ----
   const icons = [];
   if (sleep.bedtime || sleep.waketime || sleep.feeling != null) icons.push("&#127769;&#9989;");
-  if (gym.strength != null || gym.feeling != null) icons.push("&#127947;&#9989;");
-  if (food.preWorkoutCarbs || food.kcal != null || food.macro) icons.push("&#129382;&#9989;");
+  if (energy != null) icons.push("&#9889;&#9989;");
+  if (gymActive) icons.push("&#127947;&#9989;");
+  if (food.kcal != null || alcohol != null) icons.push("&#127757;&#9989;");
   if (note.text && note.text.trim()) icons.push("&#128221;&#9989;");
   document.getElementById("dl-status-icons").innerHTML = icons.join(" ");
+}
+
+function toggleGymSection() {
+  const log = getDailyLog(todayStr());
+  if (!log.gym) log.gym = dlSectionDefault("gym");
+  const gymBody = document.getElementById("dl-gym-body");
+  const btn = document.getElementById("dl-gym-toggle");
+  const isHidden = gymBody.classList.toggle("hidden");
+  btn.classList.toggle("on", !isHidden);
+  btn.innerHTML = isHidden ? "" : "&#10003;";
+  // Wenn zugeklappt: Gym-Daten NICHT löschen — Nutzer hat vielleicht schon Ratings eingetragen.
+  // Wenn aufgeklappt: keine Aktion nötig.
+  save();
 }
 
 // Notiz absenden: hängt an bestehenden Tagestext an (mit " | "), max 500 gesamt
@@ -1875,9 +2093,9 @@ function renderAnalyse() {
 
   const sleepFilled = s => !!(s && (s.bedtime || s.waketime || s.feeling != null));
   const gymFilled   = g => !!(g && (g.strength != null || g.feeling != null));
-  const foodFilled  = f => !!(f && (f.preWorkoutCarbs || f.kcal != null || f.macro));
+  const foodFilled  = f => !!(f && f.kcal != null);
   const noteFilled  = n => !!(n && n.text && n.text.trim());
-  const dayFilled   = l => sleepFilled(l.sleep) || gymFilled(l.gym) || foodFilled(l.food) || noteFilled(l.note);
+  const dayFilled   = l => sleepFilled(l.sleep) || gymFilled(l.gym) || foodFilled(l.food) || noteFilled(l.note) || l.energy != null || l.alcohol != null || l.bodyWeight != null;
 
   const filledCount = logs.filter(dayFilled).length;
 
@@ -1921,8 +2139,9 @@ function renderAnalyse() {
     '</div>';
 
   /* ---- Analyse 2: Carbs & Kraft ---- */
-  const withC = logs.filter(l => l.food && l.food.preWorkoutCarbs === true && l.gym && l.gym.strength != null).map(l => l.gym.strength);
-  const woC   = logs.filter(l => l.gym && l.gym.strength != null && (!l.food || l.food.preWorkoutCarbs === false)).map(l => l.gym.strength);
+  const getCarbs = l => !!(l.gym && l.gym.preWorkoutCarbs) || !!(l.food && l.food.preWorkoutCarbs);
+  const withC = logs.filter(l => getCarbs(l) && l.gym && l.gym.strength != null).map(l => l.gym.strength);
+  const woC   = logs.filter(l => !getCarbs(l) && l.gym && l.gym.strength != null).map(l => l.gym.strength);
   const withA = avg(withC), woA = avg(woC);
   html +=
     '<div class="panel dark an-panel">' +
@@ -1934,7 +2153,7 @@ function renderAnalyse() {
     '</div>';
 
   /* ---- Analyse 3: Mentale Last (Uni-Keywords) ---- */
-  const KW = ["lernen","anki","klausur","vorlesung","hausarbeit","übung","prüfung"];
+  const KW = ["spanisch","podcast","lesen","artikel","video","buch","vokabel","grammatik"];
   const isLearn = l => { const t = ((l.note && l.note.text) || "").toLowerCase(); return KW.some(k => t.includes(k)); };
   const learnFeel = logs.filter(l => isLearn(l) && l.gym && l.gym.feeling != null).map(l => l.gym.feeling);
   const freeFeel  = logs.filter(l => !isLearn(l) && l.gym && l.gym.feeling != null).map(l => l.gym.feeling);
@@ -1990,6 +2209,178 @@ function renderAnalyse() {
       '<div class="an-sub an-lead">&#128542; SCHLECHTE TAGE (' + worstDays.length + ') &ndash; häufige Wörter:</div>' +
       wordsLine(worstWords) +
     '</div>';
+
+  /* ---- Analyse 6: Energielevel vs. Schlafdauer ---- */
+  const energyLogs = logs.filter(l => l.energy != null && sleepMin(l.sleep) != null);
+  if (energyLogs.length >= 5) {
+    const highSleep = energyLogs.filter(l => sleepMin(l.sleep) >= 420); // ≥7h
+    const lowSleep  = energyLogs.filter(l => sleepMin(l.sleep) < 420);
+    const highE = avg(highSleep.map(l => l.energy));
+    const lowE  = avg(lowSleep.map(l => l.energy));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#9889; Energie &amp; Schlaf</div>' +
+        '<div class="an-lead">&#128564; TAGE MIT &ge;7h SCHLAF: Energie &Oslash; <span class="an-val">' + num1(highE) + '</span> <span class="an-hint">(' + highSleep.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(highE, "pos") + '</div>' +
+        '<div class="an-sub an-lead">&#9925; TAGE MIT &lt;7h SCHLAF: Energie &Oslash; <span class="an-val">' + num1(lowE) + '</span> <span class="an-hint">(' + lowSleep.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(lowE, "neg") + '</div>' +
+      '</div>';
+  }
+
+  /* ---- Analyse 7: Alkohol & Gym-Gefühl am Folgetag ---- */
+  const dates30 = lastNDays(30);
+  const alcoholImpact = [];
+  for (let i = 1; i < dates30.length; i++) {
+    const prev = state.dailyLog[dates30[i - 1]];
+    const curr = state.dailyLog[dates30[i]];
+    if (!prev || prev.alcohol == null) continue;
+    if (!curr || !curr.gym || curr.gym.feeling == null) continue;
+    alcoholImpact.push({ drinks: prev.alcohol, gymFeel: curr.gym.feeling });
+  }
+  if (alcoholImpact.length >= 5) {
+    const soberDays = alcoholImpact.filter(x => x.drinks === 0 || x.drinks === "0");
+    const drinkDays = alcoholImpact.filter(x => Number(x.drinks) >= 1);
+    const soberAvg = avg(soberDays.map(x => x.gymFeel));
+    const drinkAvg = avg(drinkDays.map(x => x.gymFeel));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#127864; Alkohol &amp; Gym-Folgetag</div>' +
+        '<div class="an-lead">&#9989; KEIN ALKOHOL: Gym-Gefühl &Oslash; <span class="an-val">' + num1(soberAvg) + '</span> <span class="an-hint">(' + soberDays.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(soberAvg, "pos") + '</div>' +
+        '<div class="an-sub an-lead">&#127864; MIT ALKOHOL: Gym-Gefühl &Oslash; <span class="an-val">' + num1(drinkAvg) + '</span> <span class="an-hint">(' + drinkDays.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(drinkAvg, "neg") + '</div>' +
+        ((soberAvg != null && drinkAvg != null)
+          ? '<div class="an-row an-hint">' + (soberAvg > drinkAvg
+              ? '&#9650; Ohne Alkohol trainierst du besser.'
+              : '&#9644; Kein klarer Unterschied bisher.') + '</div>'
+          : '') +
+      '</div>';
+  }
+
+  /* ---- Analyse 8: Mahlzeiten-Timing & Kraft ---- */
+  const timingMap = {};
+  logs.forEach(l => {
+    const t = l.gym && l.gym.mealTiming;
+    const s = l.gym && l.gym.strength;
+    if (!t || s == null) return;
+    if (!timingMap[t]) timingMap[t] = [];
+    timingMap[t].push(s);
+  });
+  const timingLabels = { fasted:"Nüchtern", lt1:"< 1h", "1to2":"1–2h", "2to3":"2–3h", gt3:"> 3h" };
+  const timingEntries = Object.entries(timingMap).filter(([,v]) => v.length >= 2);
+  if (timingEntries.length >= 2) {
+    const sorted = timingEntries.sort((a,b) => avg(b[1]) - avg(a[1]));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#9203; Essen-Timing &amp; Kraft</div>' +
+        sorted.map(([key, vals]) => {
+          const a = avg(vals);
+          return '<div class="an-row"><span class="an-label" style="min-width:70px;font-size:7px">' + (timingLabels[key] || key) + '</span>' +
+            '<div class="an-bar-track"><div class="an-bar-fill pos" style="width:' + Math.round(a/5*100) + '%"></div></div>' +
+            '<span class="an-val" style="min-width:24px">' + num1(a) + '</span>' +
+            '<span class="an-hint">(' + vals.length + ')</span></div>';
+        }).join("") +
+      '</div>';
+  }
+
+  /* ---- Analyse 9: Gewichtsverlauf (7-Tage-Gleitdurchschnitt) ---- */
+  const weightDates = lastNDays(30);
+  const weightPoints = weightDates
+    .map(d => ({ d, w: (state.dailyLog[d] || {}).bodyWeight }))
+    .filter(x => x.w != null && x.w > 0);
+  if (weightPoints.length >= 5) {
+    const minW = Math.min(...weightPoints.map(x => x.w));
+    const maxW = Math.max(...weightPoints.map(x => x.w));
+    const range = maxW - minW || 1;
+    const latest = weightPoints[weightPoints.length - 1].w;
+    const first  = weightPoints[0].w;
+    const delta  = latest - first;
+    const deltaStr = (delta >= 0 ? "+" : "") + delta.toFixed(1) + " kg";
+    const deltaCol = delta < -0.2 ? "var(--hpgreen)" : delta > 0.2 ? "var(--red)" : "var(--gold)";
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#9878; Gewichtsverlauf (30 Tage)</div>' +
+        '<div class="an-lead">Aktuell: <span class="an-val">' + latest.toFixed(1) + ' kg</span> &nbsp; Trend: <span style="color:' + deltaCol + '">' + deltaStr + '</span> <span class="an-hint">(' + weightPoints.length + ' Messpunkte)</span></div>' +
+        '<div class="an-row an-hint">Min: ' + minW.toFixed(1) + ' kg &nbsp; Max: ' + maxW.toFixed(1) + ' kg</div>' +
+      '</div>';
+  }
+
+  /* ---- Analyse 10: Energie vs. Kraftrating ---- */
+  const energyStrengthLogs = logs.filter(l => l.energy != null && l.gym && l.gym.strength != null);
+  if (energyStrengthLogs.length >= 5) {
+    const highEnergy = energyStrengthLogs.filter(l => l.energy >= 4);
+    const lowEnergy  = energyStrengthLogs.filter(l => l.energy <= 2);
+    const highStr = avg(highEnergy.map(l => l.gym.strength));
+    const lowStr  = avg(lowEnergy.map(l => l.gym.strength));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#9889; Energie &amp; Kraftrating</div>' +
+        '<div class="an-hint" style="margin-bottom:8px">Trennt schlechter Schlaf von schlechtem Tag.</div>' +
+        '<div class="an-lead">&#9889;&#9889;&#9889; HOHE ENERGIE (4-5): Kraft &Oslash; <span class="an-val">' + num1(highStr) + '</span> <span class="an-hint">(' + highEnergy.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(highStr, "pos") + '</div>' +
+        '<div class="an-sub an-lead">&#128564; NIEDRIGE ENERGIE (1-2): Kraft &Oslash; <span class="an-val">' + num1(lowStr) + '</span> <span class="an-hint">(' + lowEnergy.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(lowStr, "neg") + '</div>' +
+        ((highStr != null && lowStr != null)
+          ? '<div class="an-row an-hint">' + (highStr > lowStr + 0.3
+              ? '&#9650; An energiereichen Tagen bist du deutlich stärker.'
+              : '&#9644; Deine Kraft ist relativ unabhängig vom Energielevel.') + '</div>'
+          : '') +
+      '</div>';
+  }
+
+  /* ---- Analyse 11: Alkohol & Schlafqualität am Folgetag ---- */
+  const alcoholSleepImpact = [];
+  for (let i = 1; i < dates30.length; i++) {
+    const prev = state.dailyLog[dates30[i - 1]];
+    const curr = state.dailyLog[dates30[i]];
+    if (!prev || prev.alcohol == null) continue;
+    if (!curr || !curr.sleep || curr.sleep.feeling == null) continue;
+    alcoholSleepImpact.push({ drinks: prev.alcohol, sleepFeel: curr.sleep.feeling });
+  }
+  if (alcoholSleepImpact.length >= 5) {
+    const soberSleep = alcoholSleepImpact.filter(x => x.drinks === 0);
+    const drinkSleep = alcoholSleepImpact.filter(x => x.drinks >= 1);
+    const soberSleepAvg = avg(soberSleep.map(x => x.sleepFeel));
+    const drinkSleepAvg = avg(drinkSleep.map(x => x.sleepFeel));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#127864; Alkohol &amp; Schlafqualit&auml;t</div>' +
+        '<div class="an-lead">&#9989; KEIN ALKOHOL: Befinden nach 30min &Oslash; <span class="an-val">' + num1(soberSleepAvg) + '</span> <span class="an-hint">(' + soberSleep.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(soberSleepAvg, "pos") + '</div>' +
+        '<div class="an-sub an-lead">&#127864; MIT ALKOHOL: Befinden nach 30min &Oslash; <span class="an-val">' + num1(drinkSleepAvg) + '</span> <span class="an-hint">(' + drinkSleep.length + ' Tage)</span></div>' +
+        '<div class="an-row">' + bar(drinkSleepAvg, "neg") + '</div>' +
+        ((soberSleepAvg != null && drinkSleepAvg != null)
+          ? '<div class="an-row an-hint">' + (soberSleepAvg > drinkSleepAvg
+              ? '&#9650; Ohne Alkohol wachst du erholter auf.'
+              : '&#9644; Kein klarer Unterschied bisher.') + '</div>'
+          : '') +
+      '</div>';
+  }
+
+  /* ---- Analyse 12: Gewicht vs. Kalorien ---- */
+  const weightKcalPoints = lastNDays(30)
+    .map(d => {
+      const l = state.dailyLog[d] || {};
+      return { d, w: l.bodyWeight || null, kcal: (l.food && l.food.kcal != null) ? l.food.kcal : null };
+    })
+    .filter(x => x.w != null && x.kcal != null);
+  if (weightKcalPoints.length >= 5) {
+    const highKcal = weightKcalPoints.filter(x => x.kcal >= 2500);
+    const lowKcal  = weightKcalPoints.filter(x => x.kcal < 2000);
+    const highKcalAvgW = avg(highKcal.map(x => x.w));
+    const lowKcalAvgW  = avg(lowKcal.map(x => x.w));
+    const allKcal = avg(weightKcalPoints.map(x => x.kcal));
+    const allW    = avg(weightKcalPoints.map(x => x.w));
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#9878; Gewicht &amp; Kalorien</div>' +
+        '<div class="an-hint" style="margin-bottom:8px">Zeigt ob deine Kaloriensch&auml;tzung mit der Gewichtsentwicklung &uuml;bereinstimmt.</div>' +
+        '<div class="an-lead">&#248; Tages-Kalorien: <span class="an-val">' + (allKcal ? Math.round(allKcal) : "&ndash;") + ' kcal</span> &nbsp; &Oslash; Gewicht: <span class="an-val">' + (allW ? allW.toFixed(1) : "&ndash;") + ' kg</span></div>' +
+        (highKcal.length >= 2 ? '<div class="an-sub an-lead">&#128293; TAGE &ge;2500 kcal: &Oslash; Gewicht <span class="an-val">' + (highKcalAvgW ? highKcalAvgW.toFixed(1) : "&ndash;") + ' kg</span> <span class="an-hint">(' + highKcal.length + ' Tage)</span></div>' : '') +
+        (lowKcal.length >= 2  ? '<div class="an-sub an-lead">&#127793; TAGE &lt;2000 kcal: &Oslash; Gewicht <span class="an-val">' + (lowKcalAvgW ? lowKcalAvgW.toFixed(1) : "&ndash;") + ' kg</span> <span class="an-hint">(' + lowKcal.length + ' Tage)</span></div>' : '') +
+        '<div class="an-row an-hint">Basis: ' + weightKcalPoints.length + ' Tage mit beiden Eintr&auml;gen</div>' +
+      '</div>';
+  }
   }
 
   /* ---- Habit-Stacks (unabhängig vom Tages-Log, nur Habit-Historie) ---- */
@@ -2503,6 +2894,276 @@ function markChainDone(node) {
 }
 
 /* =====================================================================
+   INPUT-LOG
+   ===================================================================== */
+let ilSelectedType = null;    // aktuell gewählter Typ im Modal
+let ilCurrentTags  = [];      // Tags im Modal (Array von strings ohne #)
+let ilEditId       = null;    // null = neuer Eintrag, string = ID beim Bearbeiten
+let ilFilterType   = null;    // aktiver Typ-Filter in der Liste
+let ilFilterTag    = null;    // aktiver Tag-Filter in der Liste
+let ilSearchQuery  = "";      // Freitext-Suche
+
+const IL_TYPES = [
+  ["artikel","📄 Artikel"],
+  ["buch","📚 Buch"],
+  ["podcast","🎙 Podcast"],
+  ["video","▶️ Video"],
+  ["sonstiges","📌 Sonstiges"]
+];
+
+function normalizeTag(raw) {
+  // lowercase, Leerzeichen → Bindestrich, nur Wort-Zeichen + Bindestriche
+  return raw.trim().toLowerCase().replace(/\s+/g,"-").replace(/[^\w\-]/g,"").replace(/^#+/,"");
+}
+
+function openInputLogModal(editId) {
+  ilEditId = editId || null;
+  const existing = editId ? (state.inputLog || []).find(e => e.id === editId) : null;
+
+  // Typ-Buttons rendern
+  const typeRow = document.getElementById("il-type-row");
+  typeRow.innerHTML = IL_TYPES.map(([t,l]) =>
+    '<button class="il-type-btn' + ((existing && existing.type === t) || (!existing && ilSelectedType === t) ? " sel" : "") +
+    '" data-t="' + t + '" onclick="ilSelectType(\'' + t + '\')">' + l + '</button>'
+  ).join("");
+
+  ilSelectedType = existing ? existing.type : null;
+  ilCurrentTags  = existing ? [...existing.tags] : [];
+
+  document.getElementById("il-title-input").value    = existing ? existing.title    : "";
+  document.getElementById("il-source-input").value   = existing ? existing.source   : "";
+  document.getElementById("il-takeaway-input").value = existing ? existing.takeaway : "";
+  document.getElementById("il-date-input").value     = existing ? existing.date     : todayStr();
+  document.getElementById("il-tags-input").value     = "";
+  document.getElementById("inputlog-modal-title").textContent = existing ? "✏ Eintrag bearbeiten" : "📖 Neuer Eintrag";
+
+  renderIlTagsPreview();
+  openModal("inputlog-modal");
+}
+
+function ilSelectType(t) {
+  ilSelectedType = t;
+  document.querySelectorAll(".il-type-btn").forEach(b => b.classList.toggle("sel", b.dataset.t === t));
+}
+
+function renderIlTagsPreview() {
+  const el = document.getElementById("il-tags-preview");
+  el.innerHTML = ilCurrentTags.map(tag =>
+    '<span class="il-tag-chip" onclick="ilRemoveTag(\'' + tag + '\')">#' + tag + '</span>'
+  ).join("");
+}
+
+function ilRemoveTag(tag) {
+  ilCurrentTags = ilCurrentTags.filter(t => t !== tag);
+  renderIlTagsPreview();
+}
+
+// Tags-Input: Enter oder Komma trennt Tags
+document.addEventListener("DOMContentLoaded", function() {
+  const inp = document.getElementById("il-tags-input");
+  if (!inp) return;
+  inp.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      const raw = inp.value.split(/[,\s]+/).map(normalizeTag).filter(Boolean);
+      raw.forEach(t => { if (t && !ilCurrentTags.includes(t)) ilCurrentTags.push(t); });
+      inp.value = "";
+      renderIlTagsPreview();
+    }
+  });
+  // Auch bei Blur (Tap weg auf Mobile)
+  inp.addEventListener("blur", function() {
+    const raw = inp.value.split(/[,\s]+/).map(normalizeTag).filter(Boolean);
+    if (raw.length) {
+      raw.forEach(t => { if (t && !ilCurrentTags.includes(t)) ilCurrentTags.push(t); });
+      inp.value = "";
+      renderIlTagsPreview();
+    }
+  });
+});
+
+function saveInputLogEntry() {
+  const title    = document.getElementById("il-title-input").value.trim();
+  const source   = document.getElementById("il-source-input").value.trim();
+  const takeaway = document.getElementById("il-takeaway-input").value.trim();
+  const date     = document.getElementById("il-date-input").value || todayStr();
+
+  // Restliche Tags im Input-Feld noch übernehmen (falls Nutzer kein Enter gedrückt hat)
+  const rawInput = document.getElementById("il-tags-input").value;
+  if (rawInput.trim()) {
+    rawInput.split(/[,\s]+/).map(normalizeTag).filter(Boolean).forEach(t => {
+      if (t && !ilCurrentTags.includes(t)) ilCurrentTags.push(t);
+    });
+  }
+
+  if (!title)          { toast("⚠ Titel fehlt."); return; }
+  if (!source)         { toast("⚠ Quelle fehlt."); return; }
+  if (!ilSelectedType) { toast("⚠ Typ auswählen."); return; }
+  if (!ilCurrentTags.length) { toast("⚠ Mindestens ein Tag erforderlich."); return; }
+  if (!takeaway)       { toast("⚠ Takeaway fehlt."); return; }
+
+  if (!state.inputLog) state.inputLog = [];
+
+  if (ilEditId) {
+    const idx = state.inputLog.findIndex(e => e.id === ilEditId);
+    if (idx !== -1) {
+      state.inputLog[idx] = { id: ilEditId, title, source, type: ilSelectedType, tags: ilCurrentTags, takeaway, date };
+    }
+  } else {
+    state.inputLog.unshift({ id: uid(), title, source, type: ilSelectedType, tags: ilCurrentTags, takeaway, date });
+  }
+
+  save();
+  closeModal("inputlog-modal");
+  ilSelectedType = null;
+  ilCurrentTags  = [];
+  ilEditId       = null;
+  renderInputLog();
+  toast("📖 Eintrag gespeichert!");
+}
+
+function deleteInputLogEntry(id) {
+  if (!confirm("Eintrag löschen?")) return;
+  state.inputLog = (state.inputLog || []).filter(e => e.id !== id);
+  save();
+  renderInputLog();
+}
+
+function ilSetFilterType(t) {
+  ilFilterType = ilFilterType === t ? null : t;
+  renderInputLog();
+}
+
+function ilSetFilterTag(tag) {
+  ilFilterTag = ilFilterTag === tag ? null : tag;
+  renderInputLog();
+}
+
+function renderInputLog() {
+  const el = document.getElementById("inputlog-content");
+  if (!el) return;
+
+  const entries = state.inputLog || [];
+
+  // Alle vorhandenen Tags sammeln (für Filter-Chips)
+  const allTags = {};
+  entries.forEach(e => e.tags.forEach(t => { allTags[t] = (allTags[t] || 0) + 1; }));
+  const topFilterTags = Object.entries(allTags).sort((a,b) => b[1]-a[1]).slice(0,8).map(x => x[0]);
+
+  // Gefilterte + gesuchte Einträge
+  let filtered = entries;
+  if (ilFilterType) filtered = filtered.filter(e => e.type === ilFilterType);
+  if (ilFilterTag)  filtered = filtered.filter(e => e.tags.includes(ilFilterTag));
+  if (ilSearchQuery.trim()) {
+    const q = ilSearchQuery.toLowerCase();
+    filtered = filtered.filter(e =>
+      e.title.toLowerCase().includes(q) ||
+      e.takeaway.toLowerCase().includes(q) ||
+      e.source.toLowerCase().includes(q)
+    );
+  }
+
+  // Sortiert: neueste oben (nach date-String, lexikografisch korrekt)
+  filtered = [...filtered].sort((a,b) => b.date.localeCompare(a.date));
+
+  let html = "";
+
+  // Info-Banner
+  html +=
+    '<div class="il-info-banner" id="il-info-banner" onclick="toggleIlInfoBanner()">' +
+      '<div class="il-info-title">&#128218; SO FUNKTIONIERT DER INPUT-LOG <span id="il-info-arrow">&#9662;</span></div>' +
+      '<div class="il-info-body">' +
+        '<div>Jedes Mal wenn du etwas gelesen, gehört oder gesehen hast das dich weitergebracht hat — trag es ein. Nicht alles, nur was bleibt.</div>' +
+        '<div style="margin-top:6px">' +
+          '<div>Titel &rarr; Was war es?</div>' +
+          '<div>Quelle &rarr; Wo kam es her?</div>' +
+          '<div>Typ &rarr; Artikel / Buch / Podcast / Video</div>' +
+          '<div>Tags &rarr; Thema in 1–2 Wörtern (#wirtschaft, #ki, #fitness)</div>' +
+          '<div>Takeaway &rarr; Ein Satz. Deine Schlussfolgerung — nicht die des Autors.</div>' +
+        '</div>' +
+        '<div style="margin-top:6px;color:var(--gold)">Ziel: In 3 Monaten weißt du was du wirklich konsumiert hast.</div>' +
+      '</div>' +
+    '</div>';
+
+  // + Eintrag Button
+  html += '<button class="btn green" style="width:100%;margin-bottom:10px" onclick="openInputLogModal(null)">+ Eintrag</button>';
+
+  // Typ-Filter
+  if (entries.length > 0) {
+    html += '<div class="il-filter-row">';
+    IL_TYPES.forEach(([t,l]) => {
+      if (entries.some(e => e.type === t)) {
+        html += '<button class="il-filter-btn' + (ilFilterType === t ? " sel" : "") + '" onclick="ilSetFilterType(\'' + t + '\')">' + l + '</button>';
+      }
+    });
+    html += '</div>';
+
+    // Tag-Filter Chips
+    if (topFilterTags.length) {
+      html += '<div class="il-filter-row">' +
+        topFilterTags.map(tag =>
+          '<button class="il-filter-btn' + (ilFilterTag === tag ? " sel" : "") + '" onclick="ilSetFilterTag(\'' + tag + '\')">#' + tag + '</button>'
+        ).join("") +
+      '</div>';
+    }
+
+    // Suche
+    html += '<input class="il-search" placeholder="&#128269; Suche in Titel, Takeaway, Quelle ..." ' +
+      'value="' + ilSearchQuery.replace(/"/g,"&quot;") + '" ' +
+      'oninput="ilSearchQuery=this.value;renderInputLog()">';
+  }
+
+  // Einträge
+  if (filtered.length === 0) {
+    html += '<div class="panel dark" style="text-align:center;padding:20px;font-size:8px;color:#8898b0">' +
+      (entries.length === 0
+        ? '&#128218; Noch kein Eintrag.<br><br>Tippe auf „+ Eintrag" um zu starten.'
+        : '&#128270; Keine Einträge für diesen Filter.') +
+    '</div>';
+  } else {
+    filtered.forEach(e => {
+      const badgeClass = "il-badge il-badge-" + e.type;
+      const typeLabel  = (IL_TYPES.find(x => x[0] === e.type) || ["",""])[1];
+      html +=
+        '<div class="il-entry">' +
+          '<div class="il-entry-header">' +
+            '<div class="il-entry-title">' + esc(e.title) + '</div>' +
+            '<div class="il-entry-date">' + e.date + '</div>' +
+          '</div>' +
+          '<div class="il-entry-source"><span class="' + badgeClass + '">' + typeLabel + '</span>' + esc(e.source) + '</div>' +
+          '<div class="il-entry-takeaway collapsed" onclick="this.classList.toggle(\'collapsed\')">' + esc(e.takeaway) + '</div>' +
+          '<div class="il-entry-tags">' +
+            e.tags.map(t => '<span class="il-entry-tag" onclick="ilSetFilterTag(\'' + t + '\')">#' + t + '</span>').join("") +
+          '</div>' +
+          '<div style="display:flex;gap:6px;margin-top:6px">' +
+            '<button class="il-entry-del" onclick="openInputLogModal(\'' + e.id + '\')">✎ Bearbeiten</button>' +
+            '<button class="il-entry-del" onclick="deleteInputLogEntry(\'' + e.id + '\')">🗑 Löschen</button>' +
+          '</div>' +
+        '</div>';
+    });
+  }
+
+  el.innerHTML = html;
+
+  // Info-Banner-Zustand wiederherstellen
+  const banner = document.getElementById("il-info-banner");
+  if (banner && localStorage.getItem("habitdex_il_info") === "0") {
+    banner.classList.add("collapsed");
+    const arrow = document.getElementById("il-info-arrow");
+    if (arrow) arrow.innerHTML = "&#9656;";
+  }
+}
+
+function toggleIlInfoBanner() {
+  const banner = document.getElementById("il-info-banner");
+  if (!banner) return;
+  const collapsed = banner.classList.toggle("collapsed");
+  localStorage.setItem("habitdex_il_info", collapsed ? "0" : "1");
+  const arrow = document.getElementById("il-info-arrow");
+  if (arrow) arrow.innerHTML = collapsed ? "&#9656;" : "&#9662;";
+}
+
+/* =====================================================================
    TABS / MODALS / TOASTS
    ===================================================================== */
 function switchTab(name) {
@@ -2520,6 +3181,7 @@ function switchTab(name) {
   if (name === "habits") renderPeople();
   if (name === "team") { renderTrainerCard(); renderTeam(); renderBox(); }
   if (name === "dex") renderDex();
+  if (name === "inputlog") renderInputLog();
   if (name === "analyse") { renderStats(); renderAnalyse(); }
   // "shop" ist entfernt, "city" braucht kein renderCity() — der Loop übernimmt
 }
