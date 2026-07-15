@@ -2977,6 +2977,9 @@ async function getBattleData(dex) {
     const moves = learnset.slice(0, 4).map(ls => ({ name: ls.name, type: ls.type, power: ls.power || 40, category: ls.category }));
     while (moves.length < 4) moves.push({ name:"Tackle", type:"normal", power:40, category:"physical" });
     const data = { speed, atk, spAtk, moves, learnset };
+    // Wenn eine Box-Instanz bereits eigene Moves hat, die übernehmen statt die Starter-Moves
+    const existing = state.box.find(m => m.dex === +dex && m.savedMoves && m.savedMoves.length);
+    if (existing) data.moves = existing.savedMoves;
     cache.battle[dex] = data;
     saveCache();
     return data;
@@ -4175,6 +4178,10 @@ function monName(m, speciesName) { return (m && (m.nickname || speciesName || m.
 function toggleTeam(uidv) {
   const idx = state.team.indexOf(uidv);
   if (idx >= 0) {
+    const leavingMon = state.box.find(m => m.uid === uidv);
+    if (leavingMon && cache.battle[leavingMon.dex]) {
+      leavingMon.savedMoves = (cache.battle[leavingMon.dex].moves || []).slice();
+    }
     state.team.splice(idx, 1);
     toast("In die Box gelegt.");
   } else {
@@ -4245,6 +4252,7 @@ async function checkLearnMoves(mon) {
     if ((bt.moves || []).length < 4) {
       // Platz frei → sofort lernen
       bt.moves = [...(bt.moves || []), { name: newMove.name, type: newMove.type, power: newMove.power, category: newMove.category }];
+      mon.savedMoves = bt.moves.slice();
       saveCache();
       const fgt = BT.fighters.find(x => x.uid === mon.uid);
       if (fgt) fgt.data = cache.battle[mon.dex];
@@ -6246,7 +6254,7 @@ function doAttack(f) {
   // Aura + Lunge nur bei physischen Attacken (Spezial → Typ-VFX, Status → keine Bewegung).
   // Die Lunge wird verzögert in updateBattle beim Übergang Charge→Full ausgelöst, damit die
   // Auflade-Phase der Aura sichtbar ist, bevor das Pokémon losspringt.
-  if (move.category !== 'special' && move.category !== 'status') {
+  if (move.category === 'physical') {
     f.lunge = 0.3;
     f.auraT = 0;
     f.auraColor = TYPE_COLOR[move.type] || "#a8a878";
@@ -9061,6 +9069,7 @@ function forgetMove(uidv, moveIndex) {
   const alreadySaved = mon.forgottenMoves.some(fm => (fm.name || fm) === forgotten.name);
   if (!alreadySaved) mon.forgottenMoves.push({ name: forgotten.name, type: forgotten.type, power: forgotten.power || 40 });
   bt.moves = moves.filter((_, i) => i !== moveIndex);
+  mon.savedMoves = bt.moves.slice();
   saveCache();
   // Laufenden Kämpfer aktualisieren, damit er die Attacke nicht mehr nutzt
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
@@ -9079,6 +9088,7 @@ function recallMove(uidv, recallIdx) {
   const fm = recallable[recallIdx];
   if (!fm || (bt.moves || []).length >= 4) return;
   bt.moves = [...(bt.moves || []), { name: fm.name, type: fm.type, power: fm.power || 40 }];
+  mon.savedMoves = bt.moves.slice();
   // aus forgottenMoves entfernen
   mon.forgottenMoves = mon.forgottenMoves.filter(x => x.name !== fm.name);
   saveCache();
@@ -9098,6 +9108,7 @@ function learnPending(uidv, pendingIdx) {
   if (!bt || !pm) return;
   if ((bt.moves || []).length >= 4) return; // kein freier Slot → über forgetForPending
   bt.moves = [...(bt.moves || []), { name: pm.name, type: pm.type, power: pm.power, category: pm.category }];
+  mon.savedMoves = bt.moves.slice();
   mon.pendingMoves.splice(pendingIdx, 1);
   saveCache();
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
@@ -9120,6 +9131,7 @@ function forgetForPending(uidv, activeIdx, pendingIdx) {
     mon.forgottenMoves.push({ name: old.name, type: old.type, power: old.power || 40 });
   }
   bt.moves[activeIdx] = { name: pm.name, type: pm.type, power: pm.power, category: pm.category };
+  mon.savedMoves = bt.moves.slice();
   mon.pendingMoves.splice(pendingIdx, 1);
   saveCache();
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
@@ -9142,6 +9154,7 @@ function relearnMove(uidv, lsIdx) {
   if ((state.coins || 0) < RELEARN_COST) { toast("Zu wenig Münzen! (" + RELEARN_COST + " 🪙 nötig)"); return; }
   state.coins -= RELEARN_COST;
   bt.moves = [...(bt.moves || []), { name: ls.name, type: ls.type, power: ls.power || 40, category: ls.category }];
+  mon.savedMoves = bt.moves.slice();
   saveCache();
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
   if (fgt) fgt.data = cache.battle[mon.dex];
@@ -9167,6 +9180,7 @@ function relearnReplace(uidv, activeIdx, lsIdx) {
     mon.forgottenMoves.push({ name: old.name, type: old.type, power: old.power || 40 });
   }
   bt.moves[activeIdx] = { name: ls.name, type: ls.type, power: ls.power || 40, category: ls.category };
+  mon.savedMoves = bt.moves.slice();
   saveCache();
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
   if (fgt) { fgt.data = cache.battle[mon.dex]; mon.moveIdx = 0; }
@@ -9187,6 +9201,7 @@ async function useDisc(uidv, discKey) {
   let moveName = disc.exactMove || disc.name;
   let moveType = disc.moveType || "normal";
   let movePower = 60;
+  let moveCategory = "physical";
 
   // PokeAPI-Lookup für exactMove
   if (disc.exactMove) {
@@ -9194,6 +9209,7 @@ async function useDisc(uidv, discKey) {
       const md = await fetchJSON("https://pokeapi.co/api/v2/move/" + disc.exactMove);
       moveType = md.type.name;
       movePower = md.power || 60;
+      moveCategory = md.damage_class ? md.damage_class.name : "physical";
       // Deutsche Namensübersetzung
       const deName = (md.names || []).find(n => n.language.name === "de");
       if (deName) moveName = deName.name;
@@ -9201,7 +9217,8 @@ async function useDisc(uidv, discKey) {
   }
 
   if (!bt.moves) bt.moves = [];
-  bt.moves.push({ name: moveName, type: moveType, power: movePower });
+  bt.moves.push({ name: moveName, type: moveType, power: movePower, category: moveCategory });
+  mon.savedMoves = bt.moves.slice();
   saveCache();
   state.items[discKey]--;
   const fgt = BT.fighters.find(x => x.uid === mon.uid);
