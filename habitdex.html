@@ -5990,20 +5990,44 @@ function spawnWild(now) {
   const level = Math.max(3, Math.round(avg * (0.7 + Math.random() * 0.6)));
   const maxHp = 20 + level * 3;
   const speed = 22 + Math.random() * 10;
-  // Zufällige, begehbare Position ≥ 200 px vom Lead & ≥ 120 px von anderen Wilden; bei Gras bevorzugt hohes Gras
+  // Begehbare Position in einem Ring um den Anführer, ≥ 120 px von anderen Wilden;
+  // bei Gras bevorzugt hohes Gras.
+  // Warum ein Ring statt "irgendwo auf der Karte": Bei 12 Wilden auf 1600×800 war im
+  // Schnitt nicht einmal ein Wild im Sichtfenster — Slot 2 & 3 bekamen praktisch nie
+  // einen Gegner ab. Der Ring hält dieselbe Gesamtzahl, stellt sie aber dort auf, wo
+  // die Gruppe ist. Innenradius = knapp außerhalb des Kampffensters, damit nichts
+  // sichtbar aus dem Nichts erscheint.
   const lead = BT.fighters[0];
   const ts = BT.tileSize;
+  const minR = Math.hypot(BT.W / 2, BT.H / 2) + 40;   // sicher außerhalb des Fensters
+  const maxR = minR + 280;
   let sx = BT.mapW / 2, sy = BT.mapH / 2, found = false;
   for (let k = 0; k < 90 && !found; k++) {
-    const wx = ts * 3 + Math.random() * (BT.mapW - ts * 6);
-    const wy = ts * 3 + Math.random() * (BT.mapH - ts * 6);
+    let wx, wy;
+    if (lead && k < 70) {
+      const a = Math.random() * Math.PI * 2;
+      const r = minR + Math.random() * (maxR - minR);
+      wx = lead.wx + Math.cos(a) * r;
+      wy = lead.wy + Math.sin(a) * r;
+      if (wx < ts * 3 || wy < ts * 3 || wx > BT.mapW - ts * 3 || wy > BT.mapH - ts * 3) continue;
+    } else {
+      // Rückfall (Anführer am Kartenrand): wie bisher irgendwo auf der Karte
+      wx = ts * 3 + Math.random() * (BT.mapW - ts * 6);
+      wy = ts * 3 + Math.random() * (BT.mapH - ts * 6);
+      if (lead && Math.hypot(wx - lead.wx, wy - lead.wy) < minR) continue;
+    }
     if (!isWalkable(wx, wy)) continue;
-    if (lead && Math.hypot(wx - lead.wx, wy - lead.wy) < 200) continue;
+    if (!isReachableSpot(wx, wy)) continue;   // nicht in abgeschnittenen Nischen spawnen
+    // Nie im sichtbaren Fenster erscheinen. Gegen die echte Kamera geprüft, nicht nur
+    // gegen den Abstand zum Anführer: die Kamera läuft ihm verzögert nach, sonst
+    // ploppt gelegentlich ein Wild mitten im Bild auf.
+    if (wildInView({ wx, wy }, 50)) continue;
     if (BT.wilds.some(o => Math.hypot(o.wx - wx, o.wy - wy) < 120)) continue;
     const preferDark = zone.biome === "grass" && tileIdAt(wx, wy) !== 1;
     if (preferDark && k < 45) continue; // erst hohes Gras bevorzugen
     sx = wx; sy = wy; found = true;
   }
+  if (!found) { const p = findWalkableNear(sx, sy); sx = p.x; sy = p.y; }   // Rückfall absichern
   const w = { dex, level, name: "#" + dex, types: [], wx: sx, wy: sy, dir: -1, speed,
     discovered: false, hp: maxHp, maxHp, cd: 2600, hitFlash: 0 };
   BT.wilds.push(w);
@@ -6099,7 +6123,16 @@ function spawnFishWild(now) {
 }
 
 const WILD_TARGET = 12;   // Zielanzahl gleichzeitiger Wilder auf der Karte
-const FOLLOWER_RADIUS = 160;   // max. Abstand (px) der Follower vom Anführer
+// Leine: max. Abstand (px) der Follower vom Anker. Bewusst KLEIN gehalten, damit die
+// Gruppe eng zusammenbleibt und die gruppen-gerahmte Kamera (updateCamera) alle drei
+// im ~BT.W×200-Fenster hält. Größere Werte lassen Follower vertikal aus dem Bild ragen.
+const FOLLOWER_RADIUS = 340;
+// Zielradius der Follower: etwas kleiner als die Leine, damit zwischen Ziel und hartem
+// Clamp Luft bleibt (Follower zerrt nicht am Leinenende).
+const FOLLOWER_TARGET_RADIUS = 300;
+// Umkreis, in dem der Anführer Ziele annehmen darf, solange Follower noch kämpfen.
+// Auf FOLLOWER_RADIUS abgestimmt, damit der Anführer die Box nicht aufbläht.
+const LEADER_HOLD_RADIUS = 130;
 function ensureWildCount(now) {
   if (!state.team.length) return;
   if (BT.wilds.length < WILD_TARGET && now > BT.spawnAt) {
@@ -6550,77 +6583,88 @@ function updateWildBattles(dt, now) {
   // Anführer ist immer fighters[0], unabhängig vom faintT-Status
   // (damit der Ankerpunkt stabil bleibt — nicht dynamisch per faintT-Filter)
   const leader = BT.fighters[0];
-  const slot1  = BT.fighters[1] || null;
-  const slot2  = BT.fighters[2] || null;
 
-  // ---- Zielzuweisung: Slot-basiert, nicht Distanz-basiert ----
-  // Slot 0 → nächstes freies Wild (überall auf der Karte)
-  // Slot 1 → nächstes freies Wild (nur wenn Slot 0 bereits ein Ziel hat oder kämpft)
-  // Slot 2 → nächstes freies Wild (nur wenn Slot 0 und 1 bereits Ziele haben)
+  // ---- Gruppen-Anker ----
+  // Der Anker friert an der Kampfstelle ein, SOBALD ein Follower beschäftigt ist —
+  // nicht erst, wenn der Anführer zufällig kein Ziel hat. Vorher hatte der Anführer
+  // fast immer sofort ein neues Ziel irgendwo auf der Karte, der Wartezustand wurde
+  // nie gesetzt, und die noch kämpfenden Follower wurden per Leine mitgeschleift.
+  const followersEngaged    = BT.fighters.slice(1).some(f => f.faintT <= 0 && f.target && f.target.hp > 0 && BT.wilds.includes(f.target));
+  const followersRecovering = BT.fighters.slice(1).some(f => f.faintT > 0);
+  const groupBusy = followersEngaged || followersRecovering;
+
+  if (leader && leader.faintT <= 0 && groupBusy) {
+    if (!BT.anchorWaiting) {
+      BT.anchorWaiting = true;
+      BT.anchorWaitPos = { wx: leader.wx, wy: leader.wy };
+    }
+  } else {
+    BT.anchorWaiting = false;
+    BT.anchorWaitPos = null;
+  }
+
+  // Ankerpunkt: eingefroren während Gruppenkampf, sonst der Anführer selbst.
+  const acx = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wx : (leader ? leader.wx : BT.mapW / 2);
+  const acy = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wy : (leader ? leader.wy : BT.mapH / 2);
+
+  // ---- Zielzuweisung ----
+  // Reihenfolge: Follower zuerst (der am längsten wartende zuerst), Anführer zuletzt.
+  //
+  // Zwei Gründe:
+  //  - Follower vor Anführer: Follower dürfen nur Wilde im Kampffenster angreifen, der
+  //    Anführer jagt frei auf der ganzen Karte. Ging er zuerst, schnappte er jedes Wild
+  //    weg, sobald es in Sichtweite kam — Slot 2 bekam kaum, Slot 3 nie einen Gegner ab.
+  //    Wer eingeschränkt ist, wählt zuerst; der Anführer holt sich den Rest.
+  //  - Nach Wartezeit statt fester Slot-Reihenfolge: Meist ist nur EIN freies Wild im
+  //    Bild. Jede feste Reihenfolge lässt damit immer denselben Slot verhungern —
+  //    egal in welche Richtung sie zeigt. Die Wartezeit verteilt die knappen Gegner.
   // Geklaime Wilds werden nicht doppelt vergeben.
 
   const claimed = new Set();
   BT.fighters.forEach(f => { if (f.faintT <= 0 && f.target && f.target.hp > 0 && BT.wilds.includes(f.target)) claimed.add(f.target); });
 
-  BT.fighters.forEach((f, slotIdx) => {
-    if (f.faintT > 0) { f.target = null; return; }
-
-    // Ziel-Gültigkeit prüfen
-    if (f.target) {
-      const gone = f.target.hp <= 0 || !BT.wilds.includes(f.target);
-      if (gone) { claimed.delete(f.target); f.target = null; }
+  // Ungültige Ziele lösen (Ohnmacht, Wild tot oder verschwunden) + Wartezeit fortschreiben
+  BT.fighters.forEach(f => {
+    if (f.faintT > 0) { f.target = null; f.idleT = 0; return; }
+    if (f.target && (f.target.hp <= 0 || !BT.wilds.includes(f.target))) {
+      claimed.delete(f.target); f.target = null;
     }
+    f.idleT = f.target ? 0 : (f.idleT || 0) + dt;
+  });
+
+  // Follower nach Wartezeit (längste zuerst), Anführer immer zuletzt
+  const vergabeReihenfolge = BT.fighters.map((_, i) => i).sort((a, b) => {
+    if (a === 0) return 1;
+    if (b === 0) return -1;
+    return (BT.fighters[b].idleT || 0) - (BT.fighters[a].idleT || 0);
+  });
+  vergabeReihenfolge.forEach(slotIdx => {
+    const f = BT.fighters[slotIdx];
+    if (!f || f.faintT > 0) return;
 
     // Kein Ziel → neues suchen
     if (!f.target) {
-      // Slot 1 sucht nur, wenn Slot 0 bereits kämpft oder wartet
-      // Slot 2 sucht nur, wenn Slot 0 UND Slot 1 bereits kämpfen oder warten
-      const leaderEngaged = leader && (leader.target || BT.anchorWaiting);
-      const slot1Engaged  = !slot1 || slot1.target || slot1.faintT > 0;
+      // Reichweiten-Grenze um den Anker:
+      //  - Follower: müssen innerhalb ihrer Leine bleiben, sonst kommen sie per Clamp
+      //    nie an ihr Ziel (das war die "willenlos gezogen"-Dynamik).
+      //  - Anführer: frei auf der ganzen Karte — außer die Gruppe kämpft noch, dann
+      //    bleibt auch er im Anker-Umkreis und wartet die Kämpfe ab.
+      const limit = slotIdx === 0
+        ? (BT.anchorWaiting ? LEADER_HOLD_RADIUS : Infinity)
+        : FOLLOWER_TARGET_RADIUS;
 
-      if (slotIdx === 1 && !leaderEngaged) return;   // Slot 1 wartet auf Anführer
-      if (slotIdx === 2 && (!leaderEngaged || !slot1Engaged)) return; // Slot 2 wartet auf Slot 0+1
-
-      // Slot 1 & 2 dürfen NUR Wilde angreifen, die im Kampffenster (Kamera-Viewport)
-      // sichtbar sind bzw. gerade hineinkommen → das Team bleibt komplett im Bild.
-      // Slot 0 (Anführer) jagt weiterhin frei und führt die Gruppe.
-      const windowOnly = (slotIdx === 1 || slotIdx === 2);
       let best = null, bd = Infinity;
       for (const wd of BT.wilds) {
         if (wd.legendary || claimed.has(wd)) continue;
-        if (windowOnly && !wildInView(wd, 24)) continue; // nur Wilde im/am Kampffenster
+        if (limit !== Infinity && Math.hypot(wd.wx - acx, wd.wy - acy) > limit) continue;
+        // Follower zusätzlich nur im Kampffenster → Team bleibt komplett im Bild
+        if (slotIdx > 0 && !wildInView(wd, -5)) continue;
         const d = Math.hypot(wd.wx - f.wx, wd.wy - f.wy);
         if (d < bd) { bd = d; best = wd; }
       }
       if (best) { f.target = best; claimed.add(best); }
     }
   });
-
-  // ---- Warte-Logik für den Anführer ----
-  // Hat der Anführer kein Ziel mehr, aber Follower kämpfen noch?
-  const followersFighting = BT.fighters.slice(1).some(f => f.faintT <= 0 && f.target && f.target.hp > 0);
-
-  if (leader && leader.faintT <= 0 && !leader.target) {
-    if (followersFighting) {
-      // Anführer ist fertig, Follower kämpfen noch → Wartezustand
-      if (!BT.anchorWaiting) {
-        BT.anchorWaiting = true;
-        BT.anchorWaitPos = { wx: leader.wx, wy: leader.wy };
-      }
-    } else {
-      // Alle fertig → Wartezustand aufheben
-      BT.anchorWaiting = false;
-      BT.anchorWaitPos = null;
-    }
-  } else if (leader && leader.target) {
-    // Anführer kämpft → kein Wartezustand
-    BT.anchorWaiting = false;
-    BT.anchorWaitPos = null;
-  }
-
-  // Ankerpunkt: Wenn Anführer wartet, bleibt anchorWaitPos fix → Follower-Kämpfe werden NICHT abgebrochen
-  const acx = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wx : (leader ? leader.wx : BT.mapW / 2);
-  const acy = BT.anchorWaiting && BT.anchorWaitPos ? BT.anchorWaitPos.wy : (leader ? leader.wy : BT.mapH / 2);
 
   // ---- Bewegung + Angriff je Kämpfer ----
   let focus = null, focusRatio = Infinity;
@@ -6640,7 +6684,7 @@ function updateWildBattles(dt, now) {
         }
       } else {
         // Follower ohne Ziel: zum Anker aufschließen
-        if (Math.hypot(f.wx - acx, f.wy - acy) > 70) approach(f, acx, acy, 58 * dt);
+        if (Math.hypot(f.wx - acx, f.wy - acy) > 70) approach(f, acx, acy, 58 * dt, dt);
         else patrolNear(f, acx, acy, 55, dt);
       }
       return;
@@ -6648,7 +6692,7 @@ function updateWildBattles(dt, now) {
 
     const dist = Math.hypot(f.wx - w.wx, f.wy - w.wy);
     if (!w.discovered && dist < 90) { w.discovered = true; }
-    if (dist > 36) approach(f, w.wx, w.wy, 58 * dt);
+    if (dist > 36) approach(f, w.wx, w.wy, 58 * dt, dt);
     // Regeneration außerhalb der Schlagreichweite: solange ein Kämpfer nur auf sein
     // Ziel zuläuft (noch nicht "im Kampf"), heilt er weiter. Wichtig v.a. für den
     // Anführer (Slot 0), der Wilde auf der ganzen Karte jagt und sonst nie zur Ruhe
@@ -6670,25 +6714,28 @@ function updateWildBattles(dt, now) {
     }
   });
 
-  // ---- Harte Positions-Beschränkung: Follower bleiben im FOLLOWER_RADIUS um den Anführer ----
+  // ---- Leine: Kämpfer bleiben im Umkreis des Ankers ----
+  // Notfall-Netz, kein Steuerungsmittel — die Zielzuweisung oben hält die Gruppe
+  // bereits zusammen. Der Anführer wird nur mitgeclampt, solange der Anker eingefroren
+  // ist (Gruppenkampf); danach führt er die Gruppe wieder frei.
   if (leader && leader.faintT <= 0) {
     BT.fighters.forEach((f, slotIdx) => {
-      if (slotIdx === 0 || f.faintT > 0) return;
-      const dx = f.wx - leader.wx, dy = f.wy - leader.wy;
+      if (f.faintT > 0) return;
+      if (slotIdx === 0 && !BT.anchorWaiting) return;
+      const maxR = slotIdx === 0 ? LEADER_HOLD_RADIUS + 40 : FOLLOWER_RADIUS;
+      const dx = f.wx - acx, dy = f.wy - acy;
       const dist = Math.hypot(dx, dy);
-      if (dist > FOLLOWER_RADIUS) {
-        const scale = FOLLOWER_RADIUS / dist;
-        f.wx = leader.wx + dx * scale;
-        f.wy = leader.wy + dy * scale;
-        // Zielposition ebenfalls innerhalb des Radius halten
-        if (f.targetWx !== undefined) {
-          const tdx = f.targetWx - leader.wx, tdy = f.targetWy - leader.wy;
-          const td = Math.hypot(tdx, tdy);
-          if (td > FOLLOWER_RADIUS) {
-            f.targetWx = leader.wx + tdx / td * FOLLOWER_RADIUS;
-            f.targetWy = leader.wy + tdy / td * FOLLOWER_RADIUS;
-          }
-        }
+      if (dist <= maxR) return;
+      // Auf den Radius zurückholen — aber niemals in eine Wand hinein.
+      // (Genau das ließ Pokémon bisher in Hindernissen festhängen.)
+      const cx = acx + dx / dist * maxR, cy = acy + dy / dist * maxR;
+      const p = isWalkable(cx, cy) ? { x: cx, y: cy } : findWalkableNear(cx, cy);
+      f.wx = p.x; f.wy = p.y;
+      f.path = null; f.lastGoalDist = undefined; f.noProgressT = 0;
+      if (f.targetWx !== undefined) {
+        const tdx = f.targetWx - acx, tdy = f.targetWy - acy;
+        const td = Math.hypot(tdx, tdy);
+        if (td > maxR) { f.targetWx = acx + tdx / td * maxR; f.targetWy = acy + tdy / td * maxR; }
       }
     });
   }
@@ -6700,13 +6747,7 @@ function updateWildBattles(dt, now) {
     const opp = BT.fighters.find(f => f.target === w && f.faintT <= 0);
     if (!opp || BT.ballAnim) return;
     const dx = opp.wx - w.wx, dy = opp.wy - w.wy, d = Math.hypot(dx, dy) || 1;
-    if (d > 36) {
-      const s = Math.min(w.speed * dt, d);
-      const nx = w.wx + dx / d * s, ny = w.wy + dy / d * s;
-      if (isWalkable(nx, w.wy)) w.wx = nx;
-      if (isWalkable(w.wx, ny)) w.wy = ny;
-      w.dir = dx < 0 ? -1 : 1;
-    }
+    if (d > 36) approach(w, opp.wx, opp.wy, w.speed * dt, dt);
     w.cd -= dt * 1000;
     if (w.cd <= 0 && d < 48) { w.cd = 2600 + Math.random() * 600; wildHit(w, opp); }
   });
@@ -6897,23 +6938,196 @@ function tileIdAt(wx, wy) {
   if (col < 0 || row < 0 || col >= BT.cols || row >= BT.rows) return -1;
   return BT.mapTiles[row * BT.cols + col];
 }
-function isWalkable(wx, wy) {
+/* Ist das Tile an dieser Welt-Position frei? (ohne Körper-Puffer) */
+function tileOpenAt(wx, wy) {
   const t = tileIdAt(wx, wy);
   if (t < 0) return false;
   const solid = TILE_SOLID[BT.mapBiome];
   return !(solid && solid.has(t));
 }
+function tileOpenRC(col, row) {
+  if (col < 0 || row < 0 || col >= BT.cols || row >= BT.rows) return false;
+  const solid = TILE_SOLID[BT.mapBiome];
+  const t = BT.mapTiles[row * BT.cols + col];
+  return !(solid && solid.has(t));
+}
+/* Körper-Puffer: kleiner als ein halbes Tile, damit 1-Tile-Gänge passierbar bleiben,
+   aber groß genug, dass sich niemand in einer Wandecke verkeilt. */
+const WALL_PAD = 5;
+function isWalkable(wx, wy) {
+  if (!tileOpenAt(wx, wy)) return false;
+  return tileOpenAt(wx - WALL_PAD, wy) && tileOpenAt(wx + WALL_PAD, wy) &&
+         tileOpenAt(wx, wy - WALL_PAD) && tileOpenAt(wx, wy + WALL_PAD);
+}
+/* Freie Sichtlinie zwischen zwei Punkten? (samplet den Strahl) */
+function hasLineOfSight(x0, y0, x1, y1) {
+  const d = Math.hypot(x1 - x0, y1 - y0);
+  const steps = Math.ceil(d / 4);
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    if (!isWalkable(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t)) return false;
+  }
+  return true;
+}
+
+/* ---- Erreichbarkeitskarte ----
+   Markiert die größte zusammenhängende Region der Karte (mit derselben Ecken-Regel
+   wie A*: keine Diagonale durch eine Felsecke). Manche Biome — v. a. die Höhle —
+   enthalten winzige Nischen, die nur durch so eine Ecke "erreichbar" wären. Ohne
+   diese Karte könnten Pokémon dort hineingeraten und nie wieder herausfinden;
+   genau dafür war bisher ein Neuladen nötig. Wird einmal je Karte berechnet. */
+function computeReachable() {
+  const C = BT.cols, R = BT.rows;
+  const region = new Int32Array(C * R).fill(-1);
+  const groessen = [];
+  for (let r0 = 0; r0 < R; r0++) for (let c0 = 0; c0 < C; c0++) {
+    const id0 = r0 * C + c0;
+    if (region[id0] >= 0 || !tileOpenRC(c0, r0)) continue;
+    const rid = groessen.length;
+    let size = 0;
+    const stack = [id0]; region[id0] = rid;
+    while (stack.length) {
+      const n = stack.pop(); size++;
+      const nc = n % C, nr = (n - nc) / C;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        if (!tileOpenRC(nc + dc, nr + dr)) continue;
+        if (dr && dc && (!tileOpenRC(nc + dc, nr) || !tileOpenRC(nc, nr + dr))) continue;
+        const xi = (nr + dr) * C + (nc + dc);
+        if (region[xi] < 0) { region[xi] = rid; stack.push(xi); }
+      }
+    }
+    groessen.push(size);
+  }
+  let best = -1, bestSize = -1;
+  groessen.forEach((s, i) => { if (s > bestSize) { bestSize = s; best = i; } });
+  BT.reach = new Uint8Array(C * R);
+  for (let i = 0; i < region.length; i++) if (region[i] === best) BT.reach[i] = 1;
+}
+/* Liegt der Punkt im begehbaren Hauptgebiet (nicht in einer abgeschnittenen Nische)? */
+function isReachableSpot(wx, wy) {
+  if (!BT.reach) return true;
+  const col = Math.floor(wx / BT.tileSize), row = Math.floor(wy / BT.tileSize);
+  if (col < 0 || row < 0 || col >= BT.cols || row >= BT.rows) return false;
+  return BT.reach[row * BT.cols + col] === 1;
+}
+
+/* ---- A*-Pathfinding auf dem Tile-Grid ----
+   Liefert eine Liste von Wegpunkten (Tile-Mittelpunkte) von (sx,sy) nach (tx,ty),
+   oder null, wenn kein Weg existiert. Diagonalen nur, wenn beide Nachbarn frei sind
+   (kein Ecken-Schneiden durch Wände). */
+function findGridPath(sx, sy, tx, ty) {
+  if (!BT.mapTiles) return null;
+  const cols = BT.cols;
+  const s = Math.floor(sy / BT.tileSize) * cols + Math.floor(sx / BT.tileSize);
+  let gc = Math.floor(tx / BT.tileSize), gr = Math.floor(ty / BT.tileSize);
+  if (!tileOpenRC(gc, gr)) {
+    // Ziel liegt in einer Wand → nächstes freies Tile drumherum nehmen
+    let found = false;
+    for (let ring = 1; ring <= 4 && !found; ring++)
+      for (let dr = -ring; dr <= ring && !found; dr++)
+        for (let dc = -ring; dc <= ring && !found; dc++) {
+          if (Math.max(Math.abs(dr), Math.abs(dc)) !== ring) continue;
+          if (tileOpenRC(gc + dc, gr + dr)) { gc += dc; gr += dr; found = true; }
+        }
+    if (!found) return null;
+  }
+  const goal = gr * cols + gc;
+  if (s === goal) return [];
+
+  const g = new Map([[s, 0]]);
+  const came = new Map();
+  const closed = new Set();
+  const h = n => {
+    const dc = Math.abs((n % cols) - gc), dr = Math.abs(Math.floor(n / cols) - gr);
+    return (dc + dr) + (Math.SQRT2 - 2) * Math.min(dc, dr);
+  };
+  const fScore = new Map([[s, h(s)]]);
+
+  // Binärheap als offene Liste. In labyrinthartigen Biomen (Höhle) muss A* fast alle
+  // Felder absuchen — mit linearer Suche wäre das spürbar langsam.
+  const heap = [s];
+  const fOf = n => fScore.get(n) ?? Infinity;
+  const push = n => {
+    heap.push(n);
+    let i = heap.length - 1;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (fOf(heap[p]) <= fOf(heap[i])) break;
+      const t = heap[p]; heap[p] = heap[i]; heap[i] = t; i = p;
+    }
+  };
+  const pop = () => {
+    const top = heap[0], last = heap.pop();
+    if (heap.length) {
+      heap[0] = last;
+      let i = 0;
+      for (;;) {
+        const l = 2 * i + 1, r = l + 1;
+        let m = i;
+        if (l < heap.length && fOf(heap[l]) < fOf(heap[m])) m = l;
+        if (r < heap.length && fOf(heap[r]) < fOf(heap[m])) m = r;
+        if (m === i) break;
+        const t = heap[m]; heap[m] = heap[i]; heap[i] = t; i = m;
+      }
+    }
+    return top;
+  };
+
+  while (heap.length) {
+    const cur = pop();
+    if (closed.has(cur)) continue;   // veralteter Heap-Eintrag
+    if (cur === goal) {
+      const pts = [];
+      let n = cur;
+      while (n !== undefined) {
+        pts.push({ x: (n % cols + 0.5) * BT.tileSize, y: (Math.floor(n / cols) + 0.5) * BT.tileSize });
+        n = came.get(n);
+      }
+      pts.reverse();
+      pts.shift();            // Startfeld selbst überspringen
+      return pts;
+    }
+    closed.add(cur);
+    const cc = cur % cols, cr = Math.floor(cur / cols);
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (!dr && !dc) continue;
+      const nc = cc + dc, nr = cr + dr;
+      if (!tileOpenRC(nc, nr)) continue;
+      if (dr && dc && (!tileOpenRC(cc + dc, cr) || !tileOpenRC(cc, cr + dr))) continue;
+      const nn = nr * cols + nc;
+      if (closed.has(nn)) continue;
+      const ng = g.get(cur) + (dr && dc ? Math.SQRT2 : 1);
+      if (ng >= (g.get(nn) ?? Infinity)) continue;
+      came.set(nn, cur); g.set(nn, ng); fScore.set(nn, ng + h(nn));
+      push(nn);
+    }
+  }
+  return null;
+}
 function clampX(x) { return Math.max(BT.tileSize * 2.5, Math.min(BT.mapW - BT.tileSize * 2.5, x)); }
 function clampY(y) { return Math.max(BT.tileSize * 2.5, Math.min(BT.mapH - BT.tileSize * 2.5, y)); }
+/* Nächster begehbarer Punkt — immer im erreichbaren Hauptgebiet, damit niemand in
+   einer abgeschnittenen Nische abgesetzt wird und dort für immer feststeckt. */
 function findWalkableNear(x, y) {
   x = Math.max(0, Math.min(BT.mapW - 1, x)); y = Math.max(0, Math.min(BT.mapH - 1, y));
-  if (isWalkable(x, y)) return { x, y };
+  const ok = (px, py) => isWalkable(px, py) && isReachableSpot(px, py);
+  if (ok(x, y)) return { x, y };
   for (let ring = 1; ring < 40; ring++) {
     for (let a = 0; a < 12; a++) {
       const ang = a / 12 * Math.PI * 2;
       const nx = x + Math.cos(ang) * ring * BT.tileSize, ny = y + Math.sin(ang) * ring * BT.tileSize;
-      if (isWalkable(nx, ny)) return { x: nx, y: ny };
+      if (ok(nx, ny)) return { x: nx, y: ny };
     }
+  }
+  const mitte = { x: BT.mapW / 2, y: BT.mapH / 2 };
+  return ok(mitte.x, mitte.y) ? mitte : firstReachableSpot();
+}
+/* Notnagel: irgendein Feld im Hauptgebiet (nur falls selbst die Kartenmitte solide ist) */
+function firstReachableSpot() {
+  for (let r = 0; r < BT.rows; r++) for (let c = 0; c < BT.cols; c++) {
+    const x = (c + 0.5) * BT.tileSize, y = (r + 0.5) * BT.tileSize;
+    if (isWalkable(x, y) && isReachableSpot(x, y)) return { x, y };
   }
   return { x: BT.mapW / 2, y: BT.mapH / 2 };
 }
@@ -6946,16 +7160,37 @@ function separateEntities() {
 
 /* ---- Kamera: rahmt die ganze Team-Gruppe (Mittelpunkt aller lebenden Kämpfer) ---- */
 function updateCamera() {
-  // Kamera folgt ausschließlich dem Anführer (fighters[0]).
-  // Das hält alle Follower im Bild, da sie per FOLLOWER_RADIUS am Anführer gebunden sind.
-  const leader = BT.fighters[0];
-  if (!leader) return;
+  // Kamera rahmt die GRUPPE: Zielpunkt ist das Zentrum der Bounding-Box aller
+  // lebenden Kämpfer (faintT <= 0). So bleiben Anführer UND Follower im Bild,
+  // auch wenn ein Follower seitlich einen eigenen Wild-Kampf führt. Die Leine
+  // (FOLLOWER_RADIUS) hält die Box klein genug fürs Fenster.
+  // Kein Zoom: bei H=200 ist die vertikale Spannweite auf ~200 px begrenzt; im
+  // seltenen Extremfall (zwei Follower exakt vertikal entgegengesetzt am Leinen-
+  // Ende) kann ein Rand kurz überstehen — bewusst akzeptiert (Zoom wäre Variante C).
+  const alive = BT.fighters.filter(f => f.faintT <= 0);
 
-  // Im Legenden-Kampf Kompromiss zwischen Anführer und Legende
-  let fx = leader.wx, fy = leader.wy;
+  let fx, fy;
+  if (alive.length) {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const f of alive) {
+      if (f.wx < minX) minX = f.wx;
+      if (f.wx > maxX) maxX = f.wx;
+      if (f.wy < minY) minY = f.wy;
+      if (f.wy > maxY) maxY = f.wy;
+    }
+    fx = (minX + maxX) / 2;
+    fy = (minY + maxY) / 2;
+  } else {
+    // Alle ohnmächtig (kurzer TPK-Moment): auf fighters[0] halten, sonst Kamera stehen lassen.
+    const anchor = BT.fighters[0];
+    if (!anchor) return;
+    fx = anchor.wx; fy = anchor.wy;
+  }
+
+  // Legenden-Event: Legende mit einrahmen, damit Team + Legende sichtbar bleiben.
   if (BT.legendActive && BT.wild) {
-    fx = (leader.wx + BT.wild.wx) / 2;
-    fy = (leader.wy + BT.wild.wy) / 2;
+    fx = (fx + BT.wild.wx) / 2;
+    fy = (fy + BT.wild.wy) / 2;
   }
 
   const tx = Math.max(0, Math.min(BT.mapW - BT.W, fx - BT.W / 2));
@@ -6966,18 +7201,14 @@ function updateCamera() {
 
 /* ---- Bewegung ---- */
 function newPatrolTargetWorld(f) {
-  for (let k = 0; k < 10; k++) {
+  for (let k = 0; k < 20; k++) {
     const tx = clampX(f.wx + (Math.random() * 300 - 150));
     const ty = clampY(f.wy + (Math.random() * 200 - 100));
-    if (isWalkable(tx, ty)) { f.targetWx = tx; f.targetWy = ty; return; }
+    if (isWalkable(tx, ty) && isReachableSpot(tx, ty)) { f.targetWx = tx; f.targetWy = ty; return; }
   }
-  f.targetWx = f.wx; f.targetWy = f.wy;
-}
-function tryStep(e, dx, dy) {
-  let moved = false;
-  if (isWalkable(e.wx + dx, e.wy)) { e.wx += dx; if (Math.abs(dx) > 0.01) moved = true; }
-  if (isWalkable(e.wx, e.wy + dy)) { e.wy += dy; if (Math.abs(dy) > 0.01) moved = true; }
-  return moved;
+  // Fallback: nächster walkablen Punkt in der Nähe
+  const p = findWalkableNear(f.wx, f.wy);
+  f.targetWx = p.x; f.targetWy = p.y;
 }
 function tryStepWithSlide(e, dx, dy) {
   // Versuch 1: Direktbewegung (axis-separated, wie bisher)
@@ -7003,60 +7234,126 @@ function tryStepWithSlide(e, dx, dy) {
   return false;
 }
 function patrol(f, dt) {
+  if (unstickIfInWall(f)) { newPatrolTargetWorld(f); return; }
   const d = Math.hypot(f.targetWx - f.wx, f.targetWy - f.wy);
-  if (d < 10) { f.stuckTicks = 0; newPatrolTargetWorld(f); return; }
-  const step = 30 * dt;
-  const dx = (f.targetWx - f.wx) / d * step;
-  const dy = (f.targetWy - f.wy) / d * step;
-  if (Math.abs(dx) > 0.02) f.dir = dx < 0 ? -1 : 1;
-  const moved = tryStepWithSlide(f, dx, dy);
-  if (!moved) {
-    f.stuckTicks = (f.stuckTicks || 0) + 1;
-    if (f.stuckTicks > 20) {
-      // Notfall-Teleport zur nächsten freien Position
-      const p = findWalkableNear(f.wx, f.wy);
-      f.wx = p.x; f.wy = p.y;
-      f.stuckTicks = 0;
-      newPatrolTargetWorld(f);
-    } else if (f.stuckTicks > 8) {
-      newPatrolTargetWorld(f);
-    }
-  } else {
-    f.stuckTicks = 0;
+  if (d < 10) { newPatrolTargetWorld(f); f.noProgressT = 0; f.lastGoalDist = undefined; return; }
+  approach(f, f.targetWx, f.targetWy, 30 * dt, dt);
+  // Patrouillenziel unerreichbar → einfach ein anderes wählen (kein Teleport nötig)
+  if ((f.noProgressT || 0) > 1.5) {
+    newPatrolTargetWorld(f);
+    f.noProgressT = 0; f.lastGoalDist = undefined; f.path = null;
   }
 }
 function patrolNear(f, cx, cy, radius, dt) {
+  if (unstickIfInWall(f)) return;
   if (f.targetWx === undefined || Math.hypot(f.targetWx - cx, f.targetWy - cy) > radius ||
       Math.hypot(f.wx - f.targetWx, f.wy - f.targetWy) < 10) {
     for (let k = 0; k < 10; k++) {
-      const a = Math.random() * Math.PI * 2, rr = 40 + Math.random() * (radius - 40);
+      // Ziel immer echt innerhalb des Radius — sonst verwirft die Prüfung oben es
+      // sofort wieder und der Wartende zittert auf der Stelle.
+      const a = Math.random() * Math.PI * 2, rr = radius * (0.3 + Math.random() * 0.6);
       const tx = clampX(cx + Math.cos(a) * rr), ty = clampY(cy + Math.sin(a) * rr);
-      if (isWalkable(tx, ty)) { f.targetWx = tx; f.targetWy = ty; break; }
+      if (isWalkable(tx, ty) && isReachableSpot(tx, ty)) {
+        f.targetWx = tx; f.targetWy = ty; f.noProgressT = 0; f.lastGoalDist = undefined; break;
+      }
     }
   }
-  const d = Math.hypot(f.targetWx - f.wx, f.targetWy - f.wy);
-  if (d > 2) { const step = 30 * dt, dx = (f.targetWx - f.wx) / d * step, dy = (f.targetWy - f.wy) / d * step; if (Math.abs(dx) > 0.02) f.dir = dx < 0 ? -1 : 1; tryStep(f, dx, dy); }
+  if (Math.hypot(f.targetWx - f.wx, f.targetWy - f.wy) > 2) {
+    approach(f, f.targetWx, f.targetWy, 30 * dt, dt);
+    if ((f.noProgressT || 0) > 1.5) { f.targetWx = undefined; f.noProgressT = 0; f.lastGoalDist = undefined; f.path = null; }
+  }
 }
-function approach(f, tx, ty, step) {
-  const d = Math.hypot(tx - f.wx, ty - f.wy);
-  if (d < 1) return;
-  const dx = (tx - f.wx) / d * step;
-  const dy = (ty - f.wy) / d * step;
-  if (Math.abs(dx) > 0.02) f.dir = dx < 0 ? -1 : 1;
-  f.lx = (tx - f.wx) / d; f.ly = (ty - f.wy) / d;
-  const moved = tryStepWithSlide(f, dx, dy);
-  if (!moved) {
-    f.approachStuck = (f.approachStuck || 0) + 1;
-    if (f.approachStuck > 15) {
-      // Weiche seitlich aus: abwechselnd links/rechts
-      f.approachSide = (f.approachSide || 0) + 1;
-      const side = (f.approachSide % 2 === 0) ? 1 : -1;
-      const pdx = -dy / (d || 1) * step * side;
-      const pdy =  dx / (d || 1) * step * side;
-      tryStepWithSlide(f, pdx, pdy);
-    }
+/* Steckt die Entity in einer Wand (z. B. nach Verschieben/Clamping)? → herausschieben */
+function unstickIfInWall(e) {
+  if (isWalkable(e.wx, e.wy)) return false;
+  const p = findWalkableNear(e.wx, e.wy);
+  e.wx = p.x; e.wy = p.y;
+  e.path = null;
+  return true;
+}
+
+/* Bewegt e einen Schritt Richtung (tx,ty); nutzt Wandgleiten als Nahbereichs-Ausweichen. */
+function steerDirect(e, tx, ty, step) {
+  const d = Math.hypot(tx - e.wx, ty - e.wy);
+  if (d < 0.5) return true;
+  const dx = (tx - e.wx) / d * Math.min(step, d);
+  const dy = (ty - e.wy) / d * Math.min(step, d);
+  if (Math.abs(dx) > 0.02) e.dir = dx < 0 ? -1 : 1;
+  e.lx = (tx - e.wx) / d; e.ly = (ty - e.wy) / d;
+  return tryStepWithSlide(e, dx, dy);
+}
+
+/* Berechnet bei Bedarf einen neuen A*-Pfad zum Ziel und cached ihn an der Entity. */
+const PATH_REFRESH = 0.5;      // s zwischen Neuberechnungen
+const PATH_GOAL_TOLERANCE = 20; // px Zielversatz, ab dem neu geplant wird
+function ensurePath(f, tx, ty, dt, force) {
+  f.pathT = (f.pathT || 0) - (dt || 0);
+  const goalMoved = !f.pathGoal || Math.hypot(f.pathGoal.x - tx, f.pathGoal.y - ty) > PATH_GOAL_TOLERANCE;
+  // Gate gilt auch bei path === null (kein Weg gefunden) — sonst würde jeder Frame neu gesucht.
+  if (!force && !goalMoved && f.pathT > 0) return;
+  f.pathT = PATH_REFRESH;
+  f.pathGoal = { x: tx, y: ty };
+  f.path = findGridPath(f.wx, f.wy, tx, ty);
+  f.pathIdx = 0;
+}
+
+/* Läuft zum Ziel: direkt bei freier Sicht, sonst entlang eines A*-Pfades.
+   step ist die Distanz für diesen Frame (Aufrufer übergeben z. B. 58*dt). */
+function approach(f, tx, ty, step, dt) {
+  dt = dt || step / 58;   // Fallback, falls ein Aufrufer kein dt mitgibt
+  if (unstickIfInWall(f)) return;
+
+  const dGoal = Math.hypot(tx - f.wx, ty - f.wy);
+  if (dGoal < 1) return;
+
+  f.replanT = (f.replanT || 0) - dt;
+  const force = (f.noProgressT || 0) > 1.2 && f.replanT <= 0;
+  if (force) f.replanT = 1;
+
+  // ---- Lenkpunkt bestimmen ----
+  // Freie Sichtlinie → direkt aufs Ziel (natürlicher & billiger als ein Pfad).
+  // Nur im Nahbereich prüfen; über weite Strecken ist der Strahl-Test teuer und
+  // fast immer negativ — da lohnt der Pfad sofort.
+  let sx = tx, sy = ty, following = false;
+  if (!force && dGoal < 300 && hasLineOfSight(f.wx, f.wy, tx, ty)) {
+    f.path = null;
   } else {
-    f.approachStuck = 0;
+    ensurePath(f, tx, ty, dt, force);
+    const p = f.path;
+    if (p && p.length) {
+      while (f.pathIdx < p.length - 1 &&
+             Math.hypot(f.wx - p[f.pathIdx].x, f.wy - p[f.pathIdx].y) < 8) f.pathIdx++;
+      if (f.pathIdx < p.length) { sx = p[f.pathIdx].x; sy = p[f.pathIdx].y; following = true; }
+    }
+  }
+
+  // ---- Fortschritts-Erkennung ----
+  // Gemessen wird gegen den LENKPUNKT, nicht gegen das Endziel: Ein korrekter Umweg
+  // um ein großes Hindernis vergrößert die Luftlinie zum Ziel zwangsläufig und darf
+  // nicht als "steckt fest" gelten. Reine Bewegung zählt ebenfalls nicht — beim
+  // Wandgleiten bewegt sich die Entity, kommt aber nie näher.
+  const dSteer = Math.hypot(sx - f.wx, sy - f.wy);
+  if (!f.progGoal || Math.hypot(f.progGoal.x - sx, f.progGoal.y - sy) > 12) {
+    f.progGoal = { x: sx, y: sy }; f.lastGoalDist = dSteer; f.noProgressT = 0;
+  } else if (dSteer < f.lastGoalDist - 2) {
+    f.lastGoalDist = dSteer; f.noProgressT = 0;
+  } else {
+    f.noProgressT = (f.noProgressT || 0) + dt;
+  }
+
+  // Letzter Ausweg, wenn selbst nach Neuplanung nichts mehr geht (z. B. Ziel liegt
+  // in einem abgeriegelten Bereich): ans Ziel versetzen statt ewig festzuhängen.
+  if (f.noProgressT > 4) {
+    const ep = findWalkableNear(tx, ty);
+    f.wx = ep.x; f.wy = ep.y;
+    f.path = null; f.progGoal = null; f.noProgressT = 0; f.lastGoalDist = undefined;
+    return;
+  }
+
+  if (!steerDirect(f, sx, sy, step)) {
+    if (following) { f.path = null; f.pathT = 0; }   // Wegpunkt blockiert → neu planen
+  } else if (following && Math.hypot(f.wx - sx, f.wy - sy) < 8) {
+    f.pathIdx++;
   }
 }
 function wanderWild(w, dt) {
@@ -7065,7 +7362,10 @@ function wanderWild(w, dt) {
     w.wtx = clampX(w.wx + (Math.random() * 160 - 80));
     w.wty = clampY(w.wy + (Math.random() * 120 - 60));
     w.wt = 2 + Math.random() * 2;
-    if (!isWalkable(w.wtx, w.wty)) { w.wtx = w.wx; w.wty = w.wy; }
+    if (!isWalkable(w.wtx, w.wty)) {
+      const wp = findWalkableNear(w.wtx, w.wty);
+      w.wtx = wp.x; w.wty = wp.y;
+    }
   }
   w.wt -= dt;
   const d = Math.hypot(w.wtx - w.wx, w.wty - w.wy);
@@ -7077,7 +7377,7 @@ function wanderWild(w, dt) {
     const moved = tryStepWithSlide(w, dx, dy);
     if (!moved) {
       w.wildStuck = (w.wildStuck || 0) + 1;
-      if (w.wildStuck > 12) {
+      if (w.wildStuck > 6) {
         const p = findWalkableNear(w.wx, w.wy);
         w.wx = p.x; w.wy = p.y;
         w.wildStuck = 0;
@@ -7109,6 +7409,7 @@ function ensureMap() {
   if (BT.mapTiles && BT.mapBiome === biome) return;
   BT.mapBiome = biome;
   generateMap(biome);
+  computeReachable();   // vor repositionFighters: findWalkableNear braucht die Karte
   renderMinimapBase();
   repositionFighters();
 }
