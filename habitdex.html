@@ -387,6 +387,89 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   100%{filter:brightness(1);transform:scale(1)}
 }
 
+/* ===== Konzentrationsmodus-Overlay ===== */
+#focus-overlay {
+  position: fixed; inset: 0; background: rgba(8,10,16,.97); z-index: 120;
+  display: none; flex-direction: column; align-items: center;
+  padding: 24px 16px; overflow-y: auto;
+}
+#focus-overlay.open { display: flex; }
+
+.focus-mon-sprite {
+  width: 96px; height: 96px; image-rendering: pixelated;
+  animation: focusbob 1.8s ease-in-out infinite alternate;
+}
+@keyframes focusbob {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-8px); }
+}
+
+.focus-timer-display {
+  font-size: 36px; color: var(--gold); letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.6); margin: 10px 0 4px;
+}
+.focus-timer-display.urgent {
+  color: #e04038; animation: urgentpulse .6s ease-in-out infinite alternate;
+}
+@keyframes urgentpulse { from { opacity: 1; } to { opacity: .5; } }
+
+.focus-mon-name {
+  font-size: 10px; color: var(--white); margin-bottom: 16px; text-align: center;
+}
+.focus-progress-bar {
+  width: 100%; max-width: 320px; height: 8px;
+  background: var(--bg2); border: 2px solid var(--line); border-radius: 4px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.focus-progress-fill {
+  height: 100%; background: var(--gold); transition: width .5s linear;
+}
+
+.focus-task-list { width: 100%; max-width: 320px; margin-bottom: 20px; }
+.focus-task-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg2); border: 2px solid var(--line);
+  border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; font-size: 9px;
+}
+.focus-task-item.done { opacity: .5; }
+.focus-task-item.done .focus-task-text { text-decoration: line-through; }
+.focus-task-check {
+  width: 18px; height: 18px; border: 2px solid var(--line);
+  border-radius: 4px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 11px;
+}
+.focus-task-check.checked { background: var(--hpgreen); border-color: var(--hpgreen); }
+
+.focus-setup-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; width: 100%; max-width: 320px; margin-bottom: 16px;
+}
+.focus-time-btn {
+  background: var(--bg2); border: 2px solid var(--line);
+  border-radius: 8px; padding: 8px 4px; font-size: 9px;
+  color: var(--white); cursor: pointer; text-align: center;
+}
+.focus-time-btn.selected { border-color: var(--gold); color: var(--gold); }
+
+.focus-task-input-row {
+  display: flex; gap: 6px; width: 100%; max-width: 320px; margin-bottom: 8px;
+}
+.focus-task-input-row input {
+  flex: 1; background: var(--bg2); border: 2px solid var(--line);
+  border-radius: 6px; padding: 6px 8px; font-size: 9px; color: var(--white);
+}
+.focus-streak-info {
+  font-size: 7px; color: #909080; text-align: center;
+  margin-bottom: 12px; line-height: 1.9;
+}
+.mega-stone-badge {
+  display: inline-block; font-size: 7px;
+  background: linear-gradient(135deg, #3060a8, #c060d8);
+  border-radius: 4px; padding: 2px 6px; color: #fff;
+  margin-left: 4px; vertical-align: middle;
+}
+.pick-card.selected { outline: 2px solid var(--gold); }
+
 /* ===== Perfekter-Tag-Overlay + Konfetti ===== */
 #pd-overlay{
   position:fixed;inset:0;background:rgba(8,10,16,.94);z-index:110;
@@ -1311,6 +1394,11 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <div class="pd-body" id="pd-body"></div>
   </div>
 
+  <!-- Konzentrationsmodus-Overlay -->
+  <div id="focus-overlay">
+    <!-- Inhalt wird komplett via JS gerendert -->
+  </div>
+
 </div>
 
 <script>
@@ -1401,6 +1489,58 @@ const STONE_MAP = {
 const STONE_MAP_REVERSE = Object.fromEntries(
   Object.entries(STONE_MAP).map(([k, v]) => [v, k])
 );
+
+/* ---------- Mega-Entwicklungen (dex → Mega-Form) ----------
+   megaDex sind PokeAPI-IDs der Mega-Formen: SPRITE(megaDex,false) = Mega-Sprite */
+const MEGA_MAP = {
+  3:   { name: "Mega-Bisaflor",    megaDex: 10033 },
+  6:   { name: "Mega-Glurak X",    megaDex: 10034 },
+  9:   { name: "Mega-Turtok",      megaDex: 10036 },
+  15:  { name: "Mega-Bibor",       megaDex: 10090 },
+  18:  { name: "Mega-Tauboss",     megaDex: 10073 },
+  65:  { name: "Mega-Simsala",     megaDex: 10037 },
+  80:  { name: "Mega-Lahmus",      megaDex: 10071 },
+  94:  { name: "Mega-Gengar",      megaDex: 10038 },
+  115: { name: "Mega-Kangama",     megaDex: 10039 },
+  127: { name: "Mega-Pinsir",      megaDex: 10040 },
+  130: { name: "Mega-Garados",     megaDex: 10041 },
+  142: { name: "Mega-Aerodactyl",  megaDex: 10042 },
+  150: { name: "Mega-Mewtu X",     megaDex: 10043 },
+  181: { name: "Mega-Ampharos",    megaDex: 10045 },
+  208: { name: "Mega-Stahlos",     megaDex: 10072 },
+  212: { name: "Mega-Scherox",     megaDex: 10046 },
+  214: { name: "Mega-Skaraborn",   megaDex: 10047 },
+  229: { name: "Mega-Hundemon",    megaDex: 10048 },
+  248: { name: "Mega-Despotar",    megaDex: 10049 },
+  254: { name: "Mega-Gewaldro",    megaDex: 10065 },
+  257: { name: "Mega-Lohgock",     megaDex: 10050 },
+  260: { name: "Mega-Sumpex",      megaDex: 10064 },
+  282: { name: "Mega-Guardevoir",  megaDex: 10051 },
+  302: { name: "Mega-Zobiris",     megaDex: 10066 },
+  303: { name: "Mega-Flunkifer",   megaDex: 10052 },
+  306: { name: "Mega-Aggron",      megaDex: 10053 },
+  308: { name: "Mega-Meditalis",   megaDex: 10054 },
+  310: { name: "Mega-Frizelbliz",  megaDex: 10055 },
+  354: { name: "Mega-Banette",     megaDex: 10056 },
+  359: { name: "Mega-Absol",       megaDex: 10057 },
+  373: { name: "Mega-Brutalanda",  megaDex: 10089 },
+  376: { name: "Mega-Metagross",   megaDex: 10076 },
+  380: { name: "Mega-Latias",      megaDex: 10062 },
+  381: { name: "Mega-Latios",      megaDex: 10063 },
+  445: { name: "Mega-Knakrack",    megaDex: 10058 },
+  448: { name: "Mega-Lucario",     megaDex: 10059 },
+  460: { name: "Mega-Rexblisar",   megaDex: 10060 },
+};
+
+function isMegaActive(mon) {
+  return !!(mon.megaUntil && Date.now() < mon.megaUntil);
+}
+function megaAtkMultiplier(mon) { return isMegaActive(mon) ? 1.3 : 1.0; }
+function megaSpAtkMultiplier(mon) { return isMegaActive(mon) ? 1.2 : 1.0; }
+function monSpriteId(mon) {
+  if (isMegaActive(mon) && MEGA_MAP[mon.dex]) return MEGA_MAP[mon.dex].megaDex;
+  return mon.dex;
+}
 
 /* ---------- Habit-Kategorien ---------- */
 const CATS = {
@@ -1530,6 +1670,11 @@ let cache = null; // { pokemon:{}, evo:{}, evoDone:{}, battle:{dex:{speed,moves}
 let dlNoteBuffer = "";        // Tipp-Puffer für die Tages-Notiz (nicht persistiert)
 let noteArchiveOpen = false;  // Notizspeicher im Analyse-Tab auf/zu (nicht persistiert)
 let pendingStoneKey = null;   // aktuell einzusetzender Stein-Key (Stein-Auswahlgrid)
+let focusTimer = null;            // Intervall der laufenden Fokus-Session
+let focusSelectedMon = null;      // uid des im Setup gewählten Pokémon
+let focusSelectedMinutes = 25;    // gewählte Fokusdauer in Minuten
+let focusTasks = [];              // Aufgaben-Entwürfe im Setup
+let focusSetupTaskDraft = "";
 
 function defaultState() {
   return {
@@ -1553,6 +1698,7 @@ function defaultState() {
     coins: 0,          // Shop-Währung
     arenaBadges: 0,    // Anzahl errungener Arena-Orden (0–8, = besiegte Arenaleiter)
     arenaWins: 0,      // Gesamtzahl gewonnener Arena-Kämpfe (inkl. Freies Training)
+    focus: null,       // aktive Fokus-Session oder null
     gymProgress: 0,    // höchster besiegter Arenaleiter (0–8) – schaltet den nächsten frei
     lastFishTime: 0,   // Zeitstempel des letzten Angel-Versuchs (Cooldown)
     shopSeed: "",      // Datum des aktuellen Shop-Angebots
@@ -1623,7 +1769,11 @@ function loadAll() {
     if (m.happiness === undefined) m.happiness = 120;
     if (m.happinessDate === undefined) m.happinessDate = null;
     if (!m.pendingMoves) m.pendingMoves = [];
+    if (m.focusSessionCount === undefined) m.focusSessionCount = 0;
+    if (m.megaStone === undefined) m.megaStone = false;
+    if (m.megaUntil === undefined) m.megaUntil = null;
   });
+  if (state.focus === undefined) state.focus = null;
   // TM-Migration: alte disc_*-Items aus state.items entfernen
   ["disc_normal","disc_feuer","disc_wasser","disc_elektro",
    "disc_pflanze","disc_psycho","disc_drache"].forEach(k => {
@@ -4140,10 +4290,327 @@ function showEvoOverlay(oldD, newD, shiny) {
 }
 function closeEvo() { document.getElementById("evo-overlay").classList.remove("open"); }
 
+/* =====================================================================
+   KONZENTRATIONSMODUS
+   ===================================================================== */
+async function openFocusSetup() {
+  if (state.focus) { renderFocusActive(); openFocusOverlay(); return; }
+  focusSelectedMon = state.team[0] || (state.box[0] ? state.box[0].uid : null);
+  focusSelectedMinutes = 25;
+  focusTasks = [];
+  const overlay = document.getElementById("focus-overlay");
+  overlay.innerHTML = '<div class="spin" style="margin-top:80px"></div>';
+  openFocusOverlay();
+  await renderFocusSetup();
+}
+
+function openFocusOverlay() {
+  document.getElementById("focus-overlay").classList.add("open");
+  const nav = document.querySelector("nav");
+  if (nav) { nav.style.pointerEvents = "none"; nav.style.opacity = "0.3"; }
+}
+
+function closeFocusOverlay() {
+  document.getElementById("focus-overlay").classList.remove("open");
+  const nav = document.querySelector("nav");
+  if (nav) { nav.style.pointerEvents = ""; nav.style.opacity = ""; }
+}
+
+async function renderFocusSetup() {
+  const overlay = document.getElementById("focus-overlay");
+  const allMons = state.box.length ? state.box : [];
+
+  if (!allMons.length) {
+    overlay.innerHTML =
+      '<h3 style="color:var(--gold);margin-bottom:12px">🎯 Konzentrationsmodus</h3>' +
+      '<p style="font-size:9px;color:#909080;text-align:center">Du brauchst zuerst ein Pokémon!</p>' +
+      '<button class="btn" style="max-width:220px;margin-top:20px" onclick="closeFocusOverlay()">Schließen</button>';
+    return;
+  }
+
+  const monCards = await Promise.all(allMons.map(async m => {
+    const d = await getPokemonData(m.dex);
+    const hasMega = !!MEGA_MAP[m.dex];
+    const sessions = m.focusSessionCount || 0;
+    const THRESHOLD = 10;
+    const isSelected = m.uid === focusSelectedMon;
+    const megaInfo = hasMega
+      ? (m.megaStone
+          ? '<div style="font-size:7px;color:#c060d8">💎 Mega-Stein!</div>'
+          : '<div style="font-size:7px;color:#909080">' + sessions + '/' + THRESHOLD + ' Sessions</div>')
+      : '';
+    return '<div class="pick-card' + (isSelected ? ' selected' : '') + '"' +
+      ' onclick="focusSelectMon(\'' + m.uid + '\')">' +
+      '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="">' +
+      '<div class="pn">' + (m.shiny ? "✨ " : "") + esc(monName(m, d.name)) + '</div>' +
+      '<div style="font-size:7px;color:#a8b8c8">Lv.' + m.level + '</div>' +
+      megaInfo +
+    '</div>';
+  }));
+
+  const timeOptions = [15, 25, 45, 60, 90];
+  const timeButtons = timeOptions.map(t =>
+    '<button class="focus-time-btn' + (t === focusSelectedMinutes ? ' selected' : '') + '"' +
+    ' onclick="focusSelectTime(' + t + ')">' + t + ' Min</button>'
+  ).join("");
+
+  const taskHTML = focusTasks.map((task, i) =>
+    '<div class="focus-task-item">' +
+      '<div class="focus-task-check" onclick="focusRemoveSetupTask(' + i + ')">✕</div>' +
+      '<span class="focus-task-text">' + esc(task.text) + '</span>' +
+    '</div>'
+  ).join("");
+
+  overlay.innerHTML =
+    '<h3 style="color:var(--gold);margin-bottom:4px">🎯 Konzentrationsmodus</h3>' +
+    '<p style="font-size:8px;color:#909080;margin-bottom:14px;text-align:center">' +
+      'Wähle dein Pokémon, stelle die Zeit ein und starte.' +
+    '</p>' +
+    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Pokémon wählen</label>' +
+    '<div class="pick-grid" style="margin-bottom:16px">' + monCards.join("") + '</div>' +
+    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Fokuszeit</label>' +
+    '<div class="focus-setup-grid">' + timeButtons + '</div>' +
+    '<label style="font-size:8px;color:#606050;margin-bottom:6px;display:block">Aufgaben (optional)</label>' +
+    '<div class="focus-task-input-row">' +
+      '<input id="focus-task-input" type="text" maxlength="60" placeholder="Aufgabe hinzufügen …"' +
+      ' onkeydown="if(event.key===\'Enter\')focusAddSetupTask()">' +
+      '<button class="mini-btn" onclick="focusAddSetupTask()">+</button>' +
+    '</div>' +
+    '<div class="focus-task-list" id="focus-setup-tasks">' + taskHTML + '</div>' +
+    '<button class="btn green" style="max-width:280px" onclick="startFocusSession()">▶ Fokus starten</button>' +
+    '<button class="btn" style="max-width:280px;margin-top:6px" onclick="closeFocusOverlay()">Abbrechen</button>';
+}
+
+function focusSelectMon(uidv) { focusSelectedMon = uidv; renderFocusSetup(); }
+function focusSelectTime(min) { focusSelectedMinutes = min; renderFocusSetup(); }
+
+function focusAddSetupTask() {
+  const input = document.getElementById("focus-task-input");
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  focusTasks.push({ id: uid(), text, done: false });
+  input.value = "";
+  renderFocusSetup();
+}
+
+function focusRemoveSetupTask(i) {
+  focusTasks.splice(i, 1);
+  renderFocusSetup();
+}
+
+function startFocusSession() {
+  const mon = getMon(focusSelectedMon);
+  if (!mon) { toast("Kein Pokémon gewählt."); return; }
+  state.focus = {
+    monUid:     mon.uid,
+    startTime:  Date.now(),
+    durationMs: focusSelectedMinutes * 60 * 1000,
+    tasks:      focusTasks.map(t => ({ ...t })),
+    completed:  false,
+  };
+  save();
+  renderFocusActive();
+}
+
+function renderFocusActive() {
+  const sess = state.focus;
+  if (!sess) { closeFocusOverlay(); return; }
+  const mon = getMon(sess.monUid);
+  if (!mon) { state.focus = null; save(); closeFocusOverlay(); return; }
+
+  const overlay = document.getElementById("focus-overlay");
+  const elapsed = Date.now() - sess.startTime;
+  const remaining = Math.max(0, sess.durationMs - elapsed);
+  const pct = Math.min(100, (elapsed / sess.durationMs) * 100);
+  const allDone = sess.tasks.length > 0 && sess.tasks.every(t => t.done);
+  const timerDone = remaining <= 0;
+  const mm = Math.floor(remaining / 60000);
+  const ss = Math.floor((remaining % 60000) / 1000);
+  const timeStr = String(mm).padStart(2,"0") + ":" + String(ss).padStart(2,"0");
+  const urgent = remaining < 60000 && remaining > 0;
+
+  const spriteId = isMegaActive(mon) && MEGA_MAP[mon.dex]
+    ? MEGA_MAP[mon.dex].megaDex : mon.dex;
+
+  const taskHTML = sess.tasks.map((task, i) =>
+    '<div class="focus-task-item' + (task.done ? ' done' : '') + '">' +
+      '<div class="focus-task-check' + (task.done ? ' checked' : '') + '"' +
+      ' onclick="focusToggleTask(' + i + ')">' + (task.done ? '✔' : '') + '</div>' +
+      '<span class="focus-task-text">' + esc(task.text) + '</span>' +
+    '</div>'
+  ).join("");
+
+  const canFinish = timerDone || allDone;
+
+  overlay.innerHTML =
+    '<h3 style="color:var(--gold);margin-bottom:8px">🎯 Fokus-Training</h3>' +
+    '<img class="focus-mon-sprite" src="' + SPRITE(spriteId, mon.shiny) + '" alt="">' +
+    '<div class="focus-mon-name">' + (mon.shiny ? "✨ " : "") +
+      esc(mon.nickname || mon.name || ("№" + mon.dex)) + ' · Lv.' + mon.level + '</div>' +
+    '<div class="focus-timer-display' + (urgent ? ' urgent' : '') + '">' + timeStr + '</div>' +
+    '<div class="focus-progress-bar"><div class="focus-progress-fill" style="width:' + pct + '%"></div></div>' +
+    (sess.tasks.length ? '<div class="focus-task-list">' + taskHTML + '</div>' : '') +
+    '<div class="focus-streak-info">Session läuft … Die App bleibt gesperrt bis du fertig bist.</div>' +
+    (canFinish
+      ? '<button class="btn green" style="max-width:280px" onclick="completeFocusSession()">✅ Session abschließen</button>'
+      : '') +
+    '<button class="btn red" style="max-width:280px;margin-top:6px" onclick="abortFocusSession()">❌ Abbrechen (kein EXP)</button>';
+
+  if (!focusTimer && !timerDone) {
+    focusTimer = setInterval(() => {
+      const s = state.focus;
+      if (!s) { clearInterval(focusTimer); focusTimer = null; return; }
+      const rem = Math.max(0, s.durationMs - (Date.now() - s.startTime));
+      if (rem <= 0) { clearInterval(focusTimer); focusTimer = null; }
+      renderFocusActive();
+    }, 1000);
+  }
+}
+
+function focusToggleTask(i) {
+  if (!state.focus || !state.focus.tasks[i]) return;
+  state.focus.tasks[i].done = !state.focus.tasks[i].done;
+  save();
+  renderFocusActive();
+}
+
+async function completeFocusSession() {
+  const sess = state.focus;
+  if (!sess) return;
+  if (focusTimer) { clearInterval(focusTimer); focusTimer = null; }
+
+  const mon = getMon(sess.monUid);
+  if (!mon) { state.focus = null; save(); closeFocusOverlay(); return; }
+
+  const minutesTotal = Math.ceil(sess.durationMs / 60000);
+  const levelsToGain = Math.max(1, Math.floor(minutesTotal / 15));
+  const MAX_LEVEL = 100;
+  let levelsGained = 0;
+  for (let i = 0; i < levelsToGain; i++) {
+    if (mon.level < MAX_LEVEL) { mon.level++; levelsGained++; }
+  }
+
+  mon.focusSessionCount = (mon.focusSessionCount || 0) + 1;
+
+  const MEGA_THRESHOLD = 10;
+  const hasMegaEligible = !!MEGA_MAP[mon.dex];
+  const justEarnedStone = hasMegaEligible && !mon.megaStone
+    && mon.focusSessionCount >= MEGA_THRESHOLD;
+  if (justEarnedStone) mon.megaStone = true;
+
+  // Mega-Modus erneuern wenn Stein bereits vorhanden
+  if (mon.megaStone && MEGA_MAP[mon.dex]) {
+    mon.megaUntil = Date.now() + 24 * 60 * 60 * 1000;
+    if (!justEarnedStone) toast("💎 " + MEGA_MAP[mon.dex].name + " – Mega-Mode für 24h erneuert!");
+  }
+
+  mon.happiness = Math.min(255, (mon.happiness || 120) + 5);
+  state.focus = null;
+  save();
+
+  await tryEvolve(mon);
+
+  const overlay = document.getElementById("focus-overlay");
+
+  let resultHTML =
+    '<h3 style="color:var(--gold);margin-bottom:12px">✅ Session abgeschlossen!</h3>' +
+    '<img src="' + SPRITE(mon.dex, mon.shiny) + '" alt="" style="width:80px;height:80px;image-rendering:pixelated;margin-bottom:8px">' +
+    '<div style="font-size:9px;color:var(--white);margin-bottom:6px">' +
+      esc(mon.nickname || mon.name || ("№" + mon.dex)) + '</div>' +
+    '<div class="panel dark" style="max-width:280px;margin-bottom:16px;padding:12px">' +
+      '<div style="font-size:9px;line-height:2.2">' +
+        (levelsGained > 0 ? '⬆️ +' + levelsGained + ' Level (jetzt Lv.' + mon.level + ')<br>' : '') +
+        '❤️ Zuneigung +5<br>' +
+        '🎯 Focus-Sessions: ' + mon.focusSessionCount +
+        (hasMegaEligible && !justEarnedStone && !mon.megaStone
+          ? ' / ' + MEGA_THRESHOLD : '') +
+      '</div>' +
+    '</div>';
+
+  if (justEarnedStone) {
+    const megaName = MEGA_MAP[mon.dex].name;
+    resultHTML +=
+      '<div class="panel" style="max-width:280px;margin-bottom:16px;' +
+      'border:2px solid #c060d8;padding:12px;text-align:center">' +
+        '<div style="font-size:12px;margin-bottom:4px">💎</div>' +
+        '<div style="font-size:9px;color:#c060d8;font-weight:bold">Mega-Stein erhalten!</div>' +
+        '<div style="font-size:8px;color:#a8b8c8;margin-top:4px">' +
+          esc(mon.nickname || mon.name || ("№" + mon.dex)) +
+          ' kann sich jetzt als ' + esc(megaName) + ' Mega-Entwickeln!' +
+        '</div>' +
+      '</div>';
+  }
+
+  resultHTML +=
+    '<button class="btn green" style="max-width:280px"' +
+    ' onclick="closeFocusOverlay();renderTeam();renderBox()">Weiter</button>';
+
+  overlay.innerHTML = resultHTML;
+  renderTeam();
+  renderBox();
+}
+
+function abortFocusSession() {
+  if (!confirm("Session abbrechen? Kein EXP wird vergeben.")) return;
+  if (focusTimer) { clearInterval(focusTimer); focusTimer = null; }
+  state.focus = null;
+  save();
+  closeFocusOverlay();
+  toast("Fokus-Session abgebrochen.");
+}
+
+/* =====================================================================
+   MEGA-EVOLUTION
+   ===================================================================== */
+async function activateMegaEvolution(uidv) {
+  const mon = getMon(uidv);
+  if (!mon) return;
+  if (!mon.megaStone) { toast("Kein Mega-Stein vorhanden."); return; }
+  if (!MEGA_MAP[mon.dex]) { toast("Dieses Pokémon hat keine Mega-Form."); return; }
+
+  const megaInfo = MEGA_MAP[mon.dex];
+  if (isMegaActive(mon)) {
+    const remaining = Math.ceil((mon.megaUntil - Date.now()) / 3600000);
+    toast("💎 Mega-Evolution bereits aktiv! Noch ~" + remaining + "h.");
+    return;
+  }
+
+  mon.megaUntil = Date.now() + 24 * 60 * 60 * 1000;
+  save();
+
+  // Evo-Overlay-Animation wiederverwenden
+  const evoImg = document.getElementById("evo-img");
+  const evoText = document.getElementById("evo-text");
+  const evoOverlay = document.getElementById("evo-overlay");
+
+  evoImg.src = SPRITE(mon.dex, mon.shiny);
+  evoImg.className = "";
+  evoText.textContent = "Was ist das?! " + (mon.nickname || mon.name || ("№" + mon.dex)) + " …";
+  evoOverlay.classList.add("open");
+
+  await new Promise(r => setTimeout(r, 800));
+  evoImg.classList.add("evo-anim");
+  await new Promise(r => setTimeout(r, 2200));
+
+  evoImg.src = SPRITE(megaInfo.megaDex, false);
+  evoImg.classList.remove("evo-anim");
+  evoText.textContent =
+    (mon.nickname || mon.name || ("№" + mon.dex)) +
+    " hat sich zu " + megaInfo.name + " Mega-Entwickelt!\nAktiv für 24 Stunden. 💎";
+
+  renderTeam();
+  renderBox();
+}
+
 async function renderTeam() {
   const el = document.getElementById("team-list");
+  const focusBtn =
+    '<button class="btn" style="width:100%;margin-bottom:12px" onclick="openFocusSetup()">' +
+    '🎯 Konzentrationsmodus starten</button>';
   if (!state.team.length) {
-    el.innerHTML = '<div class="empty-slot">Kein Pokémon im Team.<br>Fange welche über deine Habits!</div>';
+    el.innerHTML = (state.box.length ? focusBtn : "") +
+      '<div class="empty-slot">Kein Pokémon im Team.<br>Fange welche über deine Habits!</div>';
     syncFighters();
     return;
   }
@@ -4154,7 +4621,7 @@ async function renderTeam() {
     const pct = Math.round((m.exp / expForLevel(m.level)) * 100);
     return '<div class="panel">' +
       '<div class="mon-card">' +
-        '<img class="mon-sprite" style="cursor:pointer" src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2" onclick="openMonDetail(\'' + m.uid + '\')">' +
+        '<img class="mon-sprite" style="cursor:pointer" src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2" onclick="openMonDetail(\'' + m.uid + '\')">' +
         '<div class="mon-body">' +
           '<div class="mon-top"><span class="mon-name">' + (m.shiny ? "✨ " : "") + esc(monName(m, d.name)) + '</span><span class="mon-lv">Lv. ' + m.level + '</span></div>' +
           typeBadges(d.types) +
@@ -4165,7 +4632,7 @@ async function renderTeam() {
       '</div>' +
     '</div>';
   }));
-  el.innerHTML = parts.join("");
+  el.innerHTML = focusBtn + parts.join("");
   for (let i = state.team.length; i < 3; i++) {
     el.innerHTML += '<div class="empty-slot">— freier Team-Platz —</div>';
   }
@@ -4180,7 +4647,7 @@ async function renderBox() {
     const d = await getPokemonData(m.dex);
     const inTeam = state.team.includes(m.uid);
     return '<div class="box-cell' + (inTeam ? " inteam" : "") + '" onclick="openMonDetail(\'' + m.uid + '\')">' +
-      '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
+      '<img src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
       '<div class="bn">' + (m.shiny ? "✨" : "") + esc(monName(m, d.name)) + '</div>' +
       '<div class="bl">Lv.' + m.level + (inTeam ? " ★" : "") + '</div>' +
     '</div>';
@@ -5070,8 +5537,17 @@ function arenaCalcDamage(attacker, move, defender) {
   // Basis: ((Level × 0.4 + 2) × Power × Atk/Def) / 50 + 2
   // Physische Moves nutzen ANG/VER, spezielle SP.ANG/SP.VER (auf Level skaliert).
   const special = move.category === "special";
-  const atkBase = special ? (attacker.spAtk || attacker.atk || 60) : (attacker.atk || 60);
+  let atkBase = special ? (attacker.spAtk || attacker.atk || 60) : (attacker.atk || 60);
   const defBase = special ? (defender.spDef || defender.def || 55) : (defender.def || 55);
+
+  // Mega-Evolution: ATK +30%, SP.ATK +20% wenn aktiv.
+  // Nur Spieler-Fighter tragen eine uid – Gegner bleiben unverändert.
+  const playerMon = attacker.uid ? getMon(attacker.uid) : null;
+  if (playerMon) {
+    atkBase = Math.round(atkBase *
+      (special ? megaSpAtkMultiplier(playerMon) : megaAtkMultiplier(playerMon)));
+  }
+
   const atkScaled = calcStat(atkBase, attacker.level);
   const defScaled = calcStat(defBase, defender.level);
   let dmg = ((attacker.level * 0.4 + 2) * (move.power || 40) * (atkScaled / defScaled)) / 50 + 2;
@@ -8498,9 +8974,42 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
       '</div>';
   }
 
+  let megaEvoHTML = "";
+  if (MEGA_MAP[mon.dex]) {
+    const megaInfo = MEGA_MAP[mon.dex];
+    const active = isMegaActive(mon);
+    const remainingH = active ? Math.ceil((mon.megaUntil - Date.now()) / 3600000) : 0;
+    const megaSprite = SPRITE(megaInfo.megaDex, false);
+    megaEvoHTML =
+      '<div style="height:10px"></div>' +
+      '<label style="font-size:8px;color:#606050;display:block;margin-bottom:4px">Mega-Evolution</label>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+        '<img src="' + megaSprite + '" alt="" style="width:48px;height:48px;image-rendering:pixelated' +
+          (active ? '' : ';filter:grayscale(1);opacity:.5') + '">' +
+        '<div>' +
+          '<div style="font-size:8px;color:' + (active ? '#c060d8' : 'var(--white)') + '">' +
+            esc(megaInfo.name) +
+            (active ? '<span class="mega-stone-badge">AKTIV</span>' : '') +
+          '</div>' +
+          '<div style="font-size:7px;color:#909080">' +
+            (active
+              ? '⏱ Noch ~' + remainingH + 'h · ATK ×1.3 · SP.ATK ×1.2'
+              : (mon.megaStone
+                  ? '💎 Mega-Stein verfügbar'
+                  : '🎯 ' + (mon.focusSessionCount || 0) + '/10 Fokus-Sessions')) +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      (mon.megaStone && !active
+        ? '<button class="btn" style="background:linear-gradient(135deg,#3060a8,#c060d8);margin-bottom:4px"' +
+          ' onclick="activateMegaEvolution(\'' + mon.uid + '\')">💎 Mega-Entwickeln!</button>'
+        : '');
+  }
+
   const inTeam = state.team.includes(mon.uid);
   const footer =
     stoneEvoHTML +
+    megaEvoHTML +
     '<div style="height:10px"></div>' +
     (inTeam
       ? '<button class="btn" onclick="toggleTeam(\'' + mon.uid + '\');renderMonDetailModal(getMon(\'' + mon.uid + '\'),\'' + activeTab + '\')">Aus Team nehmen</button>'
@@ -9213,6 +9722,18 @@ renderAll();
 checkPeopleReminders();
 checkDueTasks();
 processOffline();
+// Hängende Fokus-Session nach App-Neustart wiederherstellen
+if (state.focus) {
+  const elapsed = Date.now() - state.focus.startTime;
+  const remaining = state.focus.durationMs - elapsed;
+  if (remaining > 0) {
+    openFocusOverlay();
+    renderFocusActive();
+  } else {
+    openFocusOverlay();
+    setTimeout(() => completeFocusSession(), 100);
+  }
+}
 initBattle();
 checkStreakRescue();
 scheduleAllReminders();
