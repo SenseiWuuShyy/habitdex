@@ -1670,6 +1670,7 @@ let cache = null; // { pokemon:{}, evo:{}, evoDone:{}, battle:{dex:{speed,moves}
 let dlNoteBuffer = "";        // Tipp-Puffer für die Tages-Notiz (nicht persistiert)
 let noteArchiveOpen = false;  // Notizspeicher im Analyse-Tab auf/zu (nicht persistiert)
 let pendingStoneKey = null;   // aktuell einzusetzender Stein-Key (Stein-Auswahlgrid)
+let boxSortMode = "default";  // Sortierung der Pokémon-Box: default|level|dex|shiny|name
 let focusTimer = null;            // Intervall der laufenden Fokus-Session
 let focusSelectedMon = null;      // uid des im Setup gewählten Pokémon
 let focusSelectedMinutes = 25;    // gewählte Fokusdauer in Minuten
@@ -1928,6 +1929,7 @@ function saveDailyLogField(section, key, value) {
   pruneOldLogs();
   save();
   renderDailyLog();
+  checkDailyLogReward();
 }
 
 function saveDailyLogTopLevel(key, value) {
@@ -1936,6 +1938,7 @@ function saveDailyLogTopLevel(key, value) {
   pruneOldLogs();
   save();
   renderDailyLog();
+  checkDailyLogReward();
 }
 
 function toggleDailyLog() {
@@ -2142,6 +2145,27 @@ function submitDailyNote() {
   dlNoteBuffer = "";
   renderDailyLog();
   toast("📝 Notiz gespeichert!");
+  checkDailyLogReward();
+}
+
+function checkDailyLogReward() {
+  const log = getDailyLog(todayStr());
+  if (log.logRewardGiven) return;
+
+  // Section-Filled-Checks (analog zu renderAnalyse – nicht auslagern, inline halten)
+  const sleepFilled = !!(log.sleep && (log.sleep.bedtime || log.sleep.waketime || log.sleep.feeling != null));
+  const gymFilled   = !!(log.gym   && (log.gym.strength != null || log.gym.feeling != null));
+  const foodFilled  = !!(log.food  && log.food.kcal != null);
+  const noteFilled  = !!(log.note  && log.note.text && log.note.text.trim());
+
+  const filled = [sleepFilled, gymFilled, foodFilled, noteFilled].filter(Boolean).length;
+  if (filled < 3) return;
+
+  log.logRewardGiven = true;
+  state.coins = (state.coins || 0) + 15;
+  grantRandomItem();
+  toast("📋 Tageslog vollständig! +15 Münzen & ein Item erhalten.");
+  save();
 }
 
 /* =====================================================================
@@ -4139,7 +4163,7 @@ function typeBadges(types) {
 function chooseCatch(i) {
   const p = catchOptions[i];
   if (!p) return;
-  addPokemon(p.id, p.name, catchShiny);
+  addPokemon(p.id, p.name, catchShiny, 5);
   closeModal("catch-modal");
 }
 function declineCatch() {
@@ -4147,11 +4171,11 @@ function declineCatch() {
   toast("Die wilden Pokémon sind geflohen …");
 }
 
-function addPokemon(dexId, name, shiny) {
+function addPokemon(dexId, name, shiny, level) {
   const teamAvgLevel = state.team.length
     ? Math.round(state.team.reduce((s, u) => { const m = getMon(u); return s + (m ? m.level : 5); }, 0) / state.team.length)
     : 5;
-  const startLevel = Math.max(5, teamAvgLevel);
+  const startLevel = level !== undefined ? level : Math.max(5, teamAvgLevel);
   const mon = { uid: uid(), dex: dexId, level: startLevel, exp: 0, shiny: !!shiny, moveIdx: 0,
     nickname: "", forgottenMoves: [], boosts: { atk:0, def:0, spd:0 } };
   state.box.push(mon);
@@ -4340,7 +4364,7 @@ async function renderFocusSetup() {
     const d = await getPokemonData(m.dex);
     const hasMega = !!MEGA_MAP[m.dex];
     const sessions = m.focusSessionCount || 0;
-    const THRESHOLD = 10;
+    const THRESHOLD = 5;
     const isSelected = m.uid === focusSelectedMon;
     const megaInfo = hasMega
       ? (m.megaStone
@@ -4501,7 +4525,7 @@ async function completeFocusSession() {
 
   mon.focusSessionCount = (mon.focusSessionCount || 0) + 1;
 
-  const MEGA_THRESHOLD = 10;
+  const MEGA_THRESHOLD = 5;
   const hasMegaEligible = !!MEGA_MAP[mon.dex];
   const justEarnedStone = hasMegaEligible && !mon.megaStone
     && mon.focusSessionCount >= MEGA_THRESHOLD;
@@ -4647,11 +4671,33 @@ async function renderTeam() {
   syncFighters();
 }
 
+function setBoxSort(mode) { boxSortMode = mode; renderBox(); }
 async function renderBox() {
   const grid = document.getElementById("box-grid");
   const empty = document.getElementById("box-empty");
   empty.style.display = state.box.length ? "none" : "block";
-  const parts = await Promise.all(state.box.map(async m => {
+  const sortModes = [
+    { k: "default", l: "🕐" },
+    { k: "level",   l: "LV ↓" },
+    { k: "dex",     l: "DEX" },
+    { k: "shiny",   l: "✨" },
+    { k: "name",    l: "A–Z" }
+  ];
+  const sortBar =
+    '<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">' +
+    sortModes.map(s =>
+      '<button onclick="setBoxSort(\'' + s.k + '\')" style="' +
+      'font-family:inherit;font-size:8px;padding:3px 7px;border-radius:4px;cursor:pointer;' +
+      'border:1px solid var(--line);background:' + (boxSortMode === s.k ? 'var(--accent)' : 'var(--panel)') + ';' +
+      'color:' + (boxSortMode === s.k ? '#fff' : 'var(--ink)') + '">' + s.l + '</button>'
+    ).join("") +
+    '</div>';
+  let sorted = [...state.box];
+  if      (boxSortMode === "level") sorted.sort((a, b) => b.level - a.level);
+  else if (boxSortMode === "dex")   sorted.sort((a, b) => a.dex - b.dex);
+  else if (boxSortMode === "shiny") sorted.sort((a, b) => (b.shiny ? 1 : 0) - (a.shiny ? 1 : 0));
+  else if (boxSortMode === "name")  sorted.sort((a, b) => (a.nickname || a.name || "").localeCompare(b.nickname || b.name || ""));
+  const parts = await Promise.all(sorted.map(async m => {
     const d = await getPokemonData(m.dex);
     const inTeam = state.team.includes(m.uid);
     return '<div class="box-cell' + (inTeam ? " inteam" : "") + '" onclick="openMonDetail(\'' + m.uid + '\')">' +
@@ -4660,7 +4706,7 @@ async function renderBox() {
       '<div class="bl">Lv.' + m.level + (inTeam ? " ★" : "") + '</div>' +
     '</div>';
   }));
-  grid.innerHTML = parts.join("");
+  grid.innerHTML = sortBar + parts.join("");
 }
 
 /* =====================================================================
@@ -5830,7 +5876,7 @@ function renderArenaBattle() {
       '<div style="flex:1;background:var(--bg2);border:2px solid var(--line);' +
         'border-radius:8px;padding:8px;text-align:center">' +
         (player && !player.fainted
-          ? '<img src="' + SPRITE(player.dex, false) + '" style="width:48px;height:48px;image-rendering:pixelated" alt="">' +
+          ? '<img src="' + SPRITE(monSpriteId(player), false) + '" style="width:48px;height:48px;image-rendering:pixelated" alt="">' +
             '<div style="font-size:7px;color:#78c8ff">' + esc(player.name) + ' Lv.' + player.level + '</div>' +
             hpBar(player)
           : '<div style="font-size:8px;color:#606060;padding:16px 0">K.O.</div>') +
@@ -7635,7 +7681,7 @@ const AURA_PULSE       = 1.0;      // Puls 100%, fest
 function drawFighterAura(ctx, f, m, cx, cy, S, now) {
   const lvl = auraLevel(f);
   if (lvl <= 0.01 || !f.auraColor) return;
-  const sil = getSilhouette(m.dex, m.shiny, f.auraColor);
+  const sil = getSilhouette(monSpriteId(m), m.shiny, f.auraColor);
   if (!sil) return;
 
   const y = cy - S + 6;   // Sprite-Ziel-Y (wie in drawFighter)
@@ -7682,7 +7728,7 @@ function drawFighter(ctx, f, now) {
   const cx = sx + (f.lx || 0) * lunge, cy = sy + bob + (f.ly || 0) * lunge, S = 42;
   ctx.fillStyle = "rgba(0,0,0,.22)"; ctx.beginPath(); ctx.ellipse(sx, sy + 4, 12, 4, 0, 0, Math.PI * 2); ctx.fill();
   drawFighterAura(ctx, f, m, cx, cy, S, now);   // Silhouetten-Aura hinter dem Sprite (physische Attacke)
-  const img = imgFor(m.dex, m.shiny);
+  const img = imgFor(monSpriteId(m), m.shiny);
   ctx.save();
   if (f.hitFlash > 0) ctx.filter = "brightness(2.2)";
   if (img.complete && img.naturalWidth) {
@@ -8990,6 +9036,7 @@ function releaseMon(uidv) {
   state.items.sonderbonbon = (state.items.sonderbonbon || 0) + 3;
   save();
   closeModal("dex-modal");
+  closeModal("mon-detail-modal");
   toast("👋 Freigelassen. +3 Sonderbonbon erhalten!");
   syncFighters();
   renderTeam(); renderBox(); renderItems(); renderDex(); renderStats(); updateHeader();
@@ -9305,7 +9352,7 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
               ? '⏱ Noch ~' + remainingH + 'h · ATK ×1.3 · SP.ATK ×1.2'
               : (mon.megaStone
                   ? '💎 Mega-Stein verfügbar'
-                  : '🎯 ' + (mon.focusSessionCount || 0) + '/10 Fokus-Sessions')) +
+                  : '🎯 ' + (mon.focusSessionCount || 0) + '/5 Fokus-Sessions')) +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -9323,6 +9370,7 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
     (inTeam
       ? '<button class="btn" onclick="toggleTeam(\'' + mon.uid + '\');renderMonDetailModal(getMon(\'' + mon.uid + '\'),\'' + activeTab + '\')">Aus Team nehmen</button>'
       : '<button class="btn green" onclick="toggleTeam(\'' + mon.uid + '\');renderMonDetailModal(getMon(\'' + mon.uid + '\'),\'' + activeTab + '\')">Ins Team</button>') +
+    '<button class="btn red" onclick="releaseMon(\'' + mon.uid + '\')">👋 Freilassen</button>' +
     '<button class="btn" onclick="closeModal(\'mon-detail-modal\')">Schließen</button>';
 
   el.innerHTML =
