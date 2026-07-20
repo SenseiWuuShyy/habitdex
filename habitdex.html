@@ -291,6 +291,42 @@ h2:first-child{margin-top:0}
 .city-menu-label { font-size: 10px; color: var(--white); margin-bottom: 3px; }
 .city-menu-hint  { font-size: 7px;  color: #8898b0; line-height: 1.6; }
 
+/* ===== Adventure-Overlay ===== */
+#adventure-overlay{
+  position:fixed;inset:0;z-index:70;display:none;
+  background:#0b1018;overflow:hidden;
+}
+#adventure-overlay.open{display:block}
+#adv-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#adv-topbar{
+  position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:2;
+  font-family:'Press Start 2P',monospace;font-size:9px;color:#fff;
+  background:rgba(16,22,32,.8);border:2px solid var(--line);border-radius:8px;padding:5px 10px;
+}
+#adv-controls{
+  position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+  z-index:2;display:flex;gap:6px;
+}
+#adv-controls button{
+  font-family:'Press Start 2P',monospace;font-size:8px;color:#fff;
+  background:rgba(24,32,40,.85);border:2px solid var(--line);border-radius:6px;
+  padding:8px 9px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.4);
+}
+#adv-controls button:active{transform:translateY(2px);box-shadow:none}
+#adv-auto.on{background:linear-gradient(180deg,#50c878,#2e8b52);border-color:#287848}
+#adv-close{background:rgba(160,40,32,.85)}
+#adv-result{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;background:rgba(8,12,20,.72)}
+.adv-result-box{background:var(--panel);border:3px solid var(--line);border-radius:12px;padding:18px 20px;text-align:center;max-width:80%}
+.adv-result-title{font-family:'Press Start 2P',monospace;font-size:11px;margin-bottom:8px}
+.adv-result-sub{font-size:8px;color:#a8b8c8;line-height:1.8;margin-bottom:12px}
+#adv-totaldmg{
+  position:absolute;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:1;
+  display:none;pointer-events:none;white-space:nowrap;opacity:.9;letter-spacing:.5px;
+  font-family:'Press Start 2P',monospace;font-size:8px;color:#ff5040;
+  text-shadow:1px 1px 0 #2a0808,-1px -1px 0 #2a0808,1px -1px 0 #2a0808,-1px 1px 0 #2a0808;
+}
+#adv-totaldmg.on{display:block}
+
 /* ===== Bottom nav ===== */
 nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
@@ -1090,6 +1126,8 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 
       <div class="backup-box" id="settings-backup-box">
         <h3>⚙️ EINSTELLUNGEN &amp; DATENSICHERUNG</h3>
+        <label style="font-size:9px;display:block;margin:4px 0 2px">&#128564; Schlafziel (Stunden)</label>
+        <input type="number" id="sleep-goal-input" min="4" max="12" step="0.5" onchange="setSleepGoal(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
         <button class="btn" onclick="openTrainerModal()">✎ Trainer-Name ändern</button>
         <button class="btn green" onclick="exportBackup()">📤 Daten exportieren</button>
         <button class="btn" onclick="document.getElementById('backup-import-file').click()">📥 Daten importieren</button>
@@ -1360,6 +1398,20 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     </div>
   </div>
 
+  <!-- Adventure-Vollbild-Overlay -->
+  <div id="adventure-overlay">
+    <canvas id="adv-canvas"></canvas>
+    <div id="adv-topbar"><span id="adv-round">Runde 0 / 20</span></div>
+    <div id="adv-controls">
+      <button id="adv-auto"  onclick="advToggleAuto()">AUTO: AN</button>
+      <button id="adv-speed" onclick="advCycleSpeed()">x1</button>
+      <button id="adv-skip"  onclick="advSkip()">SKIP</button>
+      <button id="adv-close" onclick="closeAdventure()">✕</button>
+    </div>
+    <div id="adv-totaldmg">TotalDMG: 0</div>
+    <div id="adv-result"></div>
+  </div>
+
   <div id="toasts"></div>
 
   <!-- Onboarding -->
@@ -1618,6 +1670,11 @@ const TYPE_COLOR = { normal:"#a8a878", fire:"#f08030", water:"#6890f0", grass:"#
 
 // Statusattacken → stat-Boni { atk, def, spAtk, spDef, speed } als Multiplikator-Deltas
 // Dauer in Sekunden. Name muss exakt dem deutschen Move-Namen aus der PokeAPI entsprechen.
+const PHYS_VFX_MOVES = {
+  ground: new Set(["Erdbeben", "Fruststampfer"]),
+  rock:   new Set(["Steinwurf", "Steinkante", "Felssturz", "Steinhagel"])
+};
+
 const STAT_MOVE_EFFECTS = {
   "Schwertanz":      { dur: 12, atk: 2.0 },
   "Drachentanz":     { dur: 10, atk: 1.1, speed: 1.1 },
@@ -1697,6 +1754,7 @@ function defaultState() {
     seen: {},         // {dexId:true} – jemals gesichtet (Route + gefangen)
     weeklyEvent: null, // {weekNum, dexId, level, defeated, caught}
     coins: 0,          // Shop-Währung
+    sleepGoalMin: 450, // Ziel-Schlafdauer in Minuten (7.5h) – Färbung & Streak im Tages-Log
     arenaBadges: 0,    // Anzahl errungener Arena-Orden (0–8, = besiegte Arenaleiter)
     arenaWins: 0,      // Gesamtzahl gewonnener Arena-Kämpfe (inkl. Freies Training)
     focus: null,       // aktive Fokus-Session oder null
@@ -1705,6 +1763,7 @@ function defaultState() {
     shopSeed: "",      // Datum des aktuellen Shop-Angebots
     shopStock: [],     // Array von 6 item-keys aus SHOP_ITEMS
     dailyLog: {},     // { "YYYY-MM-DD": { sleep, gym, food, note } }
+    monthlyArchive: {}, // { "YYYY-MM": {days,sleepSum,sleepN,energySum,energyN,moodSum,moodN,kcalSum,kcalN,weightSum,weightN,alcoholN,drinkDays,gymSessions,quoteSum,quoteN} }
                       // sleep: { bedtime:"HH:MM", waketime:"HH:MM", feeling:1-5 } | null
                       // gym:   { strength:1-5, feeling:1-5 } | null
                       // food:  { preWorkoutCarbs:bool, kcal:num|null, macro:"high-carb"|"low-carb"|"protein"|"mixed"|null } | null
@@ -1745,9 +1804,12 @@ function loadAll() {
     if (h.lastWeekKey === undefined) h.lastWeekKey = null;   // Wochenziel-Streak (4a)
   });
   state.seen = state.seen || {};
+  if (!state.monthlyArchive) state.monthlyArchive = {};
   if (!state.coins) state.coins = 0;
+  if (state.sleepGoalMin === undefined) state.sleepGoalMin = 450;
   if (state.arenaBadges === undefined) state.arenaBadges = 0;
   if (state.arenaWins === undefined) state.arenaWins = 0;
+  if (state.advProgress === undefined) state.advProgress = 0;   // höchste geschaffte Dungeon-Stage
   if (state.gymProgress === undefined) state.gymProgress = 0;
   if (state.lastFishTime === undefined) state.lastFishTime = 0;
   if (!state.shopSeed) state.shopSeed = "";
@@ -1895,17 +1957,43 @@ function importBackup(event) {
 
 // Liefert (und initialisiert bei Bedarf) den Tages-Log-Eintrag für ein Datum "YYYY-MM-DD"
 function getDailyLog(date) {
-  if (!state.dailyLog[date]) state.dailyLog[date] = { sleep: null, gym: null, food: null, note: null, energy: null, alcohol: null, bodyWeight: null };
+  if (!state.dailyLog[date]) state.dailyLog[date] = { sleep: null, gym: null, food: null, note: null, energy: null, mood: null, alcohol: null, bodyWeight: null };
   return state.dailyLog[date];
 }
 
-// Entfernt dailyLog-Einträge, die älter als 90 Tage sind (localStorage klein halten).
+// Faltet einen Tages-Log in das Monats-Archiv (Summen + Zähler, verlustfreie Ø-Bildung).
+function archiveDailyLog(dStr, log) {
+  if (!log) return;
+  if (!state.monthlyArchive) state.monthlyArchive = {};
+  const mk = dStr.slice(0, 7); // "YYYY-MM"
+  const a = state.monthlyArchive[mk] || {
+    days:0, sleepSum:0, sleepN:0, energySum:0, energyN:0, moodSum:0, moodN:0,
+    kcalSum:0, kcalN:0, weightSum:0, weightN:0, alcoholN:0, drinkDays:0,
+    gymSessions:0, quoteSum:0, quoteN:0
+  };
+  a.days++;
+  const sm = sleepMinutes(log.sleep);
+  if (sm != null) { a.sleepSum += sm; a.sleepN++; }
+  if (log.energy != null) { a.energySum += log.energy; a.energyN++; }
+  if (log.mood   != null) { a.moodSum   += log.mood;   a.moodN++; }
+  if (log.food && log.food.kcal != null) { a.kcalSum += log.food.kcal; a.kcalN++; }
+  if (log.bodyWeight != null && log.bodyWeight > 0) { a.weightSum += log.bodyWeight; a.weightN++; }
+  if (log.alcohol != null) { a.alcoholN++; if (log.alcohol >= 1) a.drinkDays++; }
+  if (log.gym && (log.gym.strength != null || log.gym.feeling != null)) a.gymSessions++;
+  const q = dayHabitQuote(dStr);
+  if (q != null) { a.quoteSum += q; a.quoteN++; }
+  state.monthlyArchive[mk] = a;
+}
+
+// Entfernt dailyLog-Einträge älter als 90 Tage – aber erst nach Faltung ins Monats-Archiv.
 // YYYY-MM-DD-Strings lassen sich lexikografisch korrekt vergleichen.
 function pruneOldLogs() {
   if (!state.dailyLog) return;
   const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
   const cut = dateStr(cutoff);
-  Object.keys(state.dailyLog).forEach(d => { if (d < cut) delete state.dailyLog[d]; });
+  Object.keys(state.dailyLog).forEach(d => {
+    if (d < cut) { archiveDailyLog(d, state.dailyLog[d]); delete state.dailyLog[d]; }
+  });
 }
 
 /* =====================================================================
@@ -1915,7 +2003,7 @@ function dlSectionDefault(section) {
   if (section === "sleep") return { bedtime: "", waketime: "", feeling: null };
   if (section === "gym")   return { strength: null, feeling: null, preWorkoutCarbs: false, macro: null, mealTiming: null };
   if (section === "food")  return { kcal: null };
-  if (section === "note")  return { text: "", tags: [] };
+  if (section === "note")  return { text: "" };
   return {};
 }
 
@@ -1923,9 +2011,6 @@ function saveDailyLogField(section, key, value) {
   const log = getDailyLog(todayStr());
   if (!log[section]) log[section] = dlSectionDefault(section);
   log[section][key] = value;
-  if (section === "note" && key === "text") {
-    log.note.tags = value.match(/#\w+/g) || [];
-  }
   pruneOldLogs();
   save();
   renderDailyLog();
@@ -1968,6 +2053,40 @@ function sleepDuration(bedtime, waketime) {
   return Math.floor(mins / 60) + "h " + (mins % 60) + "min";
 }
 
+// Farbe der Schlafdauer relativ zum Ziel: grün ab Ziel, gelb bis 1h drunter, sonst rot
+function sleepGoalColor(min, goalMin) {
+  if (min == null) return "";
+  if (min >= goalMin) return "#287848";
+  if (min >= goalMin - 60) return "#a07810";
+  return "#c02820";
+}
+
+// Live berechnete Schlafziel-Streak: aufeinanderfolgende Tage mit Schlafdauer >= Ziel.
+// Tage ohne Schlafdaten werden übersprungen (kein Bruch), Rückblick max. 60 Tage.
+function sleepGoalStreak(goalMin) {
+  let streak = 0;
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const log = state.dailyLog[dateStr(d)];
+    const min = log ? sleepMinutes(log.sleep) : null;
+    if (min == null) continue;          // keine Daten -> überspringen
+    if (min >= goalMin) streak++;
+    else break;                         // Tag mit Daten unter Ziel -> Streak endet
+  }
+  return streak;
+}
+
+// Schlafziel setzen (Eingabe in Stunden, gespeichert in Minuten, 4–12h geklammert)
+function setSleepGoal(hoursVal) {
+  let h = parseFloat(hoursVal);
+  if (isNaN(h)) h = 7.5;
+  h = Math.max(4, Math.min(12, h));
+  state.sleepGoalMin = Math.round(h * 60);
+  save();
+  renderDailyLog();
+  toast("😴 Schlafziel: " + h + "h gesetzt.");
+}
+
 // erzeugt eine Reihe 1-5 Rating-Buttons; aktiver Wert farblich (1-2 rot, 3 gelb, 4-5 grün)
 function dlRatingRow(section, key, cur) {
   let html = '<div class="dl-rating">';
@@ -1994,6 +2113,7 @@ function renderDailyLog() {
   const food  = log.food  || dlSectionDefault("food");
   const note  = log.note  || dlSectionDefault("note");
   const energy     = log.energy     != null ? log.energy     : null;
+  const mood       = log.mood       != null ? log.mood       : null;
   const alcohol    = log.alcohol    != null ? log.alcohol    : null;
   const bodyWeight = log.bodyWeight != null ? log.bodyWeight : null;
   // GYM-Toggle-Zustand: true wenn Nutzer heute Gym war
@@ -2001,6 +2121,10 @@ function renderDailyLog() {
     || (log.food && (log.food.preWorkoutCarbs || log.food.macro)));  // Fallback alte Logs
 
   const dur = sleepDuration(sleep.bedtime, sleep.waketime);
+  const durMin = sleepMinutes(sleep);
+  const goalMin = state.sleepGoalMin || 450;
+  const durColor = sleepGoalColor(durMin, goalMin);
+  const slpStreak = sleepGoalStreak(goalMin);
   const macros = [["high-carb","High Carb"],["low-carb","Low Carb"],["protein","Protein"],["mixed","Mixed"]];
   const mealTimings = [["fasted","Nüchtern"],["lt1","< 1h"],["1to2","1–2h"],["2to3","2–3h"],["gt3","> 3h"]];
   const alcoholOpts = [[0,"0"],[1,"1"],[2,"2"],[3,"3+"]];
@@ -2022,11 +2146,21 @@ function renderDailyLog() {
         '<input type="time" class="dl-time" value="' + (sleep.bedtime || "") + '" onchange="saveDailyLogField(\'sleep\',\'bedtime\',this.value)">' +
         '<span class="dl-label">Aufwachzeit</span>' +
         '<input type="time" class="dl-time" value="' + (sleep.waketime || "") + '" onchange="saveDailyLogField(\'sleep\',\'waketime\',this.value)">' +
-        (dur ? '<span class="dl-duration">&#128564; ' + dur + '</span>' : '') +
+        (dur ? '<span class="dl-duration"' + (durColor ? ' style="color:' + durColor + '"' : '') + '>&#128564; ' + dur + (durMin != null && durMin >= goalMin ? ' &#10003;' : '') + '</span>' : '') +
       '</div>' +
       '<div class="dl-row">' +
         '<span class="dl-label">Befinden nach 30min</span>' +
         dlRatingRow("sleep", "feeling", sleep.feeling) +
+      '</div>' +
+      (slpStreak >= 2 ? '<div class="dl-row"><span class="dl-label" style="color:#287848">&#128293; ' + slpStreak + ' Tage im Schlafziel</span></div>' : '') +
+
+      // Alkohol (gestern Abend, morgens nachgetragen)
+      '<div class="dl-row">' +
+        '<span class="dl-label">Alkohol gestern</span>' +
+        '<div style="display:flex;gap:5px">' +
+          alcoholOpts.map(([v,l]) => '<button class="alcohol-btn' + (alcohol === v ? " on" : "") + '" onclick="saveDailyLogTopLevel(\'alcohol\',' + (alcohol === v ? "null" : v) + ')">' + l + '</button>').join("") +
+        '</div>' +
+        '<span class="dl-label">Drinks</span>' +
       '</div>' +
 
       // Energielevel
@@ -2036,6 +2170,17 @@ function renderDailyLog() {
           [1,2,3,4,5].map(i => {
             const on = energy === i ? " on" + i : "";
             return '<button class="rate-btn' + on + '" onclick="saveDailyLogTopLevel(\'energy\',' + (energy === i ? "null" : i) + ')">' + i + '</button>';
+          }).join("") +
+        '</div>' +
+      '</div>' +
+
+      // Stimmung
+      '<div class="dl-row">' +
+        '<span class="dl-label">Stimmung</span>' +
+        '<div class="dl-rating">' +
+          [1,2,3,4,5].map(i => {
+            const on = mood === i ? " on" + i : "";
+            return '<button class="rate-btn' + on + '" onclick="saveDailyLogTopLevel(\'mood\',' + (mood === i ? "null" : i) + ')">' + i + '</button>';
           }).join("") +
         '</div>' +
       '</div>' +
@@ -2091,30 +2236,23 @@ function renderDailyLog() {
         '<span class="dl-label">kcal</span>' +
       '</div>' +
 
-      // Alkohol
-      '<div class="dl-row">' +
-        '<span class="dl-label">Alkohol</span>' +
-        '<div style="display:flex;gap:5px">' +
-          alcoholOpts.map(([v,l]) => '<button class="alcohol-btn' + (alcohol === v ? " on" : "") + '" onclick="saveDailyLogTopLevel(\'alcohol\',' + (alcohol === v ? "null" : v) + ')">' + l + '</button>').join("") +
-        '</div>' +
-        '<span class="dl-label">Drinks</span>' +
-      '</div>' +
-
       // Notiz
       '<div class="dl-title" style="margin-top:8px">&#128221; NOTIZ</div>' +
       (note.text && note.text.trim()
         ? '<div class="dl-note-prev">&#128221; Heute: ' + esc(note.text) + '</div>'
         : '') +
-      '<textarea class="dl-note" maxlength="200" placeholder="Freitext... #tags nutzen" oninput="dlNoteBuffer=this.value">' + esc(dlNoteBuffer) + '</textarea>' +
+      '<textarea class="dl-note" maxlength="200" placeholder="Freitext (optional)" oninput="dlNoteBuffer=this.value">' + esc(dlNoteBuffer) + '</textarea>' +
       '<button class="btn green dl-note-send" onclick="submitDailyNote()">&#9993; Absenden</button>' +
     '</div>';
 
   // ---- Status-Icons ----
   const icons = [];
   if (sleep.bedtime || sleep.waketime || sleep.feeling != null) icons.push("&#127769;&#9989;");
+  if (alcohol != null) icons.push("&#127863;&#9989;");
   if (energy != null) icons.push("&#9889;&#9989;");
+  if (mood != null) icons.push("&#128522;&#9989;");
   if (gymActive) icons.push("&#127947;&#9989;");
-  if (food.kcal != null || alcohol != null) icons.push("&#127757;&#9989;");
+  if (food.kcal != null) icons.push("&#127757;&#9989;");
   if (note.text && note.text.trim()) icons.push("&#128221;&#9989;");
   document.getElementById("dl-status-icons").innerHTML = icons.join(" ");
 }
@@ -2141,7 +2279,6 @@ function submitDailyNote() {
   const existing = (log.note.text || "").trim();
   const combined = existing ? (existing + " | " + newText).slice(0, 500) : newText;
   saveDailyLogField('note', 'text', combined);
-  // tags werden bereits in saveDailyLogField extrahiert
   dlNoteBuffer = "";
   renderDailyLog();
   toast("📝 Notiz gespeichert!");
@@ -2152,14 +2289,20 @@ function checkDailyLogReward() {
   const log = getDailyLog(todayStr());
   if (log.logRewardGiven) return;
 
-  // Section-Filled-Checks (analog zu renderAnalyse – nicht auslagern, inline halten)
-  const sleepFilled = !!(log.sleep && (log.sleep.bedtime || log.sleep.waketime || log.sleep.feeling != null));
-  const gymFilled   = !!(log.gym   && (log.gym.strength != null || log.gym.feeling != null));
-  const foodFilled  = !!(log.food  && log.food.kcal != null);
-  const noteFilled  = !!(log.note  && log.note.text && log.note.text.trim());
+  const LOG_REWARD_MIN_SECTIONS = 4; // wie viele der 8 Sektionen für die Belohnung nötig sind
 
-  const filled = [sleepFilled, gymFilled, foodFilled, noteFilled].filter(Boolean).length;
-  if (filled < 3) return;
+  const sleepFilled   = !!(log.sleep && (log.sleep.bedtime || log.sleep.waketime || log.sleep.feeling != null));
+  const energyFilled  = log.energy != null;
+  const moodFilled    = log.mood != null;
+  const alcoholFilled = log.alcohol != null;
+  const gymFilled     = !!(log.gym && (log.gym.strength != null || log.gym.feeling != null));
+  const kcalFilled    = !!(log.food && log.food.kcal != null);
+  const weightFilled  = log.bodyWeight != null;
+  const noteFilled    = !!(log.note && log.note.text && log.note.text.trim());
+
+  const filled = [sleepFilled, energyFilled, moodFilled, alcoholFilled,
+                  gymFilled, kcalFilled, weightFilled, noteFilled].filter(Boolean).length;
+  if (filled < LOG_REWARD_MIN_SECTIONS) return;
 
   log.logRewardGiven = true;
   state.coins = (state.coins || 0) + 15;
@@ -2258,8 +2401,43 @@ function checkStackBonus(completedHabit) {
   });
 }
 
+function buildArchivePanel() {
+  const arch = state.monthlyArchive || {};
+  const keys = Object.keys(arch).sort().reverse().slice(0, 12); // neueste 12 Monate
+  if (!keys.length) return "";
+  const a1 = (sum, n) => n ? (sum / n) : null;
+  const num1 = v => v == null ? "&ndash;" : v.toFixed(1);
+  const monthLabel = mk => {
+    const [y, m] = mk.split("-");
+    const names = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+    return names[parseInt(m,10)-1] + " " + y;
+  };
+  const rows = keys.map(mk => {
+    const a = arch[mk];
+    const sleepH = a1(a.sleepSum, a.sleepN);
+    const wAvg = a1(a.weightSum, a.weightN);
+    return '<div class="an-row" style="flex-wrap:wrap;gap:4px 10px;border-top:1px solid rgba(255,255,255,.08);padding-top:5px">' +
+      '<span class="an-val" style="min-width:56px">' + monthLabel(mk) + '</span>' +
+      '<span class="an-hint">&#128564; ' + (sleepH != null ? (sleepH/60).toFixed(1) + 'h' : '&ndash;') + '</span>' +
+      '<span class="an-hint">&#9889; ' + num1(a1(a.energySum, a.energyN)) + '</span>' +
+      '<span class="an-hint">&#128522; ' + num1(a1(a.moodSum, a.moodN)) + '</span>' +
+      '<span class="an-hint">&#9878; ' + (wAvg != null ? wAvg.toFixed(1) + 'kg' : '&ndash;') + '</span>' +
+      '<span class="an-hint">&#127757; ' + (a.kcalN ? Math.round(a.kcalSum/a.kcalN) : '&ndash;') + '</span>' +
+      '<span class="an-hint">&#127947; ' + a.gymSessions + '</span>' +
+      '<span class="an-hint">&#127864; ' + a.drinkDays + '</span>' +
+      '</div>';
+  }).join("");
+  return '<div class="panel dark an-panel">' +
+    '<div class="an-title">&#128451; Langzeit-Archiv (Monats-&Oslash;)</div>' +
+    '<div class="an-hint" style="margin-bottom:6px">Aggregierte Werte für Tage älter als 90 Tage. Legende: &#128564; Schlaf &middot; &#9889; Energie &middot; &#128522; Stimmung &middot; &#9878; Gewicht &middot; &#127757; kcal &middot; &#127947; Gym-Sessions &middot; &#127864; Trinktage.</div>' +
+    rows +
+    '</div>';
+}
+
 function renderAnalyse() {
   const el = document.getElementById("analyse-content");
+  const sgInput = document.getElementById("sleep-goal-input");
+  if (sgInput) sgInput.value = (state.sleepGoalMin || 450) / 60;
   if (!el) return;
 
   const dates = lastNDays(30);
@@ -2269,7 +2447,7 @@ function renderAnalyse() {
   const gymFilled   = g => !!(g && (g.strength != null || g.feeling != null));
   const foodFilled  = f => !!(f && f.kcal != null);
   const noteFilled  = n => !!(n && n.text && n.text.trim());
-  const dayFilled   = l => sleepFilled(l.sleep) || gymFilled(l.gym) || foodFilled(l.food) || noteFilled(l.note) || l.energy != null || l.alcohol != null || l.bodyWeight != null;
+  const dayFilled   = l => sleepFilled(l.sleep) || gymFilled(l.gym) || foodFilled(l.food) || noteFilled(l.note) || l.energy != null || l.mood != null || l.alcohol != null || l.bodyWeight != null;
 
   const filledCount = logs.filter(dayFilled).length;
 
@@ -2300,7 +2478,7 @@ function renderAnalyse() {
 
   /* ---- Analyse 1: Schlaf & Gym-Performance ---- */
   const goodGym  = logs.filter(l => l.gym && l.gym.feeling >= 4);
-  const otherGym = logs.filter(l => !(l.gym && l.gym.feeling >= 4));
+  const otherGym = logs.filter(l => l.gym && l.gym.feeling != null && l.gym.feeling < 4);
   const goodSleep  = goodGym.map(l => sleepMin(l.sleep)).filter(v => v != null);
   const otherSleep = otherGym.map(l => sleepMin(l.sleep)).filter(v => v != null);
   html +=
@@ -2308,7 +2486,7 @@ function renderAnalyse() {
       '<div class="an-title">&#128170; Schlaf &amp; Gym-Performance</div>' +
       '<div class="an-lead">&#128170; BESTE GYM-TAGE (Gefühl &ge; 4): ' + goodGym.length + ' Tage</div>' +
       '<div class="an-row">&#8594; &#128564; &Oslash; Schlaf: <span class="an-val">' + (goodSleep.length ? hFmt(avg(goodSleep)) : "&ndash;") + '</span></div>' +
-      '<div class="an-sub an-lead">&#128564; ANDERE TAGE: ' + otherGym.length + ' Tage</div>' +
+      '<div class="an-sub an-lead">&#128564; SCHW&Auml;CHERE GYM-TAGE (Gef&uuml;hl &lt; 4): ' + otherGym.length + ' Tage</div>' +
       '<div class="an-row">&#8594; &Oslash; Schlaf: <span class="an-val">' + (otherSleep.length ? hFmt(avg(otherSleep)) : "&ndash;") + '</span></div>' +
     '</div>';
 
@@ -2317,6 +2495,7 @@ function renderAnalyse() {
   const withC = logs.filter(l => getCarbs(l) && l.gym && l.gym.strength != null).map(l => l.gym.strength);
   const woC   = logs.filter(l => !getCarbs(l) && l.gym && l.gym.strength != null).map(l => l.gym.strength);
   const withA = avg(withC), woA = avg(woC);
+  if (withC.length >= 2 && woC.length >= 2) {
   html +=
     '<div class="panel dark an-panel">' +
       '<div class="an-title">&#129382; Pre-Workout Carbs &amp; Kraft</div>' +
@@ -2325,42 +2504,11 @@ function renderAnalyse() {
       '<div class="an-sub an-lead">&#128683; OHNE Carbs: Kraft &Oslash; <span class="an-val">' + num1(woA) + '</span> <span class="an-hint">(' + woC.length + ' Tage)</span></div>' +
       '<div class="an-row">' + bar(woA, "neg") + '</div>' +
     '</div>';
+  }
 
-  /* ---- Analyse 3: Mentale Last (Uni-Keywords) ---- */
-  const KW = ["spanisch","podcast","lesen","artikel","video","buch","vokabel","grammatik"];
-  const isLearn = l => { const t = ((l.note && l.note.text) || "").toLowerCase(); return KW.some(k => t.includes(k)); };
-  const learnFeel = logs.filter(l => isLearn(l) && l.gym && l.gym.feeling != null).map(l => l.gym.feeling);
-  const freeFeel  = logs.filter(l => !isLearn(l) && l.gym && l.gym.feeling != null).map(l => l.gym.feeling);
-  html +=
-    '<div class="panel dark an-panel">' +
-      '<div class="an-title">&#128218; Mentale Last</div>' +
-      '<div class="an-lead">&#128218; LERNTAGE: Gym-Gefühl &Oslash; <span class="an-val">' + num1(avg(learnFeel)) + '</span> <span class="an-hint">(' + learnFeel.length + ')</span></div>' +
-      '<div class="an-sub an-lead">&#127958; FREIE TAGE: Gym-Gefühl &Oslash; <span class="an-val">' + num1(avg(freeFeel)) + '</span> <span class="an-hint">(' + freeFeel.length + ')</span></div>' +
-    '</div>';
-
-  /* ---- Analyse 4: Top-Tags ---- */
-  const tagCount = {};
-  logs.forEach(l => {
-    const tags = (l.note && l.note.tags) || (((l.note && l.note.text) || "").match(/#\w+/g)) || [];
-    tags.forEach(t => { const k = t.toLowerCase(); tagCount[k] = (tagCount[k] || 0) + 1; });
-  });
-  const topTags = Object.entries(tagCount).sort((a,b) => b[1]-a[1]).slice(0,5);
-  const maxTag = topTags.length ? topTags[0][1] : 1;
-  let tagRows = topTags.length
-    ? topTags.map(([tag,n]) =>
-        '<div class="an-row"><span class="an-tag">' + esc(tag) + '</span>' +
-        '<div class="an-bar-track"><div class="an-bar-fill tag" style="width:' + (n/maxTag*100) + '%"></div></div>' +
-        '<span class="an-val">' + n + '&times;</span></div>').join("")
-    : '<div class="an-hint">Noch keine Tags erfasst.</div>';
-  html +=
-    '<div class="panel dark an-panel">' +
-      '<div class="an-title">&#127991; Häufigste Tags (30 Tage)</div>' +
-      tagRows +
-    '</div>';
-
-  /* ---- Analyse 5: Wortschatz beste vs. schlechteste Tage ---- */
-  const bestDays  = logs.filter(l => l.gym && l.gym.feeling >= 4 && l.sleep && l.sleep.feeling >= 4);
-  const worstDays = logs.filter(l => (l.gym && l.gym.feeling != null && l.gym.feeling <= 2) || (l.sleep && l.sleep.feeling != null && l.sleep.feeling <= 2));
+  /* ---- Analyse 5: Wortschatz gute vs. schlechte Stimmung ---- */
+  const bestDays  = logs.filter(l => l.mood != null && l.mood >= 4 && l.note && l.note.text && l.note.text.trim());
+  const worstDays = logs.filter(l => l.mood != null && l.mood <= 2 && l.note && l.note.text && l.note.text.trim());
   const STOP = ["ich","und","der","die","das","war","ist","ein","es","zu","in","nicht","hab","habe","mich","mir","bei","an","auf","mit","so","noch","auch","aber","dann","sehr","heute","tag"];
   const topWords = days => {
     const c = {};
@@ -2370,19 +2518,21 @@ function renderAnalyse() {
     });
     return Object.entries(c).sort((a,b) => b[1]-a[1]).slice(0,5).map(e => e[0]);
   };
-  const bestWords  = bestDays.length  >= 3 ? topWords(bestDays)  : null;
-  const worstWords = worstDays.length >= 3 ? topWords(worstDays) : null;
-  const wordsLine = (words) => words
-    ? (words.length ? '<div class="an-words">' + words.map(esc).join(", ") + '</div>' : '<div class="an-hint">Keine Notiz-Wörter gefunden.</div>')
-    : '<div class="an-hint">Noch nicht genug Daten für diese Gruppe.</div>';
-  html +=
-    '<div class="panel dark an-panel">' +
-      '<div class="an-title">&#128300; Wortschatz: beste vs. schlechte Tage</div>' +
-      '<div class="an-lead">&#127775; BESTE TAGE (' + bestDays.length + ') &ndash; häufige Wörter:</div>' +
-      wordsLine(bestWords) +
-      '<div class="an-sub an-lead">&#128542; SCHLECHTE TAGE (' + worstDays.length + ') &ndash; häufige Wörter:</div>' +
-      wordsLine(worstWords) +
-    '</div>';
+  if (bestDays.length >= 3 || worstDays.length >= 3) {
+    const bestWords  = bestDays.length  >= 3 ? topWords(bestDays)  : null;
+    const worstWords = worstDays.length >= 3 ? topWords(worstDays) : null;
+    const wordsLine = (words) => words
+      ? (words.length ? '<div class="an-words">' + words.map(esc).join(", ") + '</div>' : '<div class="an-hint">Keine Notiz-Wörter gefunden.</div>')
+      : '<div class="an-hint">Noch nicht genug Daten für diese Gruppe.</div>';
+    html +=
+      '<div class="panel dark an-panel">' +
+        '<div class="an-title">&#128300; Wortschatz: gute vs. schlechte Stimmung</div>' +
+        '<div class="an-lead">&#127775; GUTE STIMMUNG (' + bestDays.length + ') &ndash; häufige Wörter:</div>' +
+        wordsLine(bestWords) +
+        '<div class="an-sub an-lead">&#128542; SCHLECHTE STIMMUNG (' + worstDays.length + ') &ndash; häufige Wörter:</div>' +
+        wordsLine(worstWords) +
+      '</div>';
+  }
 
   /* ---- Analyse 6: Energielevel vs. Schlafdauer ---- */
   const energyLogs = logs.filter(l => l.energy != null && sleepMin(l.sleep) != null);
@@ -2398,37 +2548,49 @@ function renderAnalyse() {
         '<div class="an-row">' + bar(highE, "pos") + '</div>' +
         '<div class="an-sub an-lead">&#9925; TAGE MIT &lt;7h SCHLAF: Energie &Oslash; <span class="an-val">' + num1(lowE) + '</span> <span class="an-hint">(' + lowSleep.length + ' Tage)</span></div>' +
         '<div class="an-row">' + bar(lowE, "neg") + '</div>' +
+        ((highE != null && lowE != null)
+          ? '<div class="an-row an-hint">' + (highE > lowE + 0.3
+              ? '&#9650; Mehr Schlaf, mehr Energie.'
+              : '&#9644; Schlafdauer wirkt sich kaum auf deine Energie aus.') + '</div>'
+          : '') +
       '</div>';
   }
 
-  /* ---- Analyse 7: Alkohol & Gym-Gefühl am Folgetag ---- */
-  const dates30 = lastNDays(30);
-  const alcoholImpact = [];
-  for (let i = 1; i < dates30.length; i++) {
-    const prev = state.dailyLog[dates30[i - 1]];
-    const curr = state.dailyLog[dates30[i]];
-    if (!prev || prev.alcohol == null) continue;
-    if (!curr || !curr.gym || curr.gym.feeling == null) continue;
-    alcoholImpact.push({ drinks: prev.alcohol, gymFeel: curr.gym.feeling });
-  }
-  if (alcoholImpact.length >= 5) {
-    const soberDays = alcoholImpact.filter(x => x.drinks === 0 || x.drinks === "0");
-    const drinkDays = alcoholImpact.filter(x => Number(x.drinks) >= 1);
-    const soberAvg = avg(soberDays.map(x => x.gymFeel));
-    const drinkAvg = avg(drinkDays.map(x => x.gymFeel));
-    html +=
-      '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#127864; Alkohol &amp; Gym-Folgetag</div>' +
-        '<div class="an-lead">&#9989; KEIN ALKOHOL: Gym-Gefühl &Oslash; <span class="an-val">' + num1(soberAvg) + '</span> <span class="an-hint">(' + soberDays.length + ' Tage)</span></div>' +
-        '<div class="an-row">' + bar(soberAvg, "pos") + '</div>' +
-        '<div class="an-sub an-lead">&#127864; MIT ALKOHOL: Gym-Gefühl &Oslash; <span class="an-val">' + num1(drinkAvg) + '</span> <span class="an-hint">(' + drinkDays.length + ' Tage)</span></div>' +
-        '<div class="an-row">' + bar(drinkAvg, "neg") + '</div>' +
-        ((soberAvg != null && drinkAvg != null)
-          ? '<div class="an-row an-hint">' + (soberAvg > drinkAvg
-              ? '&#9650; Ohne Alkohol trainierst du besser.'
-              : '&#9644; Kein klarer Unterschied bisher.') + '</div>'
-          : '') +
-      '</div>';
+  /* ---- Analyse 7: Alkohol-Auswirkung (same-day, Vorabend-Drinks) ---- */
+  // alcohol = Drinks des Vorabends, morgens nachgetragen -> selbe Nacht/Tag wie sleep.feeling/energy/mood/gym
+  const alcLogs = logs.filter(l => l.alcohol != null);
+  const soberL  = alcLogs.filter(l => l.alcohol === 0);
+  const drinkL  = alcLogs.filter(l => l.alcohol >= 1);
+  const alcMetric = (label, emoji, soberVals, drinkVals) => {
+    const sA = avg(soberVals), dA = avg(drinkVals);
+    if (sA == null || dA == null) return "";
+    return '<div class="an-sub an-lead">' + emoji + ' ' + label + '</div>' +
+      '<div class="an-row"><span class="an-label" style="min-width:64px;font-size:7px">N&uuml;chtern</span>' + bar(sA, "pos") + '<span class="an-val" style="min-width:24px">' + num1(sA) + '</span><span class="an-hint">(' + soberVals.length + ')</span></div>' +
+      '<div class="an-row"><span class="an-label" style="min-width:64px;font-size:7px">Mit Alk.</span>' + bar(dA, "neg") + '<span class="an-val" style="min-width:24px">' + num1(dA) + '</span><span class="an-hint">(' + drinkVals.length + ')</span></div>' +
+      (sA > dA + 0.2 ? '<div class="an-row an-hint">&#9660; Alkohol dr&uuml;ckt hier sp&uuml;rbar.</div>' : '<div class="an-row an-hint">&#9644; Kein klarer Effekt.</div>');
+  };
+  if (soberL.length >= 3 && drinkL.length >= 3) {
+    const rows =
+      alcMetric("Befinden nach 30 min", "&#128564;",
+        soberL.filter(l => l.sleep && l.sleep.feeling != null).map(l => l.sleep.feeling),
+        drinkL.filter(l => l.sleep && l.sleep.feeling != null).map(l => l.sleep.feeling)) +
+      alcMetric("Energie", "&#9889;",
+        soberL.filter(l => l.energy != null).map(l => l.energy),
+        drinkL.filter(l => l.energy != null).map(l => l.energy)) +
+      alcMetric("Stimmung", "&#128522;",
+        soberL.filter(l => l.mood != null).map(l => l.mood),
+        drinkL.filter(l => l.mood != null).map(l => l.mood)) +
+      alcMetric("Gym-Gef&uuml;hl", "&#127947;",
+        soberL.filter(l => l.gym && l.gym.feeling != null).map(l => l.gym.feeling),
+        drinkL.filter(l => l.gym && l.gym.feeling != null).map(l => l.gym.feeling));
+    if (rows) {
+      html +=
+        '<div class="panel dark an-panel">' +
+          '<div class="an-title">&#127864; Alkohol-Auswirkung</div>' +
+          '<div class="an-hint" style="margin-bottom:8px">Vorabend-Drinks vs. dein Befinden am selben Tag. N&uuml;chtern (' + soberL.length + ' Tage) vs. mit Alkohol (' + drinkL.length + ' Tage).</div>' +
+          rows +
+        '</div>';
+    }
   }
 
   /* ---- Analyse 8: Mahlzeiten-Timing & Kraft ---- */
@@ -2457,25 +2619,29 @@ function renderAnalyse() {
       '</div>';
   }
 
-  /* ---- Analyse 9: Gewichtsverlauf (7-Tage-Gleitdurchschnitt) ---- */
+  /* ---- Analyse 9: Gewichtsverlauf (geglättet) ---- */
   const weightDates = lastNDays(30);
   const weightPoints = weightDates
     .map(d => ({ d, w: (state.dailyLog[d] || {}).bodyWeight }))
     .filter(x => x.w != null && x.w > 0);
   if (weightPoints.length >= 5) {
-    const minW = Math.min(...weightPoints.map(x => x.w));
-    const maxW = Math.max(...weightPoints.map(x => x.w));
-    const range = maxW - minW || 1;
-    const latest = weightPoints[weightPoints.length - 1].w;
-    const first  = weightPoints[0].w;
-    const delta  = latest - first;
+    const ws = weightPoints.map(x => x.w);
+    const minW = Math.min(...ws);
+    const maxW = Math.max(...ws);
+    const k = Math.min(3, Math.floor(weightPoints.length / 2)); // Glättungsfenster
+    const firstAvg = avg(ws.slice(0, k));
+    const lastAvg  = avg(ws.slice(-k));
+    const delta  = lastAvg - firstAvg;
     const deltaStr = (delta >= 0 ? "+" : "") + delta.toFixed(1) + " kg";
     const deltaCol = delta < -0.2 ? "var(--hpgreen)" : delta > 0.2 ? "var(--red)" : "var(--gold)";
+    const spanDays = Math.max(1, (new Date(weightPoints[weightPoints.length - 1].d) - new Date(weightPoints[0].d)) / 86400000);
+    const perWeek = delta / spanDays * 7;
+    const perWeekStr = (perWeek >= 0 ? "+" : "") + perWeek.toFixed(2) + " kg/Wo";
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9878; Gewichtsverlauf (30 Tage)</div>' +
-        '<div class="an-lead">Aktuell: <span class="an-val">' + latest.toFixed(1) + ' kg</span> &nbsp; Trend: <span style="color:' + deltaCol + '">' + deltaStr + '</span> <span class="an-hint">(' + weightPoints.length + ' Messpunkte)</span></div>' +
-        '<div class="an-row an-hint">Min: ' + minW.toFixed(1) + ' kg &nbsp; Max: ' + maxW.toFixed(1) + ' kg</div>' +
+        '<div class="an-title">&#9878; Gewichtsverlauf (30 Tage, gegl&auml;ttet)</div>' +
+        '<div class="an-lead">Aktuell (&Oslash; letzte ' + k + '): <span class="an-val">' + lastAvg.toFixed(1) + ' kg</span> &nbsp; Trend: <span style="color:' + deltaCol + '">' + deltaStr + '</span> <span class="an-hint">(' + perWeekStr + ')</span></div>' +
+        '<div class="an-row an-hint">Min: ' + minW.toFixed(1) + ' kg &nbsp; Max: ' + maxW.toFixed(1) + ' kg &nbsp; ' + weightPoints.length + ' Messpunkte</div>' +
       '</div>';
   }
 
@@ -2502,57 +2668,30 @@ function renderAnalyse() {
       '</div>';
   }
 
-  /* ---- Analyse 11: Alkohol & Schlafqualität am Folgetag ---- */
-  const alcoholSleepImpact = [];
-  for (let i = 1; i < dates30.length; i++) {
-    const prev = state.dailyLog[dates30[i - 1]];
-    const curr = state.dailyLog[dates30[i]];
-    if (!prev || prev.alcohol == null) continue;
-    if (!curr || !curr.sleep || curr.sleep.feeling == null) continue;
-    alcoholSleepImpact.push({ drinks: prev.alcohol, sleepFeel: curr.sleep.feeling });
-  }
-  if (alcoholSleepImpact.length >= 5) {
-    const soberSleep = alcoholSleepImpact.filter(x => x.drinks === 0);
-    const drinkSleep = alcoholSleepImpact.filter(x => x.drinks >= 1);
-    const soberSleepAvg = avg(soberSleep.map(x => x.sleepFeel));
-    const drinkSleepAvg = avg(drinkSleep.map(x => x.sleepFeel));
+  /* ---- Analyse 12: Kalorien & Gewichts-Trend ---- */
+  const kcalWindow = lastNDays(30)
+    .map(d => { const l = state.dailyLog[d] || {}; return { d, kcal: (l.food && l.food.kcal != null) ? l.food.kcal : null, w: (l.bodyWeight != null && l.bodyWeight > 0) ? l.bodyWeight : null }; });
+  const kcalVals = kcalWindow.filter(x => x.kcal != null).map(x => x.kcal);
+  const wPts = kcalWindow.filter(x => x.w != null);
+  if (kcalVals.length >= 5 && wPts.length >= 5) {
+    const avgKcal = avg(kcalVals);
+    const kk = Math.min(3, Math.floor(wPts.length / 2));
+    const wFirst = avg(wPts.slice(0, kk).map(x => x.w));
+    const wLast  = avg(wPts.slice(-kk).map(x => x.w));
+    const wSpanDays = Math.max(1, (new Date(wPts[wPts.length - 1].d) - new Date(wPts[0].d)) / 86400000);
+    const kgPerWeek = (wLast - wFirst) / wSpanDays * 7;
+    const trendStr = (kgPerWeek >= 0 ? "+" : "") + kgPerWeek.toFixed(2) + " kg/Wo";
+    let verdict;
+    if (kgPerWeek > 0.15)       verdict = "&#128293; Aufbau: du nimmst zu &ndash; bei &Oslash; " + Math.round(avgKcal) + " kcal liegst du im &Uuml;berschuss.";
+    else if (kgPerWeek < -0.15) verdict = "&#127793; Defizit: du nimmst ab &ndash; &Oslash; " + Math.round(avgKcal) + " kcal liegt unter deinem Verbrauch.";
+    else                        verdict = "&#9878; Erhaltung: Gewicht stabil &ndash; &Oslash; " + Math.round(avgKcal) + " kcal entspricht etwa deinem Verbrauch.";
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#127864; Alkohol &amp; Schlafqualit&auml;t</div>' +
-        '<div class="an-lead">&#9989; KEIN ALKOHOL: Befinden nach 30min &Oslash; <span class="an-val">' + num1(soberSleepAvg) + '</span> <span class="an-hint">(' + soberSleep.length + ' Tage)</span></div>' +
-        '<div class="an-row">' + bar(soberSleepAvg, "pos") + '</div>' +
-        '<div class="an-sub an-lead">&#127864; MIT ALKOHOL: Befinden nach 30min &Oslash; <span class="an-val">' + num1(drinkSleepAvg) + '</span> <span class="an-hint">(' + drinkSleep.length + ' Tage)</span></div>' +
-        '<div class="an-row">' + bar(drinkSleepAvg, "neg") + '</div>' +
-        ((soberSleepAvg != null && drinkSleepAvg != null)
-          ? '<div class="an-row an-hint">' + (soberSleepAvg > drinkSleepAvg
-              ? '&#9650; Ohne Alkohol wachst du erholter auf.'
-              : '&#9644; Kein klarer Unterschied bisher.') + '</div>'
-          : '') +
-      '</div>';
-  }
-
-  /* ---- Analyse 12: Gewicht vs. Kalorien ---- */
-  const weightKcalPoints = lastNDays(30)
-    .map(d => {
-      const l = state.dailyLog[d] || {};
-      return { d, w: l.bodyWeight || null, kcal: (l.food && l.food.kcal != null) ? l.food.kcal : null };
-    })
-    .filter(x => x.w != null && x.kcal != null);
-  if (weightKcalPoints.length >= 5) {
-    const highKcal = weightKcalPoints.filter(x => x.kcal >= 2500);
-    const lowKcal  = weightKcalPoints.filter(x => x.kcal < 2000);
-    const highKcalAvgW = avg(highKcal.map(x => x.w));
-    const lowKcalAvgW  = avg(lowKcal.map(x => x.w));
-    const allKcal = avg(weightKcalPoints.map(x => x.kcal));
-    const allW    = avg(weightKcalPoints.map(x => x.w));
-    html +=
-      '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9878; Gewicht &amp; Kalorien</div>' +
-        '<div class="an-hint" style="margin-bottom:8px">Zeigt ob deine Kaloriensch&auml;tzung mit der Gewichtsentwicklung &uuml;bereinstimmt.</div>' +
-        '<div class="an-lead">&#248; Tages-Kalorien: <span class="an-val">' + (allKcal ? Math.round(allKcal) : "&ndash;") + ' kcal</span> &nbsp; &Oslash; Gewicht: <span class="an-val">' + (allW ? allW.toFixed(1) : "&ndash;") + ' kg</span></div>' +
-        (highKcal.length >= 2 ? '<div class="an-sub an-lead">&#128293; TAGE &ge;2500 kcal: &Oslash; Gewicht <span class="an-val">' + (highKcalAvgW ? highKcalAvgW.toFixed(1) : "&ndash;") + ' kg</span> <span class="an-hint">(' + highKcal.length + ' Tage)</span></div>' : '') +
-        (lowKcal.length >= 2  ? '<div class="an-sub an-lead">&#127793; TAGE &lt;2000 kcal: &Oslash; Gewicht <span class="an-val">' + (lowKcalAvgW ? lowKcalAvgW.toFixed(1) : "&ndash;") + ' kg</span> <span class="an-hint">(' + lowKcal.length + ' Tage)</span></div>' : '') +
-        '<div class="an-row an-hint">Basis: ' + weightKcalPoints.length + ' Tage mit beiden Eintr&auml;gen</div>' +
+        '<div class="an-title">&#9878; Kalorien &amp; Gewichts-Trend</div>' +
+        '<div class="an-hint" style="margin-bottom:8px">Verkn&uuml;pft deinen Kalorienschnitt mit der tats&auml;chlichen Gewichtsentwicklung &uuml;ber das Fenster.</div>' +
+        '<div class="an-lead">&#248; Kalorien: <span class="an-val">' + Math.round(avgKcal) + ' kcal</span> &nbsp; Gewichts-Trend: <span class="an-val">' + trendStr + '</span></div>' +
+        '<div class="an-row an-hint">' + verdict + '</div>' +
+        '<div class="an-row an-hint">Basis: ' + kcalVals.length + ' Kalorien-Tage, ' + wPts.length + ' Gewichts-Tage</div>' +
       '</div>';
   }
   }
@@ -2683,6 +2822,7 @@ function renderAnalyse() {
     '</div>' +
   '</div>';
 
+  html += buildArchivePanel();
   el.innerHTML = html;
   renderNoteArchive();
 }
@@ -5037,6 +5177,34 @@ const CITY = {
   battle: null          // null = kein Arena-Kampf aktiv; sonst Kampf-State-Objekt
 };
 
+/* =====================================================================
+   ADVENTURE (Dungeon 6v6) — eigenes Vollbild-Overlay, eigener Canvas.
+   Vollständig getrennt von BT (Overworld) und CITY.battle (Arena).
+   ===================================================================== */
+const ADV = {
+  cv: null, ctx: null, raf: null, running: false,
+  W: 0, H: 0, dpr: 1,
+  phase: "idle",        // "pick" | "battle"
+  lineup: [],           // uids aus state.box, max 6
+  stage: 0,             // aktuelle Dungeon-Stage (1-basiert)
+  round: 0, maxRound: 20,
+  auto: true, speed: 1, // 1 | 2 | 3
+  ally: [], foe: [],    // Kampf-Mon-Objekte
+  totalDmg: 0,
+  battlePhase: "idle",  // "loading" | "running" | "paused" | "resolved"
+  result: null,         // "win" | "lose"
+  turnQueue: [], qi: 0, // Aktionsreihenfolge der aktuellen Runde
+  acc: 0, fast: false,  // Zeit-Akkumulator / Skip-Flag
+  floats: [],           // Schadenszahlen
+  typeVfx: null, bursts: [], sparkles: [],  // wiederverwendete BT-Animationen
+  theme: null, dmgShown: 0,                 // Hintergrund-Theme + animierter TotalDMG-Zähler
+  last: 0
+};
+const ADV_LINEUP_MAX = 6;
+const ADV_STAGES = 5;         // Dungeon-Länge
+const ADV_STAGE_HEAL = 0.25;  // Teil-Heilung lebender Verbündeter zwischen Stages
+const ADV_TURN_MS = 700;      // Basis-Intervall pro Aktion (durch Speed geteilt)
+
 /* ---- Arena-Trainer-Roster (Phase 3) ---- */
 const ARENA_TRAINERS = [
   {
@@ -5168,6 +5336,12 @@ function renderCityMenu() {
         '<span class="city-menu-icon">🏆</span>' +
         '<div class="city-menu-label">Arena</div>' +
         '<div class="city-menu-hint">Orden kämpfen · Training</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn" onclick="openAdventure()">' +
+        '<span class="city-menu-icon">🗺️</span>' +
+        '<div class="city-menu-label">Adventure</div>' +
+        '<div class="city-menu-hint">Dungeon · 6 Kämpfer aus der Box</div>' +
       '</button>' +
 
       '<button class="city-menu-btn' + (bonusAvailable ? ' city-menu-btn--available' : ' city-menu-btn--claimed') + '" onclick="claimDailyReward()">' +
@@ -5902,6 +6076,540 @@ function endArenaBattle() {
   closeCityModal();
 }
 
+/* =====================================================================
+   ADVENTURE — Dungeon 6v6 (Phase 1: Gerüst + statische Szene)
+   ===================================================================== */
+
+function openAdventure() {
+  ADV.phase = "pick";
+  if (!ADV.lineup.length) ADV.lineup = state.team.slice(0, ADV_LINEUP_MAX); // Vorbelegung: aktuelles Team
+  renderAdvPicker();
+}
+
+function renderAdvPicker() {
+  if (!state.box.length) {
+    openCityModal('<h3>🗺️ Adventure</h3><p style="font-size:8px;color:#c02820;padding:12px 0">Du hast noch kein Pokémon.</p>');
+    return;
+  }
+  const cells = state.box.map(m => {
+    const picked = ADV.lineup.includes(m.uid);
+    return '<div class="box-cell' + (picked ? ' inteam' : '') + '" onclick="advTogglePick(\'' + m.uid + '\')">' +
+      '<img src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
+      '<div class="bn">' + esc(m.nickname || m.name || ('#' + m.dex)) + '</div>' +
+      '<div class="bl">Lv.' + m.level + (picked ? ' ✓' : '') + '</div>' +
+    '</div>';
+  }).join("");
+  const n = ADV.lineup.length;
+  openCityModal(
+    '<h3>🗺️ Adventure — Team wählen (' + n + '/' + ADV_LINEUP_MAX + ')</h3>' +
+    '<p class="muted" style="margin-bottom:8px">Tippe bis zu ' + ADV_LINEUP_MAX + ' Pokémon aus deiner Box an.</p>' +
+    '<div class="box-grid" style="max-height:46vh;overflow:auto">' + cells + '</div>' +
+    (n >= 1
+      ? '<button class="btn green" style="margin-top:10px" onclick="startAdvStage(1)">▶ Dungeon starten</button>'
+      : '<p style="font-size:8px;color:#c02820;margin-top:8px">Mindestens 1 Pokémon wählen.</p>')
+  );
+}
+
+function advTogglePick(uid) {
+  const i = ADV.lineup.indexOf(uid);
+  if (i >= 0) ADV.lineup.splice(i, 1);
+  else if (ADV.lineup.length < ADV_LINEUP_MAX) ADV.lineup.push(uid);
+  else { toast("Maximal " + ADV_LINEUP_MAX + " Kämpfer."); return; }
+  renderAdvPicker();
+}
+
+async function buildAdvAllies(uids) {
+  return (await Promise.all(uids.map(async uid => {
+    const m = getMon(uid); if (!m) return null;
+    const [btdata, sdata] = await Promise.all([getBattleData(m.dex), getPokemonStats(m.dex)]);
+    const maxHp = 20 + m.level * 3;
+    return {
+      uid, dex: m.dex, name: m.nickname || m.name || ("#" + m.dex),
+      types: (cache.pokemon[m.dex] || {}).types || [],
+      level: m.level, happiness: m.happiness || 120,
+      hp: maxHp, maxHp,
+      moves: (btdata.moves || [{ name:"Tackle", type:"normal", power:40 }]).slice(0, 4),
+      atk: btdata.atk || 60, def: sdata["defense"] || 55,
+      spAtk: btdata.spAtk || sdata["special-attack"] || 60,
+      spDef: sdata["special-defense"] || 55, speed: btdata.speed || 60,
+      fainted: false
+    };
+  }))).filter(Boolean);
+}
+
+// Foe-Specs für eine Stage: 6 Mons aus dem aktuellen Zonen-Pool,
+// Level = Team-Schnitt + (stage-1)*2 + Jitter.
+function advFoeSpecs(stage) {
+  const allyMons = ADV.lineup.map(u => getMon(u)).filter(Boolean);
+  const avg = allyMons.length ? Math.round(allyMons.reduce((s, m) => s + m.level, 0) / allyMons.length) : 5;
+  const pool = zoneById(state.currentZone).pool;
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  const specs = [];
+  for (const dex of shuffled) {
+    if (specs.length >= 6) break;
+    specs.push({ dex, level: Math.max(2, avg + (stage - 1) * 2 + (Math.floor(Math.random() * 5) - 2)) });
+  }
+  while (specs.length < 6) specs.push({ ...specs[specs.length % Math.max(1, pool.length)] });
+  return specs.slice(0, 6);
+}
+
+async function startAdvStage(stage) {
+  closeCityModal();
+  ADV.stage = stage; ADV.round = 1; ADV.totalDmg = 0; ADV.dmgShown = 0; ADV.phase = "battle";
+  ADV.theme = ADV_THEMES[(stage - 1) % ADV_THEMES.length];
+  const dEl0 = document.getElementById("adv-totaldmg");
+  if (dEl0) { dEl0.textContent = "TotalDMG: 0"; dEl0.classList.add("on"); }
+  ADV.result = null; ADV.floats = []; ADV.acc = 0; ADV.fast = false;
+  ADV.auto = true; ADV.battlePhase = "loading";
+  const rEl = document.getElementById("adv-result"); if (rEl) rEl.style.display = "none";
+  document.getElementById("adventure-overlay").classList.add("open");
+  ADV.ally = await buildAdvAllies(ADV.lineup);
+  ADV.foe  = await buildEnemyTeam(advFoeSpecs(stage));
+  ADV.typeVfx = null; ADV.bursts = []; ADV.sparkles = [];
+  ADV.ally.forEach(m => { m.hitFlash = 0; m.dir = 1;  m.lunge = 0; m.lx = 0; m.ly = 0; m.auraT = -1; m.auraColor = null; });
+  ADV.foe.forEach(m  => { m.hitFlash = 0; m.dir = -1; m.lunge = 0; m.lx = 0; m.ly = 0; m.auraT = -1; m.auraColor = null; });
+  advAssignSlots();
+  initAdvCanvas();
+  advBuildQueue();
+  advSyncControls();
+  advUpdateRoundLabel();
+  ADV.battlePhase = "running";
+  startAdvLoop();
+}
+
+function closeAdventure() {
+  stopAdvLoop();
+  document.getElementById("adventure-overlay").classList.remove("open");
+  const rEl = document.getElementById("adv-result"); if (rEl) rEl.style.display = "none";
+  const dEl = document.getElementById("adv-totaldmg"); if (dEl) dEl.classList.remove("on");
+  ADV.phase = "idle"; ADV.battlePhase = "idle";
+}
+
+function initAdvCanvas() {
+  ADV.cv = document.getElementById("adv-canvas");
+  ADV.ctx = ADV.cv.getContext("2d");
+  resizeAdv();
+  if (!ADV._resizeBound) { window.addEventListener("resize", resizeAdv); ADV._resizeBound = true; }
+}
+function resizeAdv() {
+  if (!ADV.cv) return;
+  const r = ADV.cv.getBoundingClientRect();
+  ADV.dpr = window.devicePixelRatio || 1;
+  ADV.W = r.width; ADV.H = r.height;
+  ADV.cv.width = ADV.W * ADV.dpr; ADV.cv.height = ADV.H * ADV.dpr;
+  ADV.ctx.setTransform(ADV.dpr, 0, 0, ADV.dpr, 0, 0);
+  ADV.ctx.imageSmoothingEnabled = false;
+  advAssignSlots(); // Slots hängen an W/H
+}
+
+function advAssignSlots() {
+  if (!ADV.W || !ADV.H) return;
+  const W = ADV.W, H = ADV.H;
+  // slot: {x, y, depth} — depth 0=hinten (kleiner/höher), 2=vorne (größer/tiefer)
+  function band(list, topY, botY, mirror) {
+    list.forEach((mon, i) => {
+      const depth = i % 3;                 // 0,1,2,0,1,2
+      const row   = Math.floor(i / 3);     // 0 oder 1
+      const ty = topY + (botY - topY) * (depth / 2);
+      const baseX = mirror ? W * 0.60 : W * 0.10;
+      const spanX = W * 0.30;
+      const x = baseX + spanX * ((row * 0.5) + 0.15) + depth * (mirror ? -8 : 8);
+      mon.slot = { x, y: ty, depth };
+    });
+  }
+  band(ADV.foe,  H * 0.36, H * 0.50, true);   // Gegner obere Kreishälfte
+  band(ADV.ally, H * 0.60, H * 0.78, false);  // Verbündete untere Kreishälfte
+}
+
+function startAdvLoop() {
+  if (ADV.running) return;
+  ADV.running = true; ADV.last = performance.now();
+  ADV.raf = requestAnimationFrame(advLoop);
+}
+function stopAdvLoop() {
+  ADV.running = false;
+  if (ADV.raf) cancelAnimationFrame(ADV.raf);
+  ADV.raf = null;
+}
+function advLoop(ts) {
+  if (!ADV.running) return;
+  const dt = Math.min(64, ts - (ADV.last || ts));
+  ADV.last = ts;
+  if (ADV.battlePhase === "running") {
+    const interval = ADV.fast ? 8 : (ADV_TURN_MS / ADV.speed);
+    ADV.acc += dt;
+    let guard = 0;
+    while (ADV.acc >= interval && ADV.battlePhase === "running" && guard < 400) {
+      ADV.acc -= interval; guard++;
+      advStep();
+    }
+  }
+  for (let i = ADV.floats.length - 1; i >= 0; i--) {
+    const fl = ADV.floats[i]; fl.t += dt; fl.y -= dt * 0.02;
+    if (fl.t >= fl.life) ADV.floats.splice(i, 1);
+  }
+  [...ADV.ally, ...ADV.foe].forEach(m => { if (m.hitFlash > 0) m.hitFlash = Math.max(0, m.hitFlash - dt); });
+  // VFX laufen in Sekunden (wie BT) — dt ist ms
+  const dts = dt / 1000;
+  [...ADV.ally, ...ADV.foe].forEach(m => {
+    if (m.lunge > 0) m.lunge = Math.max(0, m.lunge - dts);
+    if (m.auraT >= 0) { m.auraT += dts; if (m.auraT >= AURA_TOTAL) { m.auraT = -1; m.auraColor = null; } }
+  });
+  ADV.bursts.forEach(b => { b.t += dts; b.particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= dts * 1.5; }); });
+  ADV.bursts = ADV.bursts.filter(b => b.t < 0.65);
+  ADV.sparkles.forEach(s => { s.t += dts; s.x += s.vx * dts; s.y += s.vy * dts; });
+  ADV.sparkles = ADV.sparkles.filter(s => s.t < 0.9);
+  if (ADV.typeVfx) { ADV.typeVfx.t += dts; if (ADV.typeVfx.t >= ADV.typeVfx.dur) ADV.typeVfx = null; }
+  if (ADV.dmgShown !== ADV.totalDmg) {
+    ADV.dmgShown += (ADV.totalDmg - ADV.dmgShown) * 0.18;
+    if (Math.abs(ADV.totalDmg - ADV.dmgShown) < 1) ADV.dmgShown = ADV.totalDmg;
+    const el = document.getElementById("adv-totaldmg");
+    if (el) el.textContent = "TotalDMG: " + Math.round(ADV.dmgShown).toLocaleString("de-DE");
+  }
+  drawAdvScene(ts);
+  ADV.raf = requestAnimationFrame(advLoop);
+}
+
+function drawAdvScene(now) {
+  const ctx = ADV.ctx; if (!ctx) return;
+  const W = ADV.W, H = ADV.H;
+  ctx.clearRect(0, 0, W, H);
+  drawAdvBackground(ctx, now);
+  // Alle Mons tiefensortiert zeichnen (kleineres y zuerst)
+  const ents = [];
+  ADV.foe.forEach(m  => { if (!m.fainted && m.slot) ents.push({ m, side:"foe"  }); });
+  ADV.ally.forEach(m => { if (!m.fainted && m.slot) ents.push({ m, side:"ally" }); });
+  ents.sort((a, b) => a.m.slot.y - b.m.slot.y);
+  ents.forEach(e => drawAdvMon(ctx, e.m, e.side, now));
+  // Typ-Angriffs-VFX (Screen-Koordinaten → cam 0/0), über den Sprites
+  if (ADV.typeVfx) drawTypeVfx(ctx, ADV.typeVfx, 0, 0);
+  drawAdvBursts(ctx);
+  drawAdvSparkles(ctx);
+  ADV.floats.forEach(fl => {
+    ctx.textAlign = "center";
+    ctx.globalAlpha = Math.max(0, 1 - fl.t / fl.life);
+    if (fl.kind === "eff") {
+      ctx.font = "9px 'Press Start 2P', monospace";
+      ctx.lineWidth = 3; ctx.strokeStyle = "rgba(0,0,0,.85)"; ctx.strokeText(fl.text, fl.x, fl.y);
+      ctx.fillStyle = fl.color; ctx.fillText(fl.text, fl.x, fl.y);
+    } else if (fl.kind === "move") {
+      ctx.font = "7px 'Press Start 2P', monospace";
+      ctx.lineWidth = 3; ctx.strokeStyle = "rgba(0,0,0,.8)"; ctx.strokeText(fl.text, fl.x, fl.y);
+      ctx.fillStyle = fl.color; ctx.fillText(fl.text, fl.x, fl.y);
+    } else {
+      ctx.font = (fl.size || 7) + "px 'Press Start 2P', monospace";
+      ctx.fillStyle = "rgba(0,0,0,.6)"; ctx.fillText(fl.text, fl.x + 1, fl.y + 1);
+      ctx.fillStyle = fl.color; ctx.fillText(fl.text, fl.x, fl.y);
+    }
+    ctx.globalAlpha = 1;
+  });
+}
+
+// Screen-Koordinaten-Renderer (unabhängig von BT.cam). Sprite mega-aware für Verbündete.
+function drawAdvMon(ctx, mon, side, now) {
+  const s = mon.slot;
+  const scale = 0.78 + s.depth * 0.16;      // vorne größer
+  const S = 40 * scale;
+  const bob = Math.sin(now / 320 + s.x) * 2;
+  const lunge = mon.lunge > 0 ? Math.sin((0.3 - mon.lunge) / 0.3 * Math.PI) * 9 : 0;
+  const cx = s.x + (mon.lx || 0) * lunge, cy = s.y + bob + (mon.ly || 0) * lunge;
+  const shim = mon.uid ? (getMon(mon.uid) || { dex: mon.dex, shiny: false }) : { dex: mon.dex, shiny: false };
+  const spriteId = monSpriteId(shim);
+  // Schatten (bleibt am Slot, nicht am Lunge-Offset)
+  ctx.fillStyle = "rgba(0,0,0,.28)";
+  ctx.beginPath(); ctx.ellipse(s.x, s.y + 3, S*0.34, S*0.12, 0, 0, Math.PI*2); ctx.fill();
+  // Physische Aura HINTER dem Sprite (wiederverwendet aus BT)
+  drawFighterAura(ctx, mon, shim, cx, cy, S, now);
+  // Sprite (Gegner spiegeln, damit sie „nach unten" schauen)
+  const img = imgFor(spriteId, shim.shiny);
+  if (img.complete && img.naturalWidth) {
+    ctx.save();
+    if (mon.hitFlash > 0) ctx.filter = "brightness(2.4)";
+    if (mon.dir < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.drawImage(img, -S/2, cy - S + 6, S, S); }
+    else ctx.drawImage(img, cx - S/2, cy - S + 6, S, S);
+    ctx.restore();
+  }
+  // HP-Balken + Level
+  drawAdvBar(ctx, cx, cy - S - 2, mon, side);
+}
+
+function drawAdvBar(ctx, cx, topY, mon, side) {
+  const w = 40, h = 5;
+  const pct = Math.max(0, mon.hp / mon.maxHp);
+  ctx.fillStyle = "#101820"; ctx.fillRect(cx - w/2 - 1, topY - 1, w + 2, h + 2);
+  ctx.fillStyle = "#3a4658"; ctx.fillRect(cx - w/2, topY, w, h);
+  ctx.fillStyle = pct > 0.5 ? "#50c878" : pct > 0.25 ? "#f8c030" : "#e04038";
+  ctx.fillRect(cx - w/2, topY, w * pct, h);
+  ctx.font = "6px 'Press Start 2P', monospace";
+  ctx.textAlign = "left"; ctx.fillStyle = side === "ally" ? "#9fe0ff" : "#ffb0c0";
+  ctx.fillText("Lv." + mon.level, cx + w/2 + 3, topY + h);
+}
+
+function advToggleAuto() {
+  ADV.auto = !ADV.auto;
+  if (ADV.battlePhase === "running" || ADV.battlePhase === "paused")
+    ADV.battlePhase = ADV.auto ? "running" : "paused";
+  advSyncControls();
+}
+function advCycleSpeed() { ADV.speed = ADV.speed >= 3 ? 1 : ADV.speed + 1; advSyncControls(); }
+function advSkip() {
+  if (ADV.battlePhase === "resolved") return;
+  ADV.fast = true;
+  if (!ADV.auto) { ADV.auto = true; ADV.battlePhase = "running"; advSyncControls(); }
+}
+function advSyncControls() {
+  const a = document.getElementById("adv-auto");
+  const s = document.getElementById("adv-speed");
+  if (a) { a.textContent = "AUTO: " + (ADV.auto ? "AN" : "AUS"); a.classList.toggle("on", ADV.auto); }
+  if (s) s.textContent = "x" + ADV.speed;
+}
+function advUpdateRoundLabel() {
+  const el = document.getElementById("adv-round");
+  if (el) el.textContent = "Runde " + ADV.round + " / " + ADV.maxRound;
+}
+
+/* ---- Kampf-Engine (Phase 2) ---- */
+function advBuildQueue() {
+  const all = [...ADV.ally, ...ADV.foe].filter(m => !m.fainted);
+  all.sort((a, b) => calcStat(b.speed || 60, b.level) - calcStat(a.speed || 60, a.level));
+  ADV.turnQueue = all; ADV.qi = 0;
+}
+
+function advPickTarget(atk, defenders) {
+  const living = defenders.filter(d => !d.fainted);
+  if (!living.length) return null;
+  const scored = living.map(d => {
+    const best = (atk.moves || []).reduce(
+      (mx, mv) => Math.max(mx, (mv.power || 40) * effectiveness(mv.type, d.types)), 0);
+    return { d, score: best - d.hp * 0.15 + Math.random() * 8 };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored[0].d;
+}
+
+function advStep() {
+  const b = ADV;
+  if (b.qi >= b.turnQueue.length) { advEndRound(); return; }
+  const atk = b.turnQueue[b.qi++];
+  if (!atk || atk.fainted) return;
+  const isAlly = b.ally.includes(atk);
+  const target = advPickTarget(atk, isAlly ? b.foe : b.ally);
+  if (!target) { advEndRound(); return; }
+  const move = arenaEnemyPickMove(atk, target);
+  advAttackFx(atk, target, move, isAlly ? "ally" : "foe");
+  const { damage, eff } = arenaCalcDamage(atk, move, target);
+  target.hp = Math.max(0, target.hp - damage);
+  b.totalDmg += damage;
+  target.hitFlash = 180;
+  b.floats.push({ x: target.slot.x, y: target.slot.y - 22, text: "-" + damage,
+    color: eff >= 2 ? "#ff6060" : (eff > 0 && eff < 1 ? "#a0b0c0" : "#ffffff"), t: 0, life: 850, kind: "dmg", size: 8 });
+  if (eff >= 2)                b.floats.push({ x: target.slot.x, y: target.slot.y - 40, text: "SEHR EFFEKTIV",  color: "#7cf0a0", t: 0, life: 900, kind: "eff" });
+  else if (eff > 0 && eff < 1) b.floats.push({ x: target.slot.x, y: target.slot.y - 40, text: "NICHT EFFEKTIV", color: "#b0c0d0", t: 0, life: 900, kind: "eff" });
+  else if (eff === 0)          b.floats.push({ x: target.slot.x, y: target.slot.y - 40, text: "VERFEHLT",       color: "#f06060", t: 0, life: 900, kind: "eff" });
+  if (target.hp === 0) { target.fainted = true; advSparkle(target.slot.x, target.slot.y); }
+}
+
+function advEndRound() {
+  const b = ADV;
+  if (!b.foe.some(m => !m.fainted))  { advNextStage(); return; }
+  if (!b.ally.some(m => !m.fainted)) { advFinish("lose"); return; }
+  b.round++;
+  advUpdateRoundLabel();
+  if (b.round > b.maxRound) { advFinish("lose"); return; }
+  advBuildQueue();
+}
+
+function advNextStage() {
+  const b = ADV;
+  if (b.stage >= ADV_STAGES) { advFinish("win"); return; }
+  b.battlePhase = "loading";
+  b.stage++;
+  b.theme = ADV_THEMES[(b.stage - 1) % ADV_THEMES.length];
+  b.ally.forEach(m => { if (!m.fainted) m.hp = Math.min(m.maxHp, m.hp + Math.round(m.maxHp * ADV_STAGE_HEAL)); });
+  buildEnemyTeam(advFoeSpecs(b.stage)).then(foe => {
+    b.foe = foe;
+    b.foe.forEach(m => { m.hitFlash = 0; m.dir = -1; m.lunge = 0; m.lx = 0; m.ly = 0; m.auraT = -1; m.auraColor = null; });
+    b.round = 1;
+    advAssignSlots();
+    advBuildQueue();
+    advUpdateRoundLabel();
+    toast("⚔️ Stage " + b.stage + " / " + ADV_STAGES);
+    b.battlePhase = "running";
+  });
+}
+
+function advFinish(result) {
+  const b = ADV;
+  b.battlePhase = "resolved";
+  b.result = result;
+  if (result === "win") {
+    state.advProgress = Math.max(state.advProgress || 0, ADV_STAGES);
+    state.coins = (state.coins || 0) + (40 + b.stage * 10);
+    grantTeamExp(50 + b.stage * 10, true);
+  } else {
+    state.advProgress = Math.max(state.advProgress || 0, b.stage - 1);
+  }
+  save();
+  if (typeof renderTrainerCard === "function") renderTrainerCard();
+  advResultOverlay();
+}
+
+function advResultOverlay() {
+  const el = document.getElementById("adv-result");
+  if (!el) return;
+  const win = ADV.result === "win";
+  el.innerHTML =
+    '<div class="adv-result-box">' +
+      '<div class="adv-result-title" style="color:' + (win ? "#50c878" : "#e04038") + '">' +
+        (win ? "🏆 DUNGEON GESCHAFFT!" : "💀 NIEDERLAGE") + '</div>' +
+      '<div class="adv-result-sub">Stage ' + ADV.stage + ' / ' + ADV_STAGES +
+        ' · Gesamt-Schaden ' + ADV.totalDmg + '</div>' +
+      '<button class="btn" onclick="closeAdventure()">Schließen</button>' +
+    '</div>';
+  el.style.display = "flex";
+}
+
+/* ---- Animations-Trigger (wiederverwendete BT-Vokabeln) ---- */
+function advAttackFx(atk, target, move, atkSide) {
+  if (ADV.fast) return;                         // im Skip-Modus keine VFX
+  const cat = move.category || 'physical';
+  // Blickrichtung + Lunge-Vektor zum Ziel
+  const dx = target.slot.x - atk.slot.x, dy = target.slot.y - atk.slot.y, d = Math.hypot(dx, dy) || 1;
+  atk.lx = dx / d; atk.ly = dy / d;
+  atk.dir = dx < 0 ? -1 : 1;
+  const physVfxType = cat === 'physical' &&
+    PHYS_VFX_MOVES[move.type] && PHYS_VFX_MOVES[move.type].has(move.name) ? move.type : null;
+  if (cat === 'physical') {
+    if (!physVfxType) atk.lunge = 0.3;
+    atk.auraT = 0;
+    atk.auraColor = TYPE_COLOR[move.type] || "#a8a878";
+  }
+  // Typ-VFX für Spezial (außer Normal) + whitelisted physische Moves
+  if ((cat === 'special' && move.type !== 'normal') || physVfxType) {
+    ADV.typeVfx = {
+      type: move.type, t: 0,
+      dur: move.type === 'ground' ? 1.1 : move.type === 'rock' ? 1.3 : 0.95,
+      wx: target.slot.x, wy: target.slot.y,
+      attackerWx: atk.slot.x, attackerWy: atk.slot.y
+    };
+  }
+  if (cat === 'physical') advBurst(target.slot.x, target.slot.y, TYPE_COLOR[move.type] || "#f8f8f8");
+  ADV.floats.push({ x: atk.slot.x, y: atk.slot.y - 30, text: move.name,
+    color: TYPE_COLOR[move.type] || "#ffffff", t: 0, life: 700, kind: "move" });
+}
+
+function advBurst(x, y, color) {
+  if (ADV.fast || ADV.bursts.length > 12) return;
+  const particles = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+    const sp = 1.1 + Math.random() * 0.9;
+    particles.push({ x: 0, y: 0, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1.0 });
+  }
+  ADV.bursts.push({ x, y, t: 0, color, particles });
+}
+
+function drawAdvBursts(ctx) {
+  ADV.bursts.forEach(b => {
+    const t = b.t / 0.65, MAX_R = 20;
+    const [pr, pg, pb] = hexToRgbBurst(b.color);
+    const r1 = t * MAX_R, a1 = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
+    _jaggedRingBurst(ctx, b.x, b.y, r1,       1.75, 3.5, 3, b.color,   a1 * 0.95, 88);
+    _jaggedRingBurst(ctx, b.x, b.y, r1 - 1.5, 0.5,  2,   4, '#ffffff', a1 * 0.18, 88);
+    if (t < 0.22) {
+      const gf = 1 - t / 0.22;
+      _radialGlowBurst(ctx, b.x, b.y, 12 * (1 + gf * 0.4), pr, pg, pb, gf * 0.9);
+      _radialGlowBurst(ctx, b.x, b.y, 6, 255, 255, 255, gf * 0.7);
+    }
+    b.particles.forEach(p => {
+      if (p.life <= 0) return;
+      ctx.globalAlpha = Math.max(0, p.life * a1);
+      ctx.fillStyle = b.color;
+      ctx.fillRect(Math.round(b.x + p.x) - 1, Math.round(b.y + p.y) - 1, 2, 2);
+      ctx.globalAlpha = 1;
+    });
+  });
+}
+
+function advSparkle(x, y) {
+  if (ADV.fast) return;
+  for (let i = 0; i < 12; i++)
+    ADV.sparkles.push({ x, y, vx: (Math.random() - 0.5) * 90, vy: -40 - Math.random() * 70, t: 0 });
+}
+
+function drawAdvSparkles(ctx) {
+  ADV.sparkles.forEach(s => {
+    ctx.globalAlpha = Math.max(0, 1 - s.t / 0.9);
+    ctx.fillStyle = "#f8d048";
+    ctx.beginPath(); ctx.arc(s.x, s.y, 2.5, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+}
+
+/* ---- Hintergrund (Phase 3) — Canvas-Themes, keine Assets ---- */
+const ADV_THEMES = [
+  { name:"Stadion", sky:["#2a4a7a","#7aa8dc"], stand:"#c8a848", standDark:"#8a6a20",
+    floor:"#3a7a4a", floorEdge:"#245030", ring:"rgba(255,255,255,.5)",  banner:"#e04038" },
+  { name:"Tempel",  sky:["#3a2a5a","#9a7ad0"], stand:"#a89078", standDark:"#6a5848",
+    floor:"#5a4a7a", floorEdge:"#382a58", ring:"rgba(240,220,255,.5)",  banner:"#f0c040" },
+  { name:"Höhle",   sky:["#0e141c","#2a3542"], stand:"#39414d", standDark:"#20262e",
+    floor:"#2c3440", floorEdge:"#141a22", ring:"rgba(120,200,255,.45)", banner:"#38b0e0" }
+];
+
+function drawAdvBackground(ctx, now) {
+  const W = ADV.W, H = ADV.H, th = ADV.theme || ADV_THEMES[0];
+  // Himmel
+  const sky = ctx.createLinearGradient(0, 0, 0, H * 0.62);
+  sky.addColorStop(0, th.sky[0]); sky.addColorStop(1, th.sky[1]);
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+  // Ränge: zwei elliptische Bögen (oben)
+  ctx.fillStyle = th.stand;
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.30, W*0.64, H*0.32, 0, Math.PI, 0); ctx.fill();
+  ctx.fillStyle = th.standDark;
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.30, W*0.56, H*0.26, 0, Math.PI, 0); ctx.fill();
+  // Zuschauer — statisch gehasht (kein Flackern pro Frame)
+  for (let i = 0; i < 90; i++) {
+    const a  = Math.PI + (i / 90) * Math.PI;
+    const rr = W * 0.5 + ((i * 37) % 40) - 20;
+    const cx = W/2 + Math.cos(a) * rr;
+    const cy = H*0.30 + Math.sin(a) * (H*0.24) - ((i * 53) % 12);
+    if (cy < 4 || cy > H*0.30) continue;
+    ctx.fillStyle = ["#e8d0b0","#d08858","#b0c8e0","#c8b0d0"][(i * 47) % 4];
+    ctx.fillRect(cx, cy, 2, 2);
+  }
+  // Banner oben links/rechts
+  ctx.fillStyle = th.banner;
+  ctx.fillRect(W*0.10, 4, 22, 12);
+  ctx.beginPath(); ctx.moveTo(W*0.10, 16); ctx.lineTo(W*0.10+11, 22); ctx.lineTo(W*0.10+22, 16); ctx.fill();
+  ctx.fillRect(W*0.90-22, 4, 22, 12);
+  ctx.beginPath(); ctx.moveTo(W*0.90-22, 16); ctx.lineTo(W*0.90-11, 22); ctx.lineTo(W*0.90, 16); ctx.fill();
+  // Kampffläche (themed Ellipse + Ring + Mittellinie)
+  ctx.save();
+  ctx.fillStyle = th.floor;
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.60, W*0.47, H*0.33, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = th.floorEdge; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.60, W*0.47, H*0.33, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.strokeStyle = th.ring; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(W/2, H*0.60, W*0.30, H*0.21, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W*0.06, H*0.60); ctx.lineTo(W*0.94, H*0.60); ctx.stroke();
+  ctx.restore();
+  // Spielercharakter im Hintergrund — rein visuell, hinter den Verbündeten
+  drawAdvTrainer(ctx, W*0.5, H*0.90, 1.2);
+}
+
+function drawAdvTrainer(ctx, x, y, sc) {
+  const w = 14*sc, h = 24*sc;
+  ctx.save(); ctx.translate(x - w/2, y - h);
+  ctx.fillStyle = "rgba(0,0,0,.25)";
+  ctx.beginPath(); ctx.ellipse(w/2, h, w*0.5, h*0.06, 0, 0, Math.PI*2); ctx.fill();  // Schatten
+  ctx.fillStyle = "#404878"; ctx.fillRect(w*0.15, h*0.62, w*0.28, h*0.38); ctx.fillRect(w*0.57, h*0.62, w*0.28, h*0.38); // Beine
+  ctx.fillStyle = "#3060c8"; ctx.fillRect(w*0.08, h*0.32, w*0.84, h*0.34);   // Shirt (Rückenansicht)
+  ctx.fillStyle = "#f8c8a0"; ctx.fillRect(w*0.24, h*0.12, w*0.52, h*0.22);   // Kopf
+  ctx.fillStyle = "#5a3a20"; ctx.fillRect(w*0.20, h*0.08, w*0.60, h*0.12);   // Haare
+  ctx.fillStyle = "#e04038"; ctx.fillRect(w*0.14, h*0.02, w*0.72, h*0.09);   // Cap
+  ctx.restore();
+}
+
 function imgFor(dex, shiny) {
   const key = (shiny ? "s" : "n") + dex;
   if (!BT.images[key]) {
@@ -6333,8 +7041,11 @@ function doAttack(f) {
   // Aura + Lunge nur bei physischen Attacken (Spezial → Typ-VFX, Status → keine Bewegung).
   // Die Lunge wird verzögert in updateBattle beim Übergang Charge→Full ausgelöst, damit die
   // Auflade-Phase der Aura sichtbar ist, bevor das Pokémon losspringt.
+  const physVfxType = move.category === 'physical' &&
+    PHYS_VFX_MOVES[move.type] && PHYS_VFX_MOVES[move.type].has(move.name)
+    ? move.type : null;
   if (move.category === 'physical') {
-    f.lunge = 0.3;
+    if (!physVfxType) f.lunge = 0.3;
     f.auraT = 0;
     f.auraColor = TYPE_COLOR[move.type] || "#a8a878";
   }
@@ -6357,12 +7068,12 @@ function doAttack(f) {
   w.hp = Math.max(0, w.hp - dmg);
   w.hitFlash = 0.25;
 
-  // Typ-VFX für Spezial-Attacken
-  if (move.category === 'special' && move.type !== 'normal') {
+  // Typ-VFX für Spezial-Attacken + whitelisted physische Attacken
+  if ((move.category === 'special' && move.type !== 'normal') || physVfxType) {
     BT.typeVfx = {
       type: move.type,
       t: 0,
-      dur: 0.95,
+      dur: move.type === 'ground' ? 1.1 : move.type === 'rock' ? 1.3 : 0.95,
       wx: w.wx,
       wy: w.wy,
       attackerWx: f.wx,
@@ -6942,7 +7653,7 @@ function drawBattle(now) {
   });
 
   // Typ-basierte Angriffs-VFX (über Pokémon, unter Minimap)
-  if (BT.typeVfx) drawTypeVfx(ctx);
+  if (BT.typeVfx) drawTypeVfx(ctx, BT.typeVfx, BT.cam.x, BT.cam.y);
 
   drawMinimap(ctx);
 }
@@ -7781,16 +8492,15 @@ function drawBallAnim(ctx, now) {
   drawBall(ctx, bx, by);
 }
 
-function drawTypeVfx(ctx) {
-  const v = BT.typeVfx;
+function drawTypeVfx(ctx, v, camX, camY) {
   if (!v) return;
   const t = Math.min(v.t / v.dur, 1);
   // Ziel in Screen-Koordinaten
-  const cx = v.wx - BT.cam.x;
-  const cy = v.wy - BT.cam.y;
+  const cx = v.wx - camX;
+  const cy = v.wy - camY;
   // Angreifer in Screen-Koordinaten
-  const ax = v.attackerWx - BT.cam.x;
-  const ay = v.attackerWy - BT.cam.y;
+  const ax = v.attackerWx - camX;
+  const ay = v.attackerWy - camY;
 
   function easeOut(x) { return 1 - (1 - x) * (1 - x); }
 
@@ -8039,18 +8749,18 @@ function drawTypeVfx(ctx) {
     }
 
     case 'ground': {
-      // Boden-VFX: konzentrische zackige Ellipsen + Partikel + Echo
-      const GC = TYPE_COLOR['ground']; // "#e0c068"
-      const groundY = cy + 14;        // Ankerpunkt am Boden des Ziel-Sprites
+      const DUR = 1.1;
+      const ts = t * DUR;
+      const GC = TYPE_COLOR['ground'];
+      const groundY = cy + 14;
 
       function _srng(seed) {
         let s = seed;
         return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
       }
 
-      // ── Phase 1 (t 0→0.15): Boden-Flash unter dem Ziel ──
-      if (t < 0.15) {
-        const a = (t / 0.15) * 0.45;
+      if (ts < 0.15) {
+        const a = (ts / 0.15) * 0.45;
         ctx.save();
         ctx.globalAlpha = a;
         ctx.fillStyle = GC;
@@ -8060,24 +8770,20 @@ function drawTypeVfx(ctx) {
         ctx.restore();
       }
 
-      // ── 3 konzentrische Wellen (gestaffelt) ──
-      for (let w = 0; w < 3; w++) {
-        const delay = w * 0.18;
-        const wt = Math.max(0, (t - delay) / (1 - delay));
+      for (let wi = 0; wi < 3; wi++) {
+        const delay = wi * 0.18;
+        const wt = Math.max(0, (ts - delay) / (1.1 - delay));
         if (wt <= 0) continue;
-
-        const ease = Math.sin(wt * Math.PI);   // Aufbau → Maximum → Verblassen
-        const rx = wt * 58 + 5;               // horizontaler Radius wächst
-        const ry = rx * 0.22;                 // flache Ellipse (Boden-Perspektive)
-        const alpha = ease * (1 - w * 0.2) * 0.85;
+        const ease = Math.sin(wt * Math.PI);
+        const rx = wt * 52 + 5;
+        const ry = rx * 0.22;
+        const alpha = ease * (1 - wi * 0.2) * 0.85;
         if (alpha < 0.01) continue;
-
-        // zackiger Ring via seeded random (gleiche Zackigkeit pro Frame w, nicht flickernd)
-        const sr = _srng(w * 100 + Math.floor(t * 18));
+        const sr = _srng(wi * 100 + Math.floor(ts * 18));
         ctx.save();
         ctx.translate(cx, groundY);
         ctx.strokeStyle = GC;
-        ctx.lineWidth = w === 0 ? 2.5 : 1.5;
+        ctx.lineWidth = wi === 0 ? 2.5 : 1.5;
         ctx.globalAlpha = alpha;
         ctx.beginPath();
         const STEPS = 24;
@@ -8090,59 +8796,38 @@ function drawTypeVfx(ctx) {
         }
         ctx.closePath();
         ctx.stroke();
-
-        // leichte Füllung (Riss-Tönur)
-        ctx.globalAlpha = alpha * 0.10;
-        ctx.fillStyle = GC;
-        ctx.fill();
         ctx.restore();
       }
 
-      // ── Partikel (Gesteinsbroken fliegen nach oben) ──
-      // 14 Partikel, seeded pro Partikel-Index (kein Math.random() → kein Flickern)
-      for (let i = 0; i < 14; i++) {
-        const pr = _srng(i * 41 + 7);
-        const delay = pr() * 0.12;              // leicht gestaffelt
-        if (t < delay) continue;
-        const pt = Math.min((t - delay) / 0.55, 1);
-        if (pt >= 1) continue;
-
-        const px = cx + (pr() - 0.5) * 44;
-        const startY = groundY;
-        const vx = (pr() - 0.5) * 2.8;
-        const vy = -(pr() * 3.0 + 1.2);
-        const size = Math.ceil(pr() * 3 + 1.5);
-        const f = pt * 18;                      // pseudo-frame
-        const ppx = px + vx * f;
-        const ppy = startY + vy * f + 0.22 * f * f;  // Bogenwurf
-        const alpha = (1 - pt) * 0.9;
-
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = GC;
-        ctx.fillRect(Math.round(ppx), Math.round(ppy), size, size);
-        // heller 1px Highlight
-        ctx.globalAlpha = alpha * 0.5;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(Math.round(ppx), Math.round(ppy), 1, 1);
-        ctx.restore();
+      if (ts >= 0.1 && ts < 0.9) {
+        const sr2 = _srng(42);
+        const pt = Math.min((ts - 0.1) / 0.6, 1);
+        for (let i = 0; i < 12; i++) {
+          const ox = (sr2() - 0.5) * 44;
+          const peakH = 18 + sr2() * 28;
+          const py2 = groundY - Math.sin(pt * Math.PI) * peakH;
+          const alpha2 = Math.sin(pt * Math.PI) * 0.85;
+          const r = 2 + sr2() * 3;
+          const brown = sr2() > 0.5 ? '#b87a30' : '#d4a060';
+          ctx.save();
+          ctx.globalAlpha = alpha2;
+          ctx.fillStyle = brown;
+          ctx.beginPath();
+          ctx.arc(cx + ox, py2, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
       }
 
-      // ── Echo-Ellipse am Boden (Phase t > 0.65, verblasst) ──
-      if (t > 0.65) {
-        const ep = (t - 0.65) / 0.35;
-        const ea = (1 - ep) * 0.45;
-        const ew = (1 - ep * 0.5) * 48;
+      if (ts >= 0.35 && ts < 0.85) {
+        const shakeT = (ts - 0.35) / 0.5;
+        const shakeX = Math.sin(shakeT * Math.PI * 6) * 5 * (1 - shakeT);
         ctx.save();
-        ctx.globalAlpha = ea;
+        ctx.globalAlpha = 0.35;
         ctx.fillStyle = GC;
-        ctx.save();
-        ctx.translate(cx, groundY + 2);
-        ctx.scale(1, 0.20);
         ctx.beginPath();
-        ctx.arc(0, 0, ew, 0, Math.PI * 2);
+        ctx.arc(cx + shakeX, cy, 14, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
         ctx.restore();
       }
 
@@ -8227,42 +8912,91 @@ function drawTypeVfx(ctx) {
     }
 
     case 'rock': {
-      // Scharfkantige Felsnadel schießt aus dem Boden
-      ctx.translate(cx, cy); ctx.scale(0.5, 0.5); ctx.translate(-cx, -cy);
-      const groundY2 = cy + 14;
-      const progress = Math.min(t / 0.65, 1);
-      const rockY = groundY2 + 20 - easeOut(progress) * 80;
-      // Boden-Risse
-      for (let c = 0; c < 3; c++) {
-        const a = (-0.5 + c * 0.5) * Math.PI;
-        ctx.strokeStyle = `rgba(140,110,30,${0.7*easeOut(progress)})`; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(cx, groundY2);
-        ctx.lineTo(cx+Math.cos(a)*32*easeOut(progress), groundY2+Math.sin(a)*10*easeOut(progress)); ctx.stroke();
+      const DUR = 1.3;
+      const ts = t * DUR;
+
+      function _srngR(seed) {
+        let s = seed;
+        return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
       }
-      ctx.save(); ctx.translate(cx, rockY);
-      // Schatten
-      ctx.fillStyle = 'rgba(60,40,0,0.3)'; ctx.beginPath(); ctx.ellipse(0,48,18,6,0,0,Math.PI*2); ctx.fill();
-      // Felsnadel – sehr spitze Polygon-Form
-      const pts = [[0,-52],[4,-38],[9,-20],[14,10],[10,30],[6,48],[-6,48],[-10,30],[-14,10],[-9,-20],[-4,-38]];
-      const needleGrd = ctx.createLinearGradient(-14,0,14,0);
-      needleGrd.addColorStop(0,'#7a6020'); needleGrd.addColorStop(0.3,'#c8a840');
-      needleGrd.addColorStop(0.55,'#e8d060'); needleGrd.addColorStop(1,'#5a4410');
-      ctx.fillStyle = needleGrd;
-      ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]); pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1])); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = 'rgba(80,60,10,0.55)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0,-52); ctx.lineTo(5,48); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,-52); ctx.lineTo(-5,48); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,240,140,0.28)';
-      ctx.beginPath(); ctx.moveTo(0,-52); ctx.lineTo(-4,-38); ctx.lineTo(-9,-20); ctx.lineTo(-5,0); ctx.lineTo(0,-10); ctx.closePath(); ctx.fill();
-      ctx.restore();
-      // Trümmer-Splitter
-      for (let s = 0; s < 5; s++) {
-        const sx2 = cx+(Math.random()-0.5)*48, sy2 = groundY2+14+Math.random()*30;
-        ctx.save(); ctx.translate(sx2,sy2); ctx.rotate(Math.random()*Math.PI);
-        ctx.fillStyle = `hsl(42,60%,${30+Math.floor(Math.random()*20)}%)`;
-        ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(5,2); ctx.lineTo(-2,7); ctx.lineTo(-6,0); ctx.closePath(); ctx.fill();
-        ctx.restore();
+
+      const ROCKS = 7;
+      const delays = [0, 0.07, 0.14, 0.21, 0.10, 0.28, 0.35];
+      const offsets = [-18, -9, 0, 9, 18, -14, 14];
+      const sizes   = [5, 4, 6.5, 4.5, 5.5, 3.5, 6];
+
+      for (let ri = 0; ri < ROCKS; ri++) {
+        const delay = delays[ri];
+        const rt = Math.max(0, (ts - delay) / (1.0 - delay));
+        if (rt <= 0) continue;
+
+        const sr = _srngR(ri * 77 + 13);
+        const ox = offsets[ri] + (sr() - 0.5) * 5;
+        const startY = cy - 45 - sr() * 15;
+        const endY = cy + 5;
+        const fy = startY + (endY - startY) * Math.min(rt / 0.7, 1);
+        const fx = cx + ox;
+        const sz = sizes[ri];
+        const landed = rt >= 0.7;
+
+        if (!landed) {
+          const sr2 = _srngR(ri * 33 + 7);
+          const SIDES = 5 + (ri % 2);
+          ctx.save();
+          ctx.translate(fx, fy);
+          ctx.rotate(rt * 3 + ri);
+          ctx.beginPath();
+          for (let s = 0; s < SIDES; s++) {
+            const angle = (s / SIDES) * Math.PI * 2;
+            const r = sz * (0.75 + sr2() * 0.5);
+            const px = Math.cos(angle) * r;
+            const py = Math.sin(angle) * r;
+            s === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fillStyle = '#7a7a7a';
+          ctx.fill();
+          ctx.strokeStyle = '#404040';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.globalAlpha = 0.35;
+          ctx.fillStyle = '#d8d8d8';
+          ctx.beginPath();
+          ctx.arc(-sz * 0.25, -sz * 0.3, sz * 0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          const impactT = Math.min((rt - 0.7) / 0.3, 1);
+          if (impactT < 1) {
+            const sr3 = _srngR(ri * 55 + 3);
+            for (let p = 0; p < 5; p++) {
+              const angle = (p / 5) * Math.PI * 2 + sr3() * 0.5;
+              const pr = impactT * (5 + sr3() * 5);
+              const px = fx + Math.cos(angle) * pr;
+              const py = endY + Math.sin(angle) * pr * 0.4;
+              const alpha = (1 - impactT) * 0.7;
+              ctx.save();
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = '#a09070';
+              ctx.beginPath();
+              ctx.arc(px, py, 1 + sr3() * 1, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+        }
+
+        if (rt >= 0.7 && rt < 0.75) {
+          ctx.save();
+          ctx.globalAlpha = (1 - (rt - 0.7) / 0.05) * 0.6;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
       }
+
       break;
     }
 
