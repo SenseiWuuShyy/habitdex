@@ -638,6 +638,10 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 .an-words{color:var(--white);line-height:2}
 .an-hint{color:#8898b0}
 .an-label{color:var(--white);font-size:7px;flex:none}
+.an-help{float:right;cursor:pointer;width:13px;height:13px;line-height:11px;text-align:center;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font-size:8px;opacity:.6}
+.an-help:hover{opacity:1;background:var(--gold);color:var(--bg)}
+.an-help-text{display:none;font-size:7px;line-height:1.8;color:#a8b8c8;background:rgba(0,0,0,.25);border-left:2px solid var(--gold);border-radius:0 4px 4px 0;padding:6px 8px;margin:0 0 10px}
+.an-title.help-open + .an-help-text{display:block}
 
 /* ===== Input-Log Tab ===== */
 .il-type-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;margin-bottom:4px}
@@ -1292,6 +1296,17 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <button class="btn red" onclick="closeModal('candy-modal')">Abbrechen</button>
     </div>
   </div>
+  
+
+  <!-- Massage target modal -->
+  <div class="modal-bg" id="massage-modal">
+    <div class="modal">
+      <h3>💆 Massage</h3>
+      <p class="muted">Welches Pokémon soll +8 Zuneigung erhalten?</p>
+      <div class="pick-grid" id="massage-grid"></div>
+      <button class="btn red" onclick="closeModal('massage-modal')">Abbrechen</button>
+    </div>
+  </div>
 
   <!-- Stone target modal -->
   <div class="modal-bg" id="stone-modal">
@@ -1525,7 +1540,8 @@ const SHOP_ITEMS = {
   tm_38:  { name:"TM38 Feuersturm",   icon:"🌪️", price:280, category:"disc", exactMove:"fire-blast" },
   tm_45:  { name:"TM45 Anziehung",    icon:"💕",  price:150, category:"disc", exactMove:"attract" },
   tm_51:  { name:"TM51 Stahlflügel",  icon:"🪶",  price:170, category:"disc", exactMove:"steel-wing" },
-  sonderbonbon: { name:"Sonderbonbon",  icon:"🍬", price:300, category:"special" }
+  sonderbonbon: { name:"Sonderbonbon",  icon:"🍬", price:300, category:"special" },
+  massage:      { name:"Massage",       icon:"💆", price:80,  category:"special" }
 };
 
 /* ---------- Stein-Mapping (state.items-Key ↔ PokeAPI-Item-Name) ---------- */
@@ -2439,6 +2455,12 @@ function renderAnalyse() {
   const sgInput = document.getElementById("sleep-goal-input");
   if (sgInput) sgInput.value = (state.sleepGoalMin || 450) / 60;
   if (!el) return;
+  // Fragezeichen-Hilfe: Titel + einklappbare Erklärung je Analysebereich
+  const anTitle = (inner, help) =>
+    '<div class="an-title">' + inner +
+      '<span class="an-help" onclick="this.parentNode.classList.toggle(\'help-open\')" title="Erklärung">?</span>' +
+    '</div>' +
+    '<div class="an-help-text">' + help + '</div>';
 
   const dates = lastNDays(30);
   const logs = dates.map(d => state.dailyLog[d]).filter(Boolean);
@@ -2483,7 +2505,7 @@ function renderAnalyse() {
   const otherSleep = otherGym.map(l => sleepMin(l.sleep)).filter(v => v != null);
   html +=
     '<div class="panel dark an-panel">' +
-      '<div class="an-title">&#128170; Schlaf &amp; Gym-Performance</div>' +
+      anTitle('&#128170; Schlaf &amp; Gym-Performance', 'Vergleicht deine durchschnittliche Schlafdauer an den besten Gym-Tagen (Gef&uuml;hl &ge; 4) mit der an schw&auml;cheren. Zeigt, ob mehr Schlaf mit besserem Training zusammenh&auml;ngt.') +
       '<div class="an-lead">&#128170; BESTE GYM-TAGE (Gefühl &ge; 4): ' + goodGym.length + ' Tage</div>' +
       '<div class="an-row">&#8594; &#128564; &Oslash; Schlaf: <span class="an-val">' + (goodSleep.length ? hFmt(avg(goodSleep)) : "&ndash;") + '</span></div>' +
       '<div class="an-sub an-lead">&#128564; SCHW&Auml;CHERE GYM-TAGE (Gef&uuml;hl &lt; 4): ' + otherGym.length + ' Tage</div>' +
@@ -2498,7 +2520,7 @@ function renderAnalyse() {
   if (withC.length >= 2 && woC.length >= 2) {
   html +=
     '<div class="panel dark an-panel">' +
-      '<div class="an-title">&#129382; Pre-Workout Carbs &amp; Kraft</div>' +
+      anTitle('&#129382; Pre-Workout Carbs &amp; Kraft', 'Vergleicht dein durchschnittliches Kraftrating an Tagen mit Pre-Workout-Kohlenhydraten gegen Tage ohne. Zeigt, ob Carbs vor dem Training deine Kraft steigern.') +
       '<div class="an-lead">&#129382; MIT Carbs: Kraft &Oslash; <span class="an-val">' + num1(withA) + '</span> <span class="an-hint">(' + withC.length + ' Tage)</span></div>' +
       '<div class="an-row">' + bar(withA, "pos") + '</div>' +
       '<div class="an-sub an-lead">&#128683; OHNE Carbs: Kraft &Oslash; <span class="an-val">' + num1(woA) + '</span> <span class="an-hint">(' + woC.length + ' Tage)</span></div>' +
@@ -2526,7 +2548,7 @@ function renderAnalyse() {
       : '<div class="an-hint">Noch nicht genug Daten für diese Gruppe.</div>';
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#128300; Wortschatz: gute vs. schlechte Stimmung</div>' +
+        anTitle('&#128300; Wortschatz: gute vs. schlechte Stimmung', 'Sammelt die h&auml;ufigsten W&ouml;rter aus deinen Notizen an Tagen mit guter Stimmung (&ge; 4) und schlechter (&le; 2). Deckt wiederkehrende Themen hinter deiner Laune auf.') +
         '<div class="an-lead">&#127775; GUTE STIMMUNG (' + bestDays.length + ') &ndash; häufige Wörter:</div>' +
         wordsLine(bestWords) +
         '<div class="an-sub an-lead">&#128542; SCHLECHTE STIMMUNG (' + worstDays.length + ') &ndash; häufige Wörter:</div>' +
@@ -2543,7 +2565,7 @@ function renderAnalyse() {
     const lowE  = avg(lowSleep.map(l => l.energy));
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9889; Energie &amp; Schlaf</div>' +
+        anTitle('&#9889; Energie &amp; Schlaf', 'Vergleicht dein durchschnittliches Energielevel an Tagen mit &ge; 7h Schlaf gegen &lt; 7h. Zeigt, wie stark die Schlafdauer deine Tagesenergie treibt.') +
         '<div class="an-lead">&#128564; TAGE MIT &ge;7h SCHLAF: Energie &Oslash; <span class="an-val">' + num1(highE) + '</span> <span class="an-hint">(' + highSleep.length + ' Tage)</span></div>' +
         '<div class="an-row">' + bar(highE, "pos") + '</div>' +
         '<div class="an-sub an-lead">&#9925; TAGE MIT &lt;7h SCHLAF: Energie &Oslash; <span class="an-val">' + num1(lowE) + '</span> <span class="an-hint">(' + lowSleep.length + ' Tage)</span></div>' +
@@ -2586,7 +2608,7 @@ function renderAnalyse() {
     if (rows) {
       html +=
         '<div class="panel dark an-panel">' +
-          '<div class="an-title">&#127864; Alkohol-Auswirkung</div>' +
+          anTitle('&#127864; Alkohol-Auswirkung', 'Stellt dein Befinden (Schlaf, Energie, Stimmung, Gym) an n&uuml;chternen Tagen den Tagen mit Vorabend-Drinks gegen&uuml;ber. Zeigt, was Alkohol am Folgetag kostet.') +
           '<div class="an-hint" style="margin-bottom:8px">Vorabend-Drinks vs. dein Befinden am selben Tag. N&uuml;chtern (' + soberL.length + ' Tage) vs. mit Alkohol (' + drinkL.length + ' Tage).</div>' +
           rows +
         '</div>';
@@ -2608,7 +2630,7 @@ function renderAnalyse() {
     const sorted = timingEntries.sort((a,b) => avg(b[1]) - avg(a[1]));
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9203; Essen-Timing &amp; Kraft</div>' +
+        anTitle('&#9203; Essen-Timing &amp; Kraft', 'Sortiert dein Kraftrating nach dem Abstand zwischen letzter Mahlzeit und Training. Zeigt, welches Timing dir die meiste Kraft gibt.') +
         sorted.map(([key, vals]) => {
           const a = avg(vals);
           return '<div class="an-row"><span class="an-label" style="min-width:70px;font-size:7px">' + (timingLabels[key] || key) + '</span>' +
@@ -2639,7 +2661,7 @@ function renderAnalyse() {
     const perWeekStr = (perWeek >= 0 ? "+" : "") + perWeek.toFixed(2) + " kg/Wo";
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9878; Gewichtsverlauf (30 Tage, gegl&auml;ttet)</div>' +
+        anTitle('&#9878; Gewichtsverlauf (30 Tage, gegl&auml;ttet)', 'Gl&auml;ttet deinen Gewichtsverlauf der letzten 30 Tage und zeigt den Trend als kg/Woche. Filtert Tagesschwankungen aus der Waage.') +
         '<div class="an-lead">Aktuell (&Oslash; letzte ' + k + '): <span class="an-val">' + lastAvg.toFixed(1) + ' kg</span> &nbsp; Trend: <span style="color:' + deltaCol + '">' + deltaStr + '</span> <span class="an-hint">(' + perWeekStr + ')</span></div>' +
         '<div class="an-row an-hint">Min: ' + minW.toFixed(1) + ' kg &nbsp; Max: ' + maxW.toFixed(1) + ' kg &nbsp; ' + weightPoints.length + ' Messpunkte</div>' +
       '</div>';
@@ -2654,7 +2676,7 @@ function renderAnalyse() {
     const lowStr  = avg(lowEnergy.map(l => l.gym.strength));
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9889; Energie &amp; Kraftrating</div>' +
+        anTitle('&#9889; Energie &amp; Kraftrating', 'Vergleicht dein Kraftrating an Tagen mit hoher (4-5) und niedriger (1-2) Energie. Trennt schlechten Schlaf von einem generell schlechten Tag.') +
         '<div class="an-hint" style="margin-bottom:8px">Trennt schlechter Schlaf von schlechtem Tag.</div>' +
         '<div class="an-lead">&#9889;&#9889;&#9889; HOHE ENERGIE (4-5): Kraft &Oslash; <span class="an-val">' + num1(highStr) + '</span> <span class="an-hint">(' + highEnergy.length + ' Tage)</span></div>' +
         '<div class="an-row">' + bar(highStr, "pos") + '</div>' +
@@ -2687,7 +2709,7 @@ function renderAnalyse() {
     else                        verdict = "&#9878; Erhaltung: Gewicht stabil &ndash; &Oslash; " + Math.round(avgKcal) + " kcal entspricht etwa deinem Verbrauch.";
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#9878; Kalorien &amp; Gewichts-Trend</div>' +
+        anTitle('&#9878; Kalorien &amp; Gewichts-Trend', 'Verkn&uuml;pft deinen Kalorienschnitt mit der tats&auml;chlichen Gewichtsentwicklung. Sagt dir, ob du im &Uuml;berschuss, Defizit oder Erhalt liegst.') +
         '<div class="an-hint" style="margin-bottom:8px">Verkn&uuml;pft deinen Kalorienschnitt mit der tats&auml;chlichen Gewichtsentwicklung &uuml;ber das Fenster.</div>' +
         '<div class="an-lead">&#248; Kalorien: <span class="an-val">' + Math.round(avgKcal) + ' kcal</span> &nbsp; Gewichts-Trend: <span class="an-val">' + trendStr + '</span></div>' +
         '<div class="an-row an-hint">' + verdict + '</div>' +
@@ -2705,7 +2727,7 @@ function renderAnalyse() {
     const potential = stacks.filter(s => s.strength === "potential");
 
     let stackHTML = '<div class="panel dark an-panel">';
-    stackHTML += '<div class="an-title">⚡ DEINE STACKS</div>';
+    stackHTML += anTitle('⚡ DEINE STACKS', 'Erkennt Habit-Paare, die du regelm&auml;&szlig;ig zusammen erledigst. Best&auml;tigte Stacks geben Bonus-EXP, wenn du beide am selben Tag abschlie&szlig;t.');
 
     if (confirmed.length) {
       stackHTML += '<div class="an-lead" style="color:var(--hpgreen)">✅ BESTÄTIGT</div>';
@@ -2769,7 +2791,7 @@ function renderAnalyse() {
     const pct = v => v == null ? "&ndash;" : Math.round(v * 100) + "%";
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#128564; Schlaf &amp; Habit-Quote</div>' +
+        anTitle('&#128564; Schlaf &amp; Habit-Quote', 'Vergleicht deine Habit-Erf&uuml;llungsquote an Tagen mit &ge; 7h Schlaf gegen &lt; 7h. Zeigt, ob guter Schlaf dich disziplinierter macht.') +
         '<div class="an-lead">&#128564; Tage mit &ge;7h Schlaf: Habit-Quote <span class="an-val">' + pct(gq) + '</span> <span class="an-hint">(' + good.length + ' Tage)</span></div>' +
         '<div class="an-sub an-lead">&#9925; Tage mit &lt;7h Schlaf: Habit-Quote <span class="an-val">' + pct(rq) + '</span> <span class="an-hint">(' + rest.length + ' Tage)</span></div>' +
         ((gq != null && rq != null)
@@ -2802,7 +2824,7 @@ function renderAnalyse() {
     }).join("");
     html +=
       '<div class="panel dark an-panel">' +
-        '<div class="an-title">&#128200; 7-Tage-Trend pro Habit</div>' +
+        anTitle('&#128200; 7-Tage-Trend pro Habit', 'Stellt pro Habit die Quote dieser Woche der Vorwoche gegen&uuml;ber. Pfeile zeigen, welche Gewohnheiten gerade besser oder schlechter laufen.') +
         rows +
       '</div>';
   }
@@ -4915,6 +4937,20 @@ async function useItem(key) {
     });
     toast("🍓 Beere verfüttert: +25 EXP fürs Team!");
     renderItems(); save();
+  } else if (key === "massage") {
+    if (!state.box.length) { toast("Kein Pokémon in deiner Box."); return; }
+    const grid = document.getElementById("massage-grid");
+    const parts = await Promise.all(state.box.map(async m => {
+      const d = await getPokemonData(m.dex);
+      const h = m.happiness || 120;
+      return '<div class="pick-card" onclick="useMassageOn(\'' + m.uid + '\')">' +
+        '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="">' +
+        '<div class="pn">' + (m.shiny ? "✨ " : "") + esc(d.name) +
+        '<br>♥ ' + h + '/255</div>' +
+      '</div>';
+    }));
+    grid.innerHTML = parts.join("");
+    openModal("massage-modal");
   } else if (key === "sonderbonbon") {
     if (!state.box.length) { toast("Du hast noch kein Pokémon."); return; }
     const grid = document.getElementById("candy-grid");
@@ -4994,6 +5030,19 @@ function useCandyOn(uidv) {
   closeModal("candy-modal");
   toast("🍬 Sonderbonbon eingesetzt: +1 Level!");
   save(); renderTeam(); renderBox(); renderItems();
+}
+
+function useMassageOn(uidv) {
+  const m = getMon(uidv);
+  if (!m || (state.items.massage || 0) < 1) return;
+  state.items.massage--;
+  m.happiness = Math.min(255, (m.happiness || 120) + 8);
+  checkFriendshipEvolution(m);
+  closeModal("massage-modal");
+  toast("💆 Massage: +" + 8 + " Zuneigung für " + esc(m.nickname || m.name || ("№" + m.dex)) + "!");
+  save(); renderItems();
+  const dm = document.getElementById("mon-detail-modal");
+  if (dm && dm.classList.contains("open")) renderMonDetailModal(m, "bond");
 }
 
 /* =====================================================================
@@ -10012,9 +10061,15 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
         '<div style="font-size:11px;color:' + colorClass + ';letter-spacing:2px;margin-bottom:8px">' + heartBar + '</div>' +
         '<div style="font-size:8px;margin-bottom:16px">' + h + ' / 255</div>' +
         '<div style="font-size:8px;color:var(--white);line-height:2">' + statusText + '</div>' +
+        (h >= 255
+          ? '<div style="margin-top:16px;font-size:7px;color:#909080">💆 Zuneigung bereits maximal</div>'
+          : (state.items.massage || 0) < 1
+            ? '<div style="margin-top:16px;font-size:7px;color:#909080">💆 Keine Massage im Inventar (im Shop kaufbar)</div>'
+            : '<button class="btn green" style="margin-top:16px;font-size:8px" onclick="useMassageOn(\'' + mon.uid + '\')">💆 Massage einsetzen · +8 · x' + (state.items.massage || 0) + '</button>') +
         '<div style="margin-top:16px;font-size:7px;color:#909080;line-height:2">' +
           'Habits erledigen → ♥ steigt<br>' +
           'Beere verfüttern → +10 sofort<br>' +
+          '💆 Massage → +8 sofort<br>' +
           'Nichts tun → ♥ sinkt' +
         '</div>' +
       '</div>';
