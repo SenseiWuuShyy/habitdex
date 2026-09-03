@@ -326,6 +326,19 @@ h2:first-child{margin-top:0}
   text-shadow:1px 1px 0 #2a0808,-1px -1px 0 #2a0808,1px -1px 0 #2a0808,-1px 1px 0 #2a0808;
 }
 #adv-totaldmg.on{display:block}
+#adv-choice{position:absolute;inset:0;z-index:4;display:none;align-items:center;justify-content:center;background:rgba(8,12,20,.8)}
+.adv-choice-box{background:var(--panel);border:3px solid var(--line);border-radius:12px;padding:16px;text-align:center;max-width:88%}
+.adv-choice-title{font-family:'Press Start 2P',monospace;font-size:11px;color:#f8c030;margin-bottom:6px}
+.adv-choice-sub{font-size:9px;color:#7cf0a0;margin-bottom:2px}
+.adv-choice-hint{font-size:8px;color:#a8b8c8;margin-bottom:10px}
+.adv-cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.adv-card{width:92px;background:rgba(30,40,52,.9);border:2px solid var(--line);border-radius:8px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.adv-card:active{transform:translateY(2px)}
+.adv-card-ic{font-size:20px}
+.adv-card-name{font-size:7px;color:#fff;line-height:1.4}
+.adv-card-desc{font-size:6px;color:#98a8b8;line-height:1.4}
+.adv-bank-btn{margin-top:12px;font-family:'Press Start 2P',monospace;font-size:8px;color:#fff;background:rgba(80,120,60,.85);border:2px solid #3a6a2a;border-radius:6px;padding:9px 12px;cursor:pointer}
+.adv-bank-btn:active{transform:translateY(2px)}
 
 /* ===== Bottom nav ===== */
 nav{
@@ -363,6 +376,14 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border:3px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);
 }
 .modal textarea{resize:none;height:70px;line-height:1.8}
+.modal select{
+  width:100%;font-family:inherit;font-size:11px;padding:9px;
+  border:3px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);
+}
+.nc-result{margin-top:12px;border:3px solid var(--line);border-radius:8px;background:#fff;padding:8px}
+.nc-line{display:flex;justify-content:space-between;gap:8px;font-size:9px;padding:3px 0;color:var(--ink)}
+.nc-line.nc-big{font-size:12px;font-weight:bold;border-top:2px solid var(--line);border-bottom:2px solid var(--line);margin:3px 0;padding:6px 0}
+.nc-hint{font-size:7px;color:#807860;line-height:1.5;margin-top:6px}
 .cat-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
 .cat-chip{
   font-family:inherit;font-size:7px;color:#fff;padding:5px 7px;cursor:pointer;
@@ -383,6 +404,28 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 .pick-card img{width:72px;height:72px;image-rendering:pixelated}
 .pick-card .pn{font-size:8px;line-height:1.4;word-break:break-word;min-height:22px}
 .pick-card .type-badges{justify-content:center}
+.gacha-tier-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.gacha-tier-row{display:flex;align-items:center;gap:8px;background:#fff;border:3px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.gacha-tier-icon{font-size:20px;line-height:1}
+.gacha-tier-info{flex:1;text-align:left;min-width:0}
+.gacha-tier-label{font-size:9px;font-weight:bold}
+.gacha-tier-hint{font-size:7px;color:#909080;margin-top:2px}
+.gacha-tier-row .btn{width:auto;margin:0;padding:8px 12px;flex-shrink:0}
+.gacha-tier-row .btn:disabled{opacity:.4;cursor:default;filter:grayscale(.7)}
+.gacha-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.gacha-result-card{background:#fff;border:3px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.3);position:relative}
+.gacha-result-card img{width:72px;height:72px;image-rendering:pixelated}
+.gacha-result-card .pn{font-size:8px;line-height:1.4;word-break:break-word;min-height:22px}
+.gacha-result-card .iv{font-size:7px;color:#f0a000;margin-top:2px}
+.gacha-result-card .tier-badge{display:inline-block;font-size:6px;color:#fff;border-radius:6px;padding:2px 5px;margin-top:3px}
+.breed-select { display:flex; flex-direction:column; gap:4px; margin:10px 0; }
+.breed-select label { font-size:8px; color:#909080; margin-top:4px; }
+.breed-select select { font-family:inherit; font-size:9px; padding:6px; background:#1a1a2e; color:#fff; border:1px solid #444; border-radius:4px; }
+.breed-egg-view { text-align:center; margin:14px 0; }
+.breed-egg-icon { font-size:48px; }
+.breed-egg-name { font-size:11px; font-weight:bold; margin:6px 0; }
+.breed-egg-types { display:flex; gap:4px; justify-content:center; margin:6px 0; }
+.breed-egg-time { font-size:9px; color:#f0c020; margin-top:6px; }
 .rarity-tag{font-size:7px;text-align:center;margin-bottom:6px;color:#3060a8}
 .rarity-tag.rare{color:#a02820}
 .rarity-tag.legendary{color:#b8860b}
@@ -589,10 +632,11 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border:3px solid var(--line);border-radius:6px;background:#fff;
   padding:4px 5px;
 }
-.dl-kcal{
+.dl-kcal,.dl-protein{
   font-family:inherit;font-size:9px;color:var(--ink);width:70px;text-align:right;
   border:3px solid var(--line);border-radius:6px;background:#fff;padding:5px;
 }
+.dl-goal-badge{font-size:7px;margin-left:4px;flex:none}
 .dl-duration{font-size:8px;color:#287848;margin-left:auto}
 .dl-rating{display:flex;gap:5px}
 .rate-btn{
@@ -1028,6 +1072,91 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border: 2px solid var(--line); border-radius: 5px;
   padding: 4px 7px; background: var(--red); cursor: pointer;
 }
+
+/* ---- Hunter-Panel (Solo-Leveling-Look) ---- */
+.hunter-panel{
+  --sl-cyan:#4fd6ff; --sl-line:#1c3550; --sl-muted:#5a7a95; --sl-text:#bfe6ff;
+  margin:14px 0;
+  background:linear-gradient(160deg,#0e1d2e,#0a1420);
+  border:2px solid var(--sl-line);
+  border-radius:10px;
+  padding:16px;
+  box-shadow:0 0 22px rgba(79,214,255,.14), inset 0 0 30px rgba(79,214,255,.04);
+  position:relative; overflow:hidden;
+}
+.hunter-panel::before{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(79,214,255,.10), transparent 60%);
+  pointer-events:none;
+}
+.hunter-panel .hp-head{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px; position:relative;
+}
+.hunter-panel .hp-title{
+  font-size:10px; letter-spacing:2px; color:var(--sl-cyan);
+  text-transform:uppercase; text-shadow:0 0 8px var(--sl-cyan);
+}
+.hunter-panel .hp-rank{display:flex; align-items:baseline; gap:6px}
+.hunter-panel .hp-rank .rlabel{font-size:8px; color:var(--sl-muted); letter-spacing:1px}
+.hunter-panel .hp-rank .rval{font-size:26px; font-weight:900; line-height:1; text-shadow:0 0 12px currentColor}
+.hunter-panel .rank-E{color:#8a9bb0} .hunter-panel .rank-D{color:#63c07a}
+.hunter-panel .rank-C{color:#4fd6ff} .hunter-panel .rank-B{color:#a97bff}
+.hunter-panel .rank-A{color:#ffb454} .hunter-panel .rank-S{color:#ff5470}
+.hunter-panel .hp-canvas-wrap{display:flex; justify-content:center; margin:6px 0 12px}
+.hunter-panel canvas{display:block}
+.hunter-panel .hp-statlist{display:flex; flex-direction:column; gap:6px; position:relative}
+.hunter-panel .hp-statrow{
+  display:grid; grid-template-columns:20px 34px 1fr 30px;
+  align-items:center; gap:8px; font-size:10px;
+}
+.hunter-panel .hp-statrow .icon{font-size:13px; text-align:center}
+.hunter-panel .hp-statrow .name{color:var(--sl-text); font-weight:bold; letter-spacing:.5px}
+.hunter-panel .hp-statrow .track{
+  height:7px; border-radius:4px; background:#0a1622;
+  border:1px solid var(--sl-line); overflow:hidden;
+}
+.hunter-panel .hp-statrow .fill{height:100%; border-radius:3px; transition:width .4s}
+.hunter-panel .hp-statrow .lvl{
+  text-align:right; color:var(--sl-cyan); font-weight:bold; font-variant-numeric:tabular-nums;
+}
+.hunter-panel .hp-foot{
+  margin-top:12px; font-size:8px; color:var(--sl-muted);
+  text-align:center; letter-spacing:.5px; position:relative;
+}
+.hunter-panel .hp-help{
+  cursor:pointer; width:14px; height:14px; line-height:12px; text-align:center;
+  border:1px solid var(--sl-cyan); border-radius:50%; color:var(--sl-cyan);
+  font-size:9px; opacity:.65; flex:0 0 auto;
+}
+.hunter-panel .hp-help:hover{opacity:1; background:var(--sl-cyan); color:#0a1420}
+.hunter-panel .hp-help-text{
+  display:none; font-size:8px; line-height:1.7; color:#9fc4dd;
+  background:rgba(0,0,0,.28); border-left:2px solid var(--sl-cyan);
+  border-radius:0 4px 4px 0; padding:8px 10px; margin:0 0 12px; position:relative;
+}
+.hunter-panel .hp-help-text.open{display:block}
+.hunter-panel .eq-box{
+  margin-top:12px; padding:10px 12px; border-radius:8px;
+  font-size:9px; line-height:1.6; position:relative;
+}
+.hunter-panel .eq-active{
+  background:linear-gradient(160deg,rgba(255,180,84,.12),rgba(255,84,112,.08));
+  border:1px solid #ffb454;
+  box-shadow:0 0 14px rgba(255,180,84,.18);
+}
+.hunter-panel .eq-debuff{
+  background:linear-gradient(160deg,rgba(255,84,112,.14),rgba(120,0,30,.10));
+  border:1px solid #ff5470;
+  box-shadow:0 0 16px rgba(255,84,112,.25);
+}
+.hunter-panel .eq-title{
+  font-size:10px; font-weight:900; letter-spacing:1px; margin-bottom:4px;
+}
+.hunter-panel .eq-active .eq-title{color:#ffb454; text-shadow:0 0 8px rgba(255,180,84,.5)}
+.hunter-panel .eq-debuff .eq-title{color:#ff5470; text-shadow:0 0 8px rgba(255,84,112,.6)}
+.hunter-panel .eq-body{color:var(--sl-text)}
+.hunter-panel .eq-reward{margin-top:5px; color:var(--sl-muted); font-size:8px}
 </style>
 </head>
 <body>
@@ -1083,9 +1212,14 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     </section>
 
     <!-- TAB: TEAM -->
-    <section class="tab" id="tab-team">
+    <!-- TAB: HUNTER (Trainer- & Hunter-Status) -->
+    <section class="tab" id="tab-hunter">
       <div id="trainer-card"></div>
+      <div id="hunter-panel-mount"></div>
+    </section>
 
+    <!-- TAB: TEAM (aktives Team + Pokémon-Box) -->
+    <section class="tab" id="tab-team">
       <h2>&#9654; Dein Team (max. 3)</h2>
       <p class="muted" style="margin-bottom:10px">Team-Pokémon leveln passiv: ca. 3 Level pro Tag. Jeder erledigte Habit gibt sofort +0.5 Level.</p>
       <div id="team-list"></div>
@@ -1094,13 +1228,6 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <p class="muted" style="margin-bottom:10px">Tippe ein Pokémon an, um Details zu sehen, es umzubenennen und zwischen Team &amp; Box zu tauschen.</p>
       <div class="box-grid" id="box-grid"></div>
       <div id="box-empty" class="empty-slot" style="margin-top:10px">Deine Box ist leer. Hake Habits ab, um Pokémon zu fangen!</div>
-    </section>
-
-    <!-- TAB: BOX -->
-    <section class="tab" id="tab-box">
-      <h2>&#9654; Items</h2>
-      <p class="muted" style="margin-bottom:8px">Bälle wirfst du direkt auf Route 1, sobald ein wildes Pokémon unter 35% HP fangbar wird (grüner Rahmen).</p>
-      <div id="item-list"></div>
     </section>
 
     <!-- TAB: POKÉDEX -->
@@ -1132,6 +1259,17 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
         <h3>⚙️ EINSTELLUNGEN &amp; DATENSICHERUNG</h3>
         <label style="font-size:9px;display:block;margin:4px 0 2px">&#128564; Schlafziel (Stunden)</label>
         <input type="number" id="sleep-goal-input" min="4" max="12" step="0.5" onchange="setSleepGoal(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+        <label style="font-size:9px;display:block;margin:4px 0 2px">&#127869; kcal-Ziel (leer = aus)</label>
+        <input type="number" id="kcal-goal-input" min="500" max="8000" step="50" onchange="setKcalGoal(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+        <label style="font-size:9px;display:block;margin:4px 0 2px">&#127831; Protein-Ziel in g (leer = aus)</label>
+        <input type="number" id="protein-goal-input" min="20" max="400" step="5" onchange="setProteinGoal(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+        <label style="font-size:9px;display:block;margin:4px 0 2px">⚖️ Ernährungs-Modus</label>
+        <select id="nutrition-mode-input" onchange="setNutritionMode(this.value)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+          <option value="surplus">Aufbau (kcal ⩾ Ziel)</option>
+          <option value="deficit">Diät (kcal ⩽ Ziel)</option>
+          <option value="target">Erhalt (kcal ± 150)</option>
+        </select>
+        <button class="btn" onclick="openNutritionCalc()">🧮 Kalorienbedarf berechnen</button>
         <button class="btn" onclick="openTrainerModal()">✎ Trainer-Name ändern</button>
         <button class="btn green" onclick="exportBackup()">📤 Daten exportieren</button>
         <button class="btn" onclick="document.getElementById('backup-import-file').click()">📥 Daten importieren</button>
@@ -1160,7 +1298,7 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   <nav>
     <button class="active" data-tab="habits" onclick="switchTab('habits')"><span class="ic">&#128203;</span>Habits</button>
     <button data-tab="team" onclick="switchTab('team')"><span class="ic">&#9876;&#65039;</span>Team</button>
-    <button data-tab="box" onclick="switchTab('box')"><span class="ic">&#127890;</span>Box</button>
+    <button data-tab="hunter" onclick="switchTab('hunter')"><span class="ic">🎖️</span>Hunter</button>
     <button data-tab="city" onclick="switchTab('city')"><span class="ic">🏙️</span>Stadt</button>
     <button data-tab="inputlog" onclick="switchTab('inputlog')"><span class="ic">&#128218;</span>Input</button>
     <button data-tab="analyse" onclick="switchTab('analyse')"><span class="ic">&#128202;</span>Analyse</button>
@@ -1205,6 +1343,10 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       </div>
       <label>Kategorie</label>
       <div class="cat-row" id="cat-row"></div>
+      <div id="stat-target-wrap" style="display:none">
+        <label>Zielstat</label>
+        <div class="cat-row" id="stat-target-row"></div>
+      </div>
       <label>Erinnerung</label>
       <div class="reminder-row">
         <input type="checkbox" id="habit-reminder-on">
@@ -1287,6 +1429,22 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     </div>
   </div>
 
+  <!-- Gacha modal -->
+  <div class="modal-bg" id="gacha-modal">
+    <div class="modal">
+      <div id="gacha-body"></div>
+      <button class="btn red" onclick="closeModal('gacha-modal')">Schließen</button>
+    </div>
+  </div>
+
+  <!-- Breeding modal -->
+  <div class="modal-bg" id="breed-modal">
+    <div class="modal">
+      <div id="breed-body"></div>
+      <button class="btn red" onclick="closeModal('breed-modal')">Schließen</button>
+    </div>
+  </div>
+
   <!-- Candy target modal -->
   <div class="modal-bg" id="candy-modal">
     <div class="modal">
@@ -1327,6 +1485,32 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <div style="height:12px"></div>
       <button class="btn green" onclick="saveTrainerName()">Speichern</button>
       <button class="btn red" onclick="closeModal('trainer-modal')">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Kalorienbedarf-Rechner modal -->
+  <div class="modal-bg" id="nutrition-calc-modal">
+    <div class="modal">
+      <h3>🧮 Kalorienbedarf berechnen</h3>
+      <label>Geschlecht</label>
+      <select id="nc-sex" onchange="renderNutritionCalc()">
+        <option value="m">Männlich</option>
+        <option value="f">Weiblich</option>
+      </select>
+      <label>Alter (Jahre)</label>
+      <input type="number" id="nc-age" min="10" max="100" inputmode="numeric" oninput="renderNutritionCalc()">
+      <label>Größe (cm)</label>
+      <input type="number" id="nc-height" min="120" max="230" inputmode="numeric" oninput="renderNutritionCalc()">
+      <label>Gewicht (kg) &ndash; falls im Tages-Log erfasst, vorausgefüllt</label>
+      <input type="number" id="nc-weight" min="30" max="250" step="0.1" inputmode="decimal" oninput="renderNutritionCalc()">
+      <label>Aktivitätsniveau</label>
+      <select id="nc-activity" onchange="renderNutritionCalc()"></select>
+      <label>Ziel</label>
+      <select id="nc-goal" onchange="renderNutritionCalc()"></select>
+      <div id="nc-result" class="nc-result"></div>
+      <div style="height:12px"></div>
+      <button class="btn green" id="nc-apply" onclick="applyNutritionCalc()">✅ Als Ziel übernehmen</button>
+      <button class="btn red" onclick="closeModal('nutrition-calc-modal')">Schließen</button>
     </div>
   </div>
 
@@ -1425,6 +1609,7 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     </div>
     <div id="adv-totaldmg">TotalDMG: 0</div>
     <div id="adv-result"></div>
+    <div id="adv-choice"></div>
   </div>
 
   <div id="toasts"></div>
@@ -1502,6 +1687,9 @@ const LEG_SET = new Set(LEGENDARY_IDS);
 const RARE_SET = new Set(RARE_IDS);
 const COMMON_IDS = [];
 for (let i = 1; i <= MAX_DEX; i++) if (!LEG_SET.has(i) && !RARE_SET.has(i)) COMMON_IDS.push(i);
+// Pseudo-Legendäre – Teilmenge aus RARE_IDS, eigener Pool für "Episch"-Marken
+const EPIC_IDS = [149, 248, 373, 376, 445]; // Dragoran, Despotar, Salamence, Metagross, Knakrack
+const EPIC_SET = new Set(EPIC_IDS);
 
 /* ---------- Items ---------- */
 const ITEMS = {
@@ -1620,6 +1808,152 @@ const CATS = {
   eigene:     { icon:"⭐", label:"Eigene",      color:"#b8860b" }
 };
 
+/* ---------- Hunter-Stats ---------- */
+const HUNTER_STATS = {
+  str: { icon:"⚔️", label:"STR", color:"#c03028" },
+  vit: { icon:"❤️", label:"VIT", color:"#58a848" },
+  agi: { icon:"💨", label:"AGI", color:"#3878c8" },
+  int: { icon:"🧠", label:"INT", color:"#705898" },
+  per: { icon:"👁️", label:"PER", color:"#b8860b" }
+};
+// Kategorie -> Zielstat. "eigene" hat keinen festen Stat (siehe h.statTarget).
+const CAT_TO_STAT = {
+  fitness:    "str",
+  ernaehrung: "vit",
+  schlaf:     "vit",
+  lernen:     "int",
+  mind:       "per",
+  eigene:     null
+};
+const HUNTER_STAT_XP_PER_LEVEL    = 100;
+const HUNTER_STAT_XP_PER_COMPLETE = 15;   // XP pro Habit-Abschluss
+const HUNTER_STAT_MULT_CAP        = 0.30; // max. ±30%
+const HUNTER_STAT_MULT_PER_LEVEL  = 0.03; // Cap erreicht bei Level 11
+
+/* Vergibt XP an einen Hunter-Stat, levelt bei Bedarf hoch */
+function grantHunterStatXp(statKey, amount) {
+  const s = state.hunterStats && state.hunterStats[statKey];
+  if (!s) return;
+  if (!state.hunterStatSeen) state.hunterStatSeen = {};
+  state.hunterStatSeen[statKey] = todayStr();
+  s.xp += amount;
+  while (s.xp >= HUNTER_STAT_XP_PER_LEVEL) {
+    s.xp -= HUNTER_STAT_XP_PER_LEVEL;
+    s.level += 1;
+    toast("📈 " + HUNTER_STATS[statKey].icon + " " + HUNTER_STATS[statKey].label + " Level " + s.level + "!");
+  }
+  // Live-Update, falls Team-Tab gerade offen ist (defensiv – Panel existiert erst nach Paket 2)
+  if (typeof renderHunterPanel === "function" && document.getElementById("hunter-panel-mount")) renderHunterPanel();
+}
+
+/* Multiplikator eines Hunter-Stats für Gameplay-Effekte (1.0 – 1.30).
+   Aktiver Emergency-Debuff senkt den Effekt um EQ_DEBUFF_MALUS. */
+function hunterStatMultiplier(statKey) {
+  const s = state.hunterStats && state.hunterStats[statKey];
+  const lvl = s ? s.level : 1;
+  let mult = 1 + Math.min(HUNTER_STAT_MULT_CAP, (lvl - 1) * HUNTER_STAT_MULT_PER_LEVEL);
+  if (state.hunterDebuff) mult *= (1 - EQ_DEBUFF_MALUS);
+  return mult;
+}
+
+/* ---------- Hunter-Rang (aus Summe der Stat-Level) ---------- */
+// 5 Stats, jeder startet bei Level 1 -> Minimum-Summe 5.
+// Schwellen: E früh erreichbar, S echtes Langzeitziel.
+const HUNTER_RANK_TIERS = [
+  { rank:"S", min:120, color:"#ff5470" },
+  { rank:"A", min: 85, color:"#ffb454" },
+  { rank:"B", min: 55, color:"#a97bff" },
+  { rank:"C", min: 32, color:"#4fd6ff" },
+  { rank:"D", min: 15, color:"#63c07a" },
+  { rank:"E", min:  0, color:"#8a9bb0" }
+];
+function hunterRank() {
+  const sum = Object.values(state.hunterStats || {}).reduce((s, v) => s + (v.level || 1), 0);
+  for (const t of HUNTER_RANK_TIERS) if (sum >= t.min) return Object.assign({}, t, { sum });
+  return Object.assign({}, HUNTER_RANK_TIERS[HUNTER_RANK_TIERS.length - 1], { sum });
+}
+function hunterNextRankThreshold(sum) {
+  const higher = HUNTER_RANK_TIERS.filter(t => t.min > sum).map(t => t.min);
+  return higher.length ? Math.min(...higher) : null;
+}
+
+/* ---------- Emergency Quests ---------- */
+const EQ_NEGLECT_DAYS  = 3;    // Tage ohne Stat-XP -> garantierte Quest
+const EQ_RANDOM_CHANCE = 0.15; // sonst: Zufallschance auf niedrigsten Stat
+const EQ_REWARD_XP     = 40;   // Stat-XP bei Abschluss
+const EQ_DEBUFF_MALUS  = 0.15; // −15% auf alle Stat-Effekte, solange Debuff aktiv
+// Reverse-Lookup Stat -> erste passende Habit-Kategorie (für Quest-Text & Erfüllung).
+// VIT teilt sich ernaehrung+schlaf; hier ernaehrung als Repräsentant.
+const STAT_TO_CAT = { str:"fitness", vit:"ernaehrung", agi:null, int:"lernen", per:"mind" };
+
+/* Wählt den Zielstat für eine neue Quest: am längsten vernachlässigt (>= EQ_NEGLECT_DAYS)
+   -> garantiert; sonst mit EQ_RANDOM_CHANCE der niedrigste Stat. Nur Stats mit Kategorie. */
+function pickEmergencyStat() {
+  const seen = state.hunterStatSeen || {};
+  const t = todayStr();
+  const candidates = Object.keys(HUNTER_STATS).filter(k => STAT_TO_CAT[k]); // AGI raus
+  // Vernachlässigungs-Tage je Stat (nie gesehen = sehr hoch)
+  const neglect = k => {
+    const last = seen[k];
+    if (!last) return 999;
+    return daysBetween(last, t);
+  };
+  const worst = candidates.slice().sort((a, b) => neglect(b) - neglect(a))[0];
+  if (worst && neglect(worst) >= EQ_NEGLECT_DAYS) return worst;
+  // sonst Zufall
+  if (Math.random() < EQ_RANDOM_CHANCE) {
+    return candidates.slice().sort((a, b) =>
+      (state.hunterStats[a].level - state.hunterStats[b].level))[0];
+  }
+  return null;
+}
+
+/* Erzeugt beim Rollover ggf. eine neue Emergency Quest (nur wenn keine aktiv). */
+function maybeSpawnEmergencyQuest() {
+  if (state.emergencyQuest) return;         // nur eine gleichzeitig
+  const stat = pickEmergencyStat();
+  if (!stat) return;
+  const cat = STAT_TO_CAT[stat];
+  state.emergencyQuest = { stat, cat, date: todayStr() };
+  const meta = HUNTER_STATS[stat];
+  toast("⚠️ NOTFALL-QUEST: " + meta.icon + " " + meta.label + " verkümmert! Erfülle heute einen " + CATS[cat].label + "-Habit.");
+  save();
+}
+
+/* Prüft beim Habit-Abschluss, ob dadurch die aktive Quest erfüllt wird
+   und/oder ein Debuff geheilt wird. Aufruf aus grantHabitReward. */
+function checkEmergencyProgress(h) {
+  // Debuff heilt, sobald die vernachlässigte Kategorie erfüllt wird
+  if (state.hunterDebuff && h.category === state.hunterDebuff.cat) {
+    state.hunterDebuff = null;
+    toast("✨ Fluch gebrochen – dein Team kämpft wieder mit voller Kraft.");
+  }
+  // Aktive Quest erfüllt?
+  const q = state.emergencyQuest;
+  if (q && q.date === todayStr() && h.category === q.cat) {
+    grantHunterStatXp(q.stat, EQ_REWARD_XP);
+    const tier = upgradeTier(tierForStreak(h.streak || 0));
+    grantMarke(tier);
+    state.emergencyQuest = null;
+    toast("✅ NOTFALL-QUEST gemeistert! +" + EQ_REWARD_XP + " " + HUNTER_STATS[q.stat].label + "-XP & Bonus-Marke.");
+  }
+  // defensives Live-Update (Debuff-Heilung ohne Stat-XP triggert sonst kein Re-Render)
+  if (document.getElementById("hunter-panel-mount")) renderHunterPanel();
+}
+
+/* Beim Rollover: abgelaufene, nicht erfüllte Quest -> Debuff setzen. */
+function resolveExpiredEmergencyQuest() {
+  const q = state.emergencyQuest;
+  if (!q) return;
+  if (q.date !== todayStr()) {              // Quest ist von einem früheren Tag = abgelaufen
+    state.hunterDebuff = { cat: q.cat, since: todayStr() };
+    state.emergencyQuest = null;
+    const meta = HUNTER_STATS[q.stat];
+    toast("💀 NOTFALL-QUEST verpasst! Fluch: −" + Math.round(EQ_DEBUFF_MALUS * 100) + "% Kampfkraft, bis du einen " + CATS[q.cat].label + "-Habit erfüllst.");
+    save();
+  }
+}
+
 /* ---------- Habit-Typen ---------- */
 const HABIT_TYPES = {
   yesno:    { icon:"✅", label:"Ja/Nein" },
@@ -1673,6 +2007,17 @@ const REWARD_TABLE = [
   { weight: 8,  type: "double_item",      label: "Doppelglück!" },
   { weight: 2,  type: "shiny_chance",     label: "✨ SHINY-CHANCE!" }
 ];
+
+const MARKEN_TIERS = {
+  common:    { label: "Gewöhnliche Marke", icon: "🟤", color: "#9a9a9a" },
+  rare:      { label: "Seltene Marke",     icon: "🔵", color: "#4098e0" },
+  epic:      { label: "Epische Marke",     icon: "🟣", color: "#a050d0" },
+  legendary: { label: "Legendäre Marke",   icon: "🟡", color: "#f0c020" }
+};
+const GACHA_PULL_COUNT = { common: 1, rare: 1, epic: 2, legendary: 3 };
+const MARKEN_ORDER = ["common", "rare", "epic", "legendary"];
+const BREED_COST_COINS = 50;
+const BREED_HATCH_MS = 4 * 60 * 60 * 1000; // 4 Stunden Echtzeit-Brutdauer
 
 /* ---------- Type translation & colors ---------- */
 const TYPE_DE = { normal:"Normal", fire:"Feuer", water:"Wasser", grass:"Pflanze",
@@ -1755,7 +2100,7 @@ function defaultState() {
     habits: [],       // {id,name,emoji,category,reminder,doneDate,rewardDate,streak,lastDoneDate,lastFreezeStreak,history:{date:{done,note,frozen}}}
     people: [],       // {id,name,type:"freund"|"familie"|"mentor"|"kollege",rhythm:"weekly"|"monthly"|"quarterly",contacts:[{date:"YYYY-MM-DD",note:""}]}
     goals: [],        // {id,name,target,current,unit,claimed}
-    box: [],          // {uid,dex,level,exp,shiny,moveIdx}
+    box: [],          // {uid,dex,level,exp,shiny,moveIdx,ko,healReadyAt}
     team: [],         // [uid,...] max 3
     items: { pokeball:0, superball:0, hyperball:0, trank:0, sonderbonbon:0, beere:0 },
     lastTick: Date.now(),
@@ -1770,7 +2115,13 @@ function defaultState() {
     seen: {},         // {dexId:true} – jemals gesichtet (Route + gefangen)
     weeklyEvent: null, // {weekNum, dexId, level, defeated, caught}
     coins: 0,          // Shop-Währung
+    marken: { common: 0, rare: 0, epic: 0, legendary: 0 }, // Gacha-Marken (4 Stufen)
+    breeding: { egg: null }, // Zuchtstation: egg = null | {parentA,parentB,childDex,fusionName,fusionTypes,iv,shiny,hatchAt}
     sleepGoalMin: 450, // Ziel-Schlafdauer in Minuten (7.5h) – Färbung & Streak im Tages-Log
+    kcalGoal: null,       // Tages-kcal-Ziel (null = nicht gesetzt)
+    proteinGoal: null,    // Tages-Protein-Ziel in g (null = nicht gesetzt)
+    nutritionMode: "surplus", // "surplus"=Aufbau (kcal ⩾ Ziel) | "deficit"=Diät (kcal ⩽ Ziel) | "target"=Erhalt (±150)
+    profile: { sex: "m", age: null, heightCm: null, weightKg: null, activity: 1.55, lastGoal: "lose" }, // für Kalorienbedarf (Mifflin-St Jeor)
     arenaBadges: 0,    // Anzahl errungener Arena-Orden (0–8, = besiegte Arenaleiter)
     arenaWins: 0,      // Gesamtzahl gewonnener Arena-Kämpfe (inkl. Freies Training)
     focus: null,       // aktive Fokus-Session oder null
@@ -1782,10 +2133,20 @@ function defaultState() {
     monthlyArchive: {}, // { "YYYY-MM": {days,sleepSum,sleepN,energySum,energyN,moodSum,moodN,kcalSum,kcalN,weightSum,weightN,alcoholN,drinkDays,gymSessions,quoteSum,quoteN} }
                       // sleep: { bedtime:"HH:MM", waketime:"HH:MM", feeling:1-5 } | null
                       // gym:   { strength:1-5, feeling:1-5 } | null
-                      // food:  { preWorkoutCarbs:bool, kcal:num|null, macro:"high-carb"|"low-carb"|"protein"|"mixed"|null } | null
+                      // food:  { preWorkoutCarbs:bool, kcal:num|null, protein:num|null, macro:"high-carb"|"low-carb"|"protein"|"mixed"|null } | null
                       // note:  { text:"", tags:["#legday", ...] } | null
     tasks: [],
-    inputLog: []
+    inputLog: [],
+    hunterStats: {
+      str: { xp: 0, level: 1 },
+      vit: { xp: 0, level: 1 },
+      agi: { xp: 0, level: 1 },
+      int: { xp: 0, level: 1 },
+      per: { xp: 0, level: 1 }
+    },
+    hunterStatSeen: {},   // { statKey: "YYYY-MM-DD" } — letzter Tag mit XP-Zuwachs je Stat
+    emergencyQuest: null, // aktive Quest: { stat, cat, date } | null
+    hunterDebuff: null    // aktiver Penalty: { cat, since:"YYYY-MM-DD" } | null
     // Jedes Element: { id, title, source, type, tags:[], takeaway, date:"YYYY-MM-DD" }
     // Jedes Element hat diese Struktur:
     // {
@@ -1818,11 +2179,18 @@ function loadAll() {
     if (h.timerStart === undefined) h.timerStart = 0;
     if (h.pausedUntil === undefined) h.pausedUntil = null;   // Pausenmodus (4b)
     if (h.lastWeekKey === undefined) h.lastWeekKey = null;   // Wochenziel-Streak (4a)
+    if (h.statTarget === undefined) h.statTarget = (h.category === "eigene") ? "str" : null;  // Hunter-Stat-Zielstat
   });
   state.seen = state.seen || {};
   if (!state.monthlyArchive) state.monthlyArchive = {};
   if (!state.coins) state.coins = 0;
+  if (!state.marken) state.marken = { common: 0, rare: 0, epic: 0, legendary: 0 };
+  if (!state.breeding) state.breeding = { egg: null };
   if (state.sleepGoalMin === undefined) state.sleepGoalMin = 450;
+  if (state.kcalGoal === undefined) state.kcalGoal = null;
+  if (state.proteinGoal === undefined) state.proteinGoal = null;
+  if (state.nutritionMode === undefined) state.nutritionMode = "surplus";
+  if (!state.profile) state.profile = { sex: "m", age: null, heightCm: null, weightKg: null, activity: 1.55, lastGoal: "lose" };
   if (state.arenaBadges === undefined) state.arenaBadges = 0;
   if (state.arenaWins === undefined) state.arenaWins = 0;
   if (state.advProgress === undefined) state.advProgress = 0;   // höchste geschaffte Dungeon-Stage
@@ -1851,7 +2219,14 @@ function loadAll() {
     if (m.focusSessionCount === undefined) m.focusSessionCount = 0;
     if (m.megaStone === undefined) m.megaStone = false;
     if (m.megaUntil === undefined) m.megaUntil = null;
+    if (!m.iv) m.iv = { hp:31, attack:31, defense:31, "special-attack":31, "special-defense":31, speed:31 };
+    if (m.ko === undefined) m.ko = false;
+    if (m.healReadyAt === undefined) m.healReadyAt = 0;
   });
+  // Center-System: K.O.-Mons nie im Team (Invariante), fertige Heilungen abschließen, Sekundentakt starten
+  state.team = state.team.filter(u => { const m = getMon(u); return !(m && m.ko); });
+  processCenterHealing(true);
+  if (!window.__centerTick) window.__centerTick = setInterval(centerTick, 1000);
   if (state.focus === undefined) state.focus = null;
   // TM-Migration: alte disc_*-Items aus state.items entfernen
   ["disc_normal","disc_feuer","disc_wasser","disc_elektro",
@@ -1984,7 +2359,7 @@ function archiveDailyLog(dStr, log) {
   const mk = dStr.slice(0, 7); // "YYYY-MM"
   const a = state.monthlyArchive[mk] || {
     days:0, sleepSum:0, sleepN:0, energySum:0, energyN:0, moodSum:0, moodN:0,
-    kcalSum:0, kcalN:0, weightSum:0, weightN:0, alcoholN:0, drinkDays:0,
+    kcalSum:0, kcalN:0, proteinSum:0, proteinN:0, weightSum:0, weightN:0, alcoholN:0, drinkDays:0,
     gymSessions:0, quoteSum:0, quoteN:0
   };
   a.days++;
@@ -1993,6 +2368,7 @@ function archiveDailyLog(dStr, log) {
   if (log.energy != null) { a.energySum += log.energy; a.energyN++; }
   if (log.mood   != null) { a.moodSum   += log.mood;   a.moodN++; }
   if (log.food && log.food.kcal != null) { a.kcalSum += log.food.kcal; a.kcalN++; }
+  if (log.food && log.food.protein != null) { a.proteinSum = (a.proteinSum || 0) + log.food.protein; a.proteinN = (a.proteinN || 0) + 1; }
   if (log.bodyWeight != null && log.bodyWeight > 0) { a.weightSum += log.bodyWeight; a.weightN++; }
   if (log.alcohol != null) { a.alcoholN++; if (log.alcohol >= 1) a.drinkDays++; }
   if (log.gym && (log.gym.strength != null || log.gym.feeling != null)) a.gymSessions++;
@@ -2018,7 +2394,7 @@ function pruneOldLogs() {
 function dlSectionDefault(section) {
   if (section === "sleep") return { bedtime: "", waketime: "", feeling: null };
   if (section === "gym")   return { strength: null, feeling: null, preWorkoutCarbs: false, macro: null, mealTiming: null };
-  if (section === "food")  return { kcal: null };
+  if (section === "food")  return { kcal: null, protein: null };
   if (section === "note")  return { text: "" };
   return {};
 }
@@ -2102,6 +2478,192 @@ function setSleepGoal(hoursVal) {
   renderDailyLog();
   toast("😴 Schlafziel: " + h + "h gesetzt.");
 }
+/* ---------- Ernährungsziele (kcal + Protein) ---------- */
+const KCAL_TARGET_TOL = 150; // Toleranzfenster im Modus "target"
+// Treffer-Status: true / false / null (kein Ziel gesetzt oder kein Ist-Wert)
+function kcalGoalHit(kcal) {
+  const g = state.kcalGoal;
+  if (g == null || kcal == null) return null;
+  const mode = state.nutritionMode || "surplus";
+  if (mode === "deficit") return kcal <= g;
+  if (mode === "target")  return Math.abs(kcal - g) <= KCAL_TARGET_TOL;
+  return kcal >= g; // surplus
+}
+function proteinGoalHit(protein) {
+  const g = state.proteinGoal;
+  if (g == null || protein == null) return null;
+  return protein >= g;
+}
+// Farbe: grün Treffer, gelb knapp daneben, rot klar daneben, "" ohne Ziel/Wert (spiegelt sleepGoalColor)
+function kcalGoalColor(kcal) {
+  const g = state.kcalGoal;
+  if (g == null || kcal == null) return "";
+  if (kcalGoalHit(kcal)) return "#287848";
+  const mode = state.nutritionMode || "surplus";
+  if (mode === "deficit") return kcal <= g * 1.1 ? "#a07810" : "#c02820";
+  if (mode === "target")  return Math.abs(kcal - g) <= KCAL_TARGET_TOL * 2 ? "#a07810" : "#c02820";
+  return kcal >= g * 0.9 ? "#a07810" : "#c02820"; // surplus
+}
+function proteinGoalColor(protein) {
+  const g = state.proteinGoal;
+  if (g == null || protein == null) return "";
+  if (protein >= g)        return "#287848";
+  if (protein >= g * 0.85) return "#a07810";
+  return "#c02820";
+}
+// Aufeinanderfolgende Tage, die das jeweilige Ziel treffen (Tage ohne Ist-Wert überspringen, max. 60) — spiegelt sleepGoalStreak
+function nutritionGoalStreak(kind) {
+  const g = kind === "kcal" ? state.kcalGoal : state.proteinGoal;
+  if (g == null) return 0;
+  let streak = 0;
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const log = state.dailyLog[dateStr(d)];
+    const food = log && log.food;
+    const v = food ? (kind === "kcal" ? food.kcal : food.protein) : null;
+    if (v == null) continue;
+    const hit = kind === "kcal" ? kcalGoalHit(v) : proteinGoalHit(v);
+    if (hit) streak++; else break;
+  }
+  return streak;
+}
+// Ziele setzen (Eingabe leer/0 -> null = deaktiviert; sonst geklammert) — spiegelt setSleepGoal
+function setKcalGoal(val) {
+  const n = parseInt(val, 10);
+  state.kcalGoal = (isNaN(n) || n <= 0) ? null : Math.max(500, Math.min(8000, n));
+  save(); renderDailyLog();
+  toast(state.kcalGoal == null ? "🍽 kcal-Ziel entfernt." : "🍽 kcal-Ziel: " + state.kcalGoal + " gesetzt.");
+}
+function setProteinGoal(val) {
+  const n = parseInt(val, 10);
+  state.proteinGoal = (isNaN(n) || n <= 0) ? null : Math.max(20, Math.min(400, n));
+  save(); renderDailyLog();
+  toast(state.proteinGoal == null ? "🍗 Protein-Ziel entfernt." : "🍗 Protein-Ziel: " + state.proteinGoal + " g gesetzt.");
+}
+function setNutritionMode(mode) {
+  state.nutritionMode = ["surplus", "deficit", "target"].indexOf(mode) >= 0 ? mode : "surplus";
+  save(); renderDailyLog();
+  toast("⚖️ Ernährungs-Modus geändert.");
+}
+/* ---------- Kalorienbedarf: Mifflin-St Jeor (1990) + PAL-Aktivitätsfaktor ---------- */
+// Aktivitätsstufen: [PAL-Faktor, Label]
+const ACTIVITY_LEVELS = [
+  [1.2,   "Sitzend (kaum Bewegung)"],
+  [1.375, "Leicht aktiv (1–3×/Woche Sport)"],
+  [1.55,  "Mäßig aktiv (3–5×/Woche)"],
+  [1.725, "Sehr aktiv (6–7×/Woche)"],
+  [1.9,   "Extrem aktiv (körperl. Arbeit / 2×/Tag)"]
+];
+// Ziele: [key, Label, kcal-Delta auf TDEE, nutritionMode, Protein g/kg Körpergewicht]
+const CALORIE_GOALS = [
+  ["lose",      "Abnehmen (moderat, ~0,45 kg/Wo)", -500, "deficit", 2.0],
+  ["lose_mild", "Abnehmen (sanft, ~0,25 kg/Wo)",   -300, "deficit", 2.0],
+  ["maintain",  "Gewicht halten",                     0, "target",  1.6],
+  ["gain_mild", "Zunehmen (Lean Bulk, ~0,25 kg/Wo)", 300, "surplus", 1.8],
+  ["gain",      "Zunehmen (Aufbau, ~0,45 kg/Wo)",    500, "surplus", 1.8]
+];
+// Jüngstes im Tages-Log erfasstes Körpergewicht (bis 180 Tage zurück), sonst null
+function latestBodyWeight() {
+  for (let i = 0; i < 180; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const log = state.dailyLog[dateStr(d)];
+    if (log && log.bodyWeight != null && log.bodyWeight > 0) return log.bodyWeight;
+  }
+  return null;
+}
+// Ruheumsatz (BMR) nach Mifflin-St Jeor. null, wenn Pflichtdaten fehlen.
+function calcBMR(p) {
+  if (!p || p.age == null || p.heightCm == null || p.weightKg == null) return null;
+  const base = 10 * p.weightKg + 6.25 * p.heightCm - 5 * p.age;
+  return p.sex === "f" ? base - 161 : base + 5;
+}
+// Gesamtumsatz (TDEE) = BMR × Aktivitätsfaktor
+function calcTDEE(p) {
+  const bmr = calcBMR(p);
+  return bmr == null ? null : bmr * (p.activity || 1.55);
+}
+// Kompletter Vorschlag für ein Ziel: {bmr, tdee, target, protein, mode, label, floored} | null
+function calcCalorieNeeds(p, goalKey) {
+  const tdee = calcTDEE(p);
+  if (tdee == null) return null;
+  const g = CALORIE_GOALS.find(x => x[0] === goalKey) || CALORIE_GOALS[2];
+  const bmr = calcBMR(p);
+  let target = tdee + g[2], floored = false;
+  if (g[2] < 0) { const floor = Math.max(bmr, 1200); if (target < floor) { target = floor; floored = true; } } // nie unter Ruheumsatz / 1200 kcal
+  return {
+    bmr: Math.round(bmr),
+    tdee: Math.round(tdee),
+    target: Math.round(target / 10) * 10,
+    protein: Math.round((p.weightKg * g[4]) / 5) * 5,
+    mode: g[3],
+    label: g[1],
+    floored: floored
+  };
+}
+/* ---------- Kalorienbedarf-Rechner UI ---------- */
+function openNutritionCalc() {
+  const p = state.profile || {};
+  // Selects einmalig aus den Konstanten befüllen
+  const actSel = document.getElementById("nc-activity");
+  if (!actSel.options.length) actSel.innerHTML = ACTIVITY_LEVELS.map(a => '<option value="' + a[0] + '">' + a[1] + '</option>').join("");
+  const goalSel = document.getElementById("nc-goal");
+  if (!goalSel.options.length) goalSel.innerHTML = CALORIE_GOALS.map(g => '<option value="' + g[0] + '">' + g[1] + '</option>').join("");
+  document.getElementById("nc-sex").value = p.sex || "m";
+  document.getElementById("nc-age").value = p.age != null ? p.age : "";
+  document.getElementById("nc-height").value = p.heightCm != null ? p.heightCm : "";
+  const logW = latestBodyWeight();
+  const w = logW != null ? logW : (p.weightKg != null ? p.weightKg : "");
+  document.getElementById("nc-weight").value = w;
+  actSel.value = String(p.activity || 1.55);
+  goalSel.value = p.lastGoal || "lose";
+  renderNutritionCalc();
+  openModal("nutrition-calc-modal");
+}
+function readNutritionCalcInputs() {
+  const age = parseInt(document.getElementById("nc-age").value, 10);
+  const heightCm = parseFloat(document.getElementById("nc-height").value);
+  const weightKg = parseFloat(document.getElementById("nc-weight").value);
+  return {
+    sex: document.getElementById("nc-sex").value === "f" ? "f" : "m",
+    age: isNaN(age) ? null : age,
+    heightCm: isNaN(heightCm) ? null : heightCm,
+    weightKg: isNaN(weightKg) ? null : weightKg,
+    activity: parseFloat(document.getElementById("nc-activity").value) || 1.55
+  };
+}
+function renderNutritionCalc() {
+  const res = calcCalorieNeeds(readNutritionCalcInputs(), document.getElementById("nc-goal").value);
+  const box = document.getElementById("nc-result");
+  const applyBtn = document.getElementById("nc-apply");
+  if (!res) {
+    box.innerHTML = '<div class="nc-hint">Bitte Alter, Größe und Gewicht ausfüllen.</div>';
+    applyBtn.disabled = true; applyBtn.style.opacity = ".5";
+    return;
+  }
+  applyBtn.disabled = false; applyBtn.style.opacity = "1";
+  box.innerHTML =
+    '<div class="nc-line"><span>Ruheumsatz (BMR)</span><span>' + res.bmr + ' kcal</span></div>' +
+    '<div class="nc-line"><span>Gesamtumsatz (TDEE)</span><span>' + res.tdee + ' kcal</span></div>' +
+    '<div class="nc-line nc-big"><span>&#127919; Tagesziel</span><span>' + res.target + ' kcal</span></div>' +
+    '<div class="nc-line"><span>&#127831; Protein-Empfehlung</span><span>' + res.protein + ' g</span></div>' +
+    (res.floored ? '<div class="nc-hint">&#9888;&#65039; Auf Sicherheits-Untergrenze angehoben &ndash; nicht dauerhaft unter dem Ruheumsatz essen.</div>' : '') +
+    '<div class="nc-hint">Basis: Mifflin-St Jeor &times; Aktivit&auml;t. Richtwert &ndash; nach 2&ndash;4 Wochen an deine tats&auml;chliche Gewichtsentwicklung anpassen.</div>';
+}
+function applyNutritionCalc() {
+  const p = readNutritionCalcInputs();
+  const goalKey = document.getElementById("nc-goal").value;
+  const res = calcCalorieNeeds(p, goalKey);
+  if (!res) { toast("Bitte Alter, Größe und Gewicht ausfüllen."); return; }
+  state.profile = { sex: p.sex, age: p.age, heightCm: p.heightCm, weightKg: p.weightKg, activity: p.activity, lastGoal: goalKey };
+  state.kcalGoal = res.target;
+  state.proteinGoal = res.protein;
+  state.nutritionMode = res.mode;
+  save();
+  renderDailyLog();
+  renderAnalyse();
+  closeModal("nutrition-calc-modal");
+  toast("🎯 Ziel gesetzt: " + res.target + " kcal · " + res.protein + " g Protein.");
+}
 
 // erzeugt eine Reihe 1-5 Rating-Buttons; aktiver Wert farblich (1-2 rot, 3 gelb, 4-5 grün)
 function dlRatingRow(section, key, cur) {
@@ -2148,6 +2710,14 @@ function renderDailyLog() {
   // Aktuelle carbs/macro: gym-Objekt hat Vorrang, food-Objekt als Legacy-Fallback
   const carbs = gym.preWorkoutCarbs || (log.food && log.food.preWorkoutCarbs) || false;
   const macro = gym.macro || (log.food && log.food.macro) || null;
+  // Ernährungsziel-Abgleich
+  const kcalColor  = kcalGoalColor(food.kcal);
+  const kcalHit    = kcalGoalHit(food.kcal);
+  const kcalStreak = nutritionGoalStreak("kcal");
+  const protColor  = proteinGoalColor(food.protein);
+  const protHit    = proteinGoalHit(food.protein);
+  const protStreak = nutritionGoalStreak("protein");
+  const nutriModeLabel = { surplus: "Ziel ⩾ ", deficit: "Ziel ⩽ ", target: "Ziel ± " }[state.nutritionMode || "surplus"];
 
   body.innerHTML =
 
@@ -2245,12 +2815,22 @@ function renderDailyLog() {
     '<div class="dl-section">' +
       '<div class="dl-section-header">&#127769; ABENDS</div>' +
 
-      // Kalorien
+      // Ernährung: kcal + Protein mit Zielabgleich
+      '<div class="dl-title">&#127869; ERNÄHRUNG</div>' +
       '<div class="dl-row">' +
         '<span class="dl-label">Kalorien</span>' +
         '<input type="number" class="dl-kcal" inputmode="numeric" value="' + (food.kcal != null ? food.kcal : "") + '" onchange="saveDailyLogField(\'food\',\'kcal\',this.value===\'\'?null:Number(this.value))">' +
         '<span class="dl-label">kcal</span>' +
+        (state.kcalGoal != null ? '<span class="dl-goal-badge"' + (kcalColor ? ' style="color:' + kcalColor + '"' : '') + '>' + nutriModeLabel + state.kcalGoal + (kcalHit ? ' &#10003;' : '') + '</span>' : '') +
       '</div>' +
+      (state.kcalGoal != null && kcalStreak >= 2 ? '<div class="dl-row"><span class="dl-label" style="color:#287848">&#128293; ' + kcalStreak + ' Tage im kcal-Ziel</span></div>' : '') +
+      '<div class="dl-row">' +
+        '<span class="dl-label">Protein</span>' +
+        '<input type="number" class="dl-protein" inputmode="numeric" value="' + (food.protein != null ? food.protein : "") + '" onchange="saveDailyLogField(\'food\',\'protein\',this.value===\'\'?null:Number(this.value))">' +
+        '<span class="dl-label">g</span>' +
+        (state.proteinGoal != null ? '<span class="dl-goal-badge"' + (protColor ? ' style="color:' + protColor + '"' : '') + '>Ziel ⩾ ' + state.proteinGoal + (protHit ? ' &#10003;' : '') + '</span>' : '') +
+      '</div>' +
+      (state.proteinGoal != null && protStreak >= 2 ? '<div class="dl-row"><span class="dl-label" style="color:#287848">&#128293; ' + protStreak + ' Tage im Protein-Ziel</span></div>' : '') +
 
       // Notiz
       '<div class="dl-title" style="margin-top:8px">&#128221; NOTIZ</div>' +
@@ -2269,6 +2849,7 @@ function renderDailyLog() {
   if (mood != null) icons.push("&#128522;&#9989;");
   if (gymActive) icons.push("&#127947;&#9989;");
   if (food.kcal != null) icons.push("&#127757;&#9989;");
+  if (food.protein != null) icons.push("&#127831;&#9989;");
   if (note.text && note.text.trim()) icons.push("&#128221;&#9989;");
   document.getElementById("dl-status-icons").innerHTML = icons.join(" ");
 }
@@ -2312,7 +2893,7 @@ function checkDailyLogReward() {
   const moodFilled    = log.mood != null;
   const alcoholFilled = log.alcohol != null;
   const gymFilled     = !!(log.gym && (log.gym.strength != null || log.gym.feeling != null));
-  const kcalFilled    = !!(log.food && log.food.kcal != null);
+  const kcalFilled    = !!(log.food && (log.food.kcal != null || log.food.protein != null));
   const weightFilled  = log.bodyWeight != null;
   const noteFilled    = !!(log.note && log.note.text && log.note.text.trim());
 
@@ -2323,7 +2904,8 @@ function checkDailyLogReward() {
   log.logRewardGiven = true;
   state.coins = (state.coins || 0) + 15;
   grantRandomItem();
-  toast("📋 Tageslog vollständig! +15 Münzen & ein Item erhalten.");
+  grantMarke("common");
+  toast("📋 Tageslog vollständig! +15 Münzen, ein Item & eine Marke erhalten.");
   save();
 }
 
@@ -2439,13 +3021,14 @@ function buildArchivePanel() {
       '<span class="an-hint">&#128522; ' + num1(a1(a.moodSum, a.moodN)) + '</span>' +
       '<span class="an-hint">&#9878; ' + (wAvg != null ? wAvg.toFixed(1) + 'kg' : '&ndash;') + '</span>' +
       '<span class="an-hint">&#127757; ' + (a.kcalN ? Math.round(a.kcalSum/a.kcalN) : '&ndash;') + '</span>' +
+      '<span class="an-hint">&#127831; ' + (a.proteinN ? Math.round(a.proteinSum/a.proteinN) + 'g' : '&ndash;') + '</span>' +
       '<span class="an-hint">&#127947; ' + a.gymSessions + '</span>' +
       '<span class="an-hint">&#127864; ' + a.drinkDays + '</span>' +
       '</div>';
   }).join("");
   return '<div class="panel dark an-panel">' +
     '<div class="an-title">&#128451; Langzeit-Archiv (Monats-&Oslash;)</div>' +
-    '<div class="an-hint" style="margin-bottom:6px">Aggregierte Werte für Tage älter als 90 Tage. Legende: &#128564; Schlaf &middot; &#9889; Energie &middot; &#128522; Stimmung &middot; &#9878; Gewicht &middot; &#127757; kcal &middot; &#127947; Gym-Sessions &middot; &#127864; Trinktage.</div>' +
+    '<div class="an-hint" style="margin-bottom:6px">Aggregierte Werte für Tage älter als 90 Tage. Legende: &#128564; Schlaf &middot; &#9889; Energie &middot; &#128522; Stimmung &middot; &#9878; Gewicht &middot; &#127757; kcal &middot; &#127831; Protein &middot; &#127947; Gym-Sessions &middot; &#127864; Trinktage.</div>' +
     rows +
     '</div>';
 }
@@ -2454,6 +3037,12 @@ function renderAnalyse() {
   const el = document.getElementById("analyse-content");
   const sgInput = document.getElementById("sleep-goal-input");
   if (sgInput) sgInput.value = (state.sleepGoalMin || 450) / 60;
+  const kgInput = document.getElementById("kcal-goal-input");
+  if (kgInput) kgInput.value = state.kcalGoal != null ? state.kcalGoal : "";
+  const pgInput = document.getElementById("protein-goal-input");
+  if (pgInput) pgInput.value = state.proteinGoal != null ? state.proteinGoal : "";
+  const nmInput = document.getElementById("nutrition-mode-input");
+  if (nmInput) nmInput.value = state.nutritionMode || "surplus";
   if (!el) return;
   // Fragezeichen-Hilfe: Titel + einklappbare Erklärung je Analysebereich
   const anTitle = (inner, help) =>
@@ -2467,7 +3056,7 @@ function renderAnalyse() {
 
   const sleepFilled = s => !!(s && (s.bedtime || s.waketime || s.feeling != null));
   const gymFilled   = g => !!(g && (g.strength != null || g.feeling != null));
-  const foodFilled  = f => !!(f && f.kcal != null);
+  const foodFilled  = f => !!(f && (f.kcal != null || f.protein != null));
   const noteFilled  = n => !!(n && n.text && n.text.trim());
   const dayFilled   = l => sleepFilled(l.sleep) || gymFilled(l.gym) || foodFilled(l.food) || noteFilled(l.note) || l.energy != null || l.mood != null || l.alcohol != null || l.bodyWeight != null;
 
@@ -2716,6 +3305,30 @@ function renderAnalyse() {
         '<div class="an-row an-hint">Basis: ' + kcalVals.length + ' Kalorien-Tage, ' + wPts.length + ' Gewichts-Tage</div>' +
       '</div>';
   }
+  /* ---- Analyse 13: Ernährungsziele ---- */
+  if (state.kcalGoal != null || state.proteinGoal != null) {
+    const nWin = lastNDays(30).map(d => (state.dailyLog[d] || {}).food || null);
+    const kArr = nWin.filter(f => f && f.kcal != null).map(f => f.kcal);
+    const pArr = nWin.filter(f => f && f.protein != null).map(f => f.protein);
+    const kHits = kArr.filter(v => kcalGoalHit(v)).length;
+    const pHits = pArr.filter(v => proteinGoalHit(v)).length;
+    const pctStr = (h, n) => n ? Math.round(h / n * 100) + '%' : '&ndash;';
+    const modeTxt = { surplus: 'Aufbau ⩾', deficit: 'Diät ⩽', target: 'Erhalt ±' }[state.nutritionMode || 'surplus'];
+    if (kArr.length >= 3 || pArr.length >= 3) {
+      html +=
+        '<div class="panel dark an-panel">' +
+          anTitle('&#127869; Ern&auml;hrungsziele', 'Zeigt, wie oft du in den letzten 30 Tagen dein kcal- und Protein-Ziel getroffen hast, plus aktuelle Serie und Durchschnitt.') +
+          (state.kcalGoal != null
+            ? '<div class="an-lead">&#127757; kcal-Ziel (' + modeTxt + ' ' + state.kcalGoal + '): <span class="an-val">' + pctStr(kHits, kArr.length) + '</span> <span class="an-hint">(' + kHits + '/' + kArr.length + ' Tage &middot; &Oslash; ' + (kArr.length ? Math.round(avg(kArr)) : '&ndash;') + ' kcal)</span></div>' +
+              '<div class="an-row an-hint">Aktuelle Serie: &#128293; ' + nutritionGoalStreak('kcal') + ' Tage</div>'
+            : '') +
+          (state.proteinGoal != null
+            ? '<div class="an-sub an-lead">&#127831; Protein-Ziel (⩾ ' + state.proteinGoal + ' g): <span class="an-val">' + pctStr(pHits, pArr.length) + '</span> <span class="an-hint">(' + pHits + '/' + pArr.length + ' Tage &middot; &Oslash; ' + (pArr.length ? Math.round(avg(pArr)) : '&ndash;') + ' g)</span></div>' +
+              '<div class="an-row an-hint">Aktuelle Serie: &#128293; ' + nutritionGoalStreak('protein') + ' Tage</div>'
+            : '') +
+        '</div>';
+    }
+  }
   }
 
   /* ---- Habit-Stacks (unabhängig vom Tages-Log, nur Habit-Historie) ---- */
@@ -2912,6 +3525,10 @@ function dateStr(d) {
 }
 function todayStr() { return dateStr(new Date()); }
 function yesterdayStr() { const d = new Date(); d.setDate(d.getDate()-1); return dateStr(d); }
+function daysBetween(aStr, bStr) {
+  const a = new Date(aStr + "T00:00:00"), b = new Date(bStr + "T00:00:00");
+  return Math.round((b - a) / 86400000);
+}
 function dayBeforeYesterdayStr() { const d = new Date(); d.setDate(d.getDate()-2); return dateStr(d); }
 function lastNDays(n) {
   const out = [];
@@ -2932,6 +3549,8 @@ function checkDayRollover() {
     checkStreakRescue();
     checkWeeklyEvent();
     updateDailyHappiness();
+    resolveExpiredEmergencyQuest();   // abgelaufene Quest -> Debuff
+    maybeSpawnEmergencyQuest();       // ggf. neue Quest für heute
   }
   updateHeader();
 }
@@ -3518,7 +4137,8 @@ function switchTab(name) {
   if (document.visibilityState === "visible") startBattleLoop();
 
   if (name === "habits") renderPeople();
-  if (name === "team") { renderTrainerCard(); renderTeam(); renderBox(); }
+  if (name === "hunter") { renderTrainerCard(); renderHunterPanel(); }
+  if (name === "team") { renderTeam(); renderBox(); }
   if (name === "dex") renderDex();
   if (name === "inputlog") renderInputLog();
   if (name === "analyse") { renderStats(); renderAnalyse(); }
@@ -3561,8 +4181,23 @@ function buildCatRow() {
     '<button type="button" class="cat-chip' + (k === selectedCat ? " sel" : "") + '" style="background:' + CATS[k].color +
     '" onclick="pickCat(\'' + k + '\')">' + CATS[k].icon + " " + CATS[k].label + '</button>'
   ).join("");
+  updateStatTargetWrap();
 }
 function pickCat(k) { selectedCat = k; buildCatRow(); }
+let selectedStatTarget = "str";
+function updateStatTargetWrap() {
+  const wrap = document.getElementById("stat-target-wrap");
+  wrap.style.display = (selectedCat === "eigene") ? "block" : "none";
+  if (selectedCat === "eigene") buildStatTargetRow();
+}
+function buildStatTargetRow() {
+  const row = document.getElementById("stat-target-row");
+  row.innerHTML = Object.keys(HUNTER_STATS).map(k =>
+    '<button type="button" class="cat-chip' + (k === selectedStatTarget ? " sel" : "") + '" style="background:' + HUNTER_STATS[k].color +
+    '" onclick="pickStatTarget(\'' + k + '\')">' + HUNTER_STATS[k].icon + " " + HUNTER_STATS[k].label + '</button>'
+  ).join("");
+}
+function pickStatTarget(k) { selectedStatTarget = k; buildStatTargetRow(); }
 
 let selectedType = "yesno";
 function buildTypeRow() {
@@ -3593,6 +4228,7 @@ function openHabitModal(id) {
   document.getElementById("habit-target-input").value = (h && h.target) ? h.target : "";
   updateTargetWrap();
   selectedCat = (h && h.category) ? h.category : "eigene";
+  selectedStatTarget = (h && h.statTarget) ? h.statTarget : "str";
   buildCatRow();
   document.getElementById("habit-reminder-on").checked = !!(h && h.reminder && h.reminder.on);
   document.getElementById("habit-reminder-time").value = (h && h.reminder && h.reminder.time) || "20:00";
@@ -3612,12 +4248,13 @@ function saveHabit() {
   let h;
   if (editingHabitId) {
     h = state.habits.find(x => x.id === editingHabitId);
-    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; h.pausedUntil = pauseVal; }
+    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; h.pausedUntil = pauseVal; h.statTarget = (selectedCat === "eigene") ? selectedStatTarget : null; }
   } else {
     h = { id: uid(), name, emoji, category: selectedCat, type: selectedType, target,
       doneDate: null, rewardDate: null, streak: 0, lastDoneDate: null, lastFreezeStreak: 0,
       history: {}, reminder: null, timerRunning: false, timerStart: 0,
-      pausedUntil: pauseVal, lastWeekKey: null };
+      pausedUntil: pauseVal, lastWeekKey: null,
+      statTarget: (selectedCat === "eigene") ? selectedStatTarget : null };
     state.habits.push(h);
   }
   if (h) {
@@ -3684,6 +4321,11 @@ function grantHabitReward(h) {
   h.rewardDate = t;
   state.coins = (state.coins || 0) + 10;   // Münzen für erledigten Habit (einmal pro Tag)
   ensureTodayStats();
+  // Hunter-Stat-XP: Kategorie-Stat (oder manueller Zielstat bei "eigene")
+  const targetStat = h.category === "eigene" ? (h.statTarget || null) : CAT_TO_STAT[h.category];
+  if (targetStat) grantHunterStatXp(targetStat, HUNTER_STAT_XP_PER_COMPLETE);
+  // Timer-Habits geben zusätzlich AGI (Ausführungstempo), außer AGI ist bereits der Zielstat
+  if (h.type === "timer" && targetStat !== "agi") grantHunterStatXp("agi", HUNTER_STAT_XP_PER_COMPLETE);
   const bonus = h.type === "negative" ? Math.round(HABIT_BONUS_EXP * 1.5) : HABIT_BONUS_EXP;
   grantTeamExp(bonus, true);
   addTrainerExp(30);
@@ -3692,9 +4334,10 @@ function grantHabitReward(h) {
   const tier = tierForStreak(h.streak);
   if (rw.type === "item_only") grantRandomItem();
   else if (rw.type === "double_item") { grantRandomItem(); grantRandomItem(); }
-  else if (rw.type === "pokemon_only") openCatchModal(tier);
-  else if (rw.type === "item_and_pokemon") { grantRandomItem(); openCatchModal(tier); }
-  else if (rw.type === "shiny_chance") openCatchModal(tier, false, true);
+  else if (rw.type === "pokemon_only") grantMarke(tier);
+  else if (rw.type === "item_and_pokemon") { grantRandomItem(); grantMarke(tier); }
+  else if (rw.type === "shiny_chance") grantMarke(upgradeTier(tier));
+  checkEmergencyProgress(h);   // Emergency-Quest-Fortschritt & Debuff-Heilung
 }
 
 /* Markiert Habit heute als erledigt (setzt doneDate, Streak, Belohnung) */
@@ -4264,8 +4907,30 @@ function grantRandomItem() {
 
 function tierForStreak(streak) {
   if (streak >= 30) return "legendary";
+  if (streak >= 20) return "epic";
   if (streak >= 7) return "rare";
   return "common";
+}
+function grantMarke(tier, count) {
+  count = count || 1;
+  state.marken = state.marken || { common:0, rare:0, epic:0, legendary:0 };
+  state.marken[tier] = (state.marken[tier] || 0) + count;
+  ensureTodayStats();
+  toast(MARKEN_TIERS[tier].icon + " +" + count + " " + MARKEN_TIERS[tier].label + (count > 1 ? "n" : ""));
+}
+function upgradeTier(tier) {
+  const i = MARKEN_ORDER.indexOf(tier);
+  return MARKEN_ORDER[Math.min(MARKEN_ORDER.length - 1, i + 1)];
+}
+function rollIV() { return Math.floor(Math.random() * 32); } // 0–31
+function rollIVSet() {
+  return { hp: rollIV(), attack: rollIV(), defense: rollIV(),
+    "special-attack": rollIV(), "special-defense": rollIV(), speed: rollIV() };
+}
+// Liefert die IV eines Fighters (nur Spieler-Mons haben echte IVs, Wildgegner default 31)
+function ivFor(fighter, key) {
+  const m = fighter && fighter.uid ? getMon(fighter.uid) : null;
+  return (m && m.iv && m.iv[key] !== undefined) ? m.iv[key] : 31;
 }
 function rollDexId(tier) {
   const r = Math.random();
@@ -4333,13 +4998,13 @@ function declineCatch() {
   toast("Die wilden Pokémon sind geflohen …");
 }
 
-function addPokemon(dexId, name, shiny, level) {
+function addPokemon(dexId, name, shiny, level, silent) {
   const teamAvgLevel = state.team.length
     ? Math.round(state.team.reduce((s, u) => { const m = getMon(u); return s + (m ? m.level : 5); }, 0) / state.team.length)
     : 5;
   const startLevel = level !== undefined ? level : Math.max(5, teamAvgLevel);
   const mon = { uid: uid(), dex: dexId, level: startLevel, exp: 0, shiny: !!shiny, moveIdx: 0,
-    nickname: "", forgottenMoves: [], boosts: { atk:0, def:0, spd:0 } };
+    nickname: "", forgottenMoves: [], boosts: { atk:0, def:0, spd:0 }, iv: rollIVSet() };
   state.box.push(mon);
   state.seen = state.seen || {}; state.seen[dexId] = true;
   if (state.team.length < 3) state.team.push(mon.uid);
@@ -4348,10 +5013,223 @@ function addPokemon(dexId, name, shiny, level) {
   if (state.catchLog.length > 200) state.catchLog = state.catchLog.slice(-200);
   ensureTodayStats();
   state.todayStats.caught.push((shiny ? "✨ " : "") + (name || "#" + dexId));
-  save();
-  toast("🎉 " + (shiny ? "✨ " : "") + (name || "#" + dexId) + " wurde gefangen!");
-  renderTeam(); renderBox(); renderStats(); updateHeader();
+  if (!silent) {
+    save();
+    toast("🎉 " + (shiny ? "✨ " : "") + (name || "#" + dexId) + " wurde gefangen!");
+    renderTeam(); renderBox(); renderStats(); updateHeader();
+  }
   getPokemonData(dexId).catch(()=>{});
+  return mon;
+}
+function gachaPoolForTier(tier) {
+  if (tier === "legendary") return LEGENDARY_IDS;
+  if (tier === "epic") return EPIC_IDS;
+  if (tier === "rare") return RARE_IDS.filter(id => !EPIC_SET.has(id));
+  return COMMON_IDS;
+}
+function gachaPull(tier) {
+  state.marken = state.marken || { common:0, rare:0, epic:0, legendary:0 };
+  if ((state.marken[tier] || 0) < 1) { toast("Nicht genug " + MARKEN_TIERS[tier].label + "n!"); return; }
+  state.marken[tier]--;
+  const pool = gachaPoolForTier(tier);
+  const count = GACHA_PULL_COUNT[tier];
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    const dexId = pick(pool);
+    results.push(addPokemon(dexId, null, false, undefined, true)); // silent=true
+  }
+  save();
+  renderTeam(); renderBox(); renderStats(); updateHeader();
+  renderGachaResults(results, tier);
+}
+function openGachaAutomat() {
+  state.marken = state.marken || { common:0, rare:0, epic:0, legendary:0 };
+  const body = document.getElementById("gacha-body");
+  body.innerHTML =
+    '<h3>🎰 Gacha-Automat</h3>' +
+    '<p class="muted">Löse deine Marken ein und ziehe neue Pokémon.</p>' +
+    '<div class="gacha-tier-list">' +
+    MARKEN_ORDER.map(tier => {
+      const t = MARKEN_TIERS[tier];
+      const have = state.marken[tier] || 0;
+      const count = GACHA_PULL_COUNT[tier];
+      const dis = have < 1 ? ' disabled' : '';
+      return '<div class="gacha-tier-row">' +
+        '<span class="gacha-tier-icon">' + t.icon + '</span>' +
+        '<div class="gacha-tier-info">' +
+          '<div class="gacha-tier-label" style="color:' + t.color + '">' + t.label + '</div>' +
+          '<div class="gacha-tier-hint">Bestand: ' + have + ' · ' + count + ' Pokémon/Zug</div>' +
+        '</div>' +
+        '<button class="btn green"' + dis + ' onclick="gachaPull(\'' + tier + '\')">Ziehen</button>' +
+      '</div>';
+    }).join("") +
+    '</div>';
+  openModal("gacha-modal");
+}
+function renderGachaResults(results, tier) {
+  const t = MARKEN_TIERS[tier];
+  const body = document.getElementById("gacha-body");
+  body.innerHTML =
+    '<h3>' + t.icon + ' Gezogen!</h3>' +
+    '<p class="muted">' + results.length + ' neue' + (results.length > 1 ? '' : 's') + ' Pokémon aus einer ' + t.label + '.</p>' +
+    '<div class="gacha-result-grid">' +
+    results.map(m => {
+      const ivPct = Math.round(Object.values(m.iv || {}).reduce((a,b) => a+b, 0) / (31 * 6) * 100);
+      const nm = monName(m, (cache.pokemon && cache.pokemon[m.dex] && cache.pokemon[m.dex].name));
+      return '<div class="gacha-result-card">' +
+        '<img src="' + SPRITE(m.dex, m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
+        '<div class="pn">' + esc(nm) + '</div>' +
+        '<div class="iv">🧬 IV ' + ivPct + '%</div>' +
+        '<span class="tier-badge" style="background:' + t.color + '">' + t.label + '</span>' +
+      '</div>';
+    }).join("") +
+    '</div>' +
+    '<button class="btn" onclick="openGachaAutomat()">Zurück zum Automaten</button>';
+  openModal("gacha-modal");
+}
+
+/* =====================================================================
+   ZUCHTSTATION (Phase 2)
+   ===================================================================== */
+// Wählt aus einem (evtl. Dual-)Typ-Array einen Typ zufällig
+function pickType(types) {
+  const t = (types || []).filter(Boolean);
+  return t.length ? pick(t) : "normal";
+}
+// Fusioniert zwei Einzeltypen zu einem Typ-Array + deutschem Anzeigenamen
+function buildFusion(typeA, typeB) {
+  if (typeA === typeB) return { types: [typeA], name: null }; // gleicher Typ → keine Fusion
+  const deA = TYPE_DE[typeA] || typeA;
+  const deB = TYPE_DE[typeB] || typeB;
+  return { types: [typeA, typeB], name: deA + "-" + deB };
+}
+// Vererbt IVs: pro Stat 50% von einem zufälligen Elternteil (±0–3 Streuung, clamp 0–31), sonst neu gewürfelt
+function inheritIV(ivA, ivB) {
+  const keys = ["hp","attack","defense","special-attack","special-defense","speed"];
+  const out = {};
+  keys.forEach(k => {
+    if (Math.random() < 0.5) {
+      const src = Math.random() < 0.5 ? ivA : ivB;
+      const base = (src && src[k] !== undefined) ? src[k] : 31;
+      const jitter = Math.floor(Math.random() * 7) - 3; // -3..+3
+      out[k] = Math.max(0, Math.min(31, base + jitter));
+    } else {
+      out[k] = Math.floor(Math.random() * 32);
+    }
+  });
+  return out;
+}
+async function startBreeding(uidA, uidB) {
+  if (state.breeding.egg) { toast("Es brütet bereits ein Ei!"); return; }
+  const a = getMon(uidA), b = getMon(uidB);
+  if (!a || !b) { toast("Ungültige Auswahl."); return; }
+  if (a.uid === b.uid) { toast("Wähle zwei verschiedene Pokémon."); return; }
+  if (a.dex === b.dex) { toast("Die Eltern müssen unterschiedliche Spezies sein."); return; }
+  if ((state.coins || 0) < BREED_COST_COINS) { toast("Nicht genug Münzen (" + BREED_COST_COINS + " nötig)."); return; }
+
+  // Typen sicherstellen (async geladen, gecacht in cache.pokemon[dex].types)
+  const [pa, pb] = await Promise.all([getPokemonData(a.dex), getPokemonData(b.dex)]);
+  const typeA = pickType(pa.types);
+  const typeB = pickType(pb.types);
+  const fusion = buildFusion(typeA, typeB);
+
+  const childDex = pick([a.dex, b.dex]); // Sprite/Basiswerte von einem Elternteil
+  const shiny = (Math.random() < 0.02) || a.shiny || b.shiny ? (Math.random() < 0.10) : false;
+
+  state.coins -= BREED_COST_COINS;
+  state.breeding.egg = {
+    parentA: a.dex, parentB: b.dex,
+    childDex,
+    fusionName: fusion.name,      // null wenn gleicher Typ
+    fusionTypes: fusion.types,
+    iv: inheritIV(a.iv, b.iv),
+    shiny,
+    hatchAt: Date.now() + BREED_HATCH_MS
+  };
+  save();
+  toast("🥚 Ei erhalten! Es brütet " + (BREED_HATCH_MS / 3600000) + " Stunden.");
+  renderBreeding();
+}
+function hatchEgg() {
+  const egg = state.breeding.egg;
+  if (!egg) return;
+  if (Date.now() < egg.hatchAt) { toast("Das Ei ist noch nicht bereit."); return; }
+  const nm = egg.fusionName || (cache.pokemon[egg.childDex] && cache.pokemon[egg.childDex].name) || ("№" + egg.childDex);
+  const mon = addPokemon(egg.childDex, nm, egg.shiny, undefined, true); // silent
+  // Vererbte IVs + Fusions-Overlay auf das frisch erzeugte Mon anwenden
+  mon.iv = egg.iv;
+  if (egg.fusionName) { mon.fusionName = egg.fusionName; mon.fusionTypes = egg.fusionTypes; mon.nickname = egg.fusionName; }
+  state.breeding.egg = null;
+  save();
+  renderTeam(); renderBox(); renderStats(); updateHeader();
+  toast("🎉 " + (egg.shiny ? "✨ " : "") + nm + " ist geschlüpft!");
+  renderBreeding();
+}
+function cancelEgg() {
+  if (!state.breeding.egg) return;
+  state.breeding.egg = null;
+  save();
+  toast("Ei verworfen. (Münzen werden nicht erstattet.)");
+  renderBreeding();
+}
+function openBreeding() { renderBreeding(); openModal("breed-modal"); }
+
+function renderBreeding() {
+  const body = document.getElementById("breed-body");
+  if (!body) return;
+  const egg = state.breeding.egg;
+
+  // --- Ei brütet gerade ---
+  if (egg) {
+    const remaining = egg.hatchAt - Date.now();
+    const ready = remaining <= 0;
+    const nm = egg.fusionName || "Überraschungs-Ei";
+    let timeStr;
+    if (ready) timeStr = "✅ Bereit zum Schlüpfen!";
+    else {
+      const h = Math.floor(remaining / 3600000);
+      const m = Math.floor((remaining % 3600000) / 60000);
+      timeStr = "⏳ Schlüpft in " + (h > 0 ? h + "h " : "") + m + "min";
+    }
+    const typeBadges = (egg.fusionTypes || []).map(t =>
+      '<span class="type-badge" style="background:' + (TYPE_COLOR[t] || "#888") + '">' + (TYPE_DE[t] || t) + '</span>'
+    ).join(" ");
+    body.innerHTML =
+      '<h3>🥚 Zuchtstation</h3>' +
+      '<div class="breed-egg-view">' +
+        '<div class="breed-egg-icon">' + (ready ? "🐣" : "🥚") + '</div>' +
+        '<div class="breed-egg-name">' + esc(nm) + '</div>' +
+        '<div class="breed-egg-types">' + typeBadges + '</div>' +
+        '<div class="breed-egg-time">' + timeStr + '</div>' +
+      '</div>' +
+      (ready
+        ? '<button class="btn green" onclick="hatchEgg()">Schlüpfen lassen!</button>'
+        : '<button class="btn" disabled>Noch am Brüten…</button>') +
+      '<button class="btn red" style="margin-top:6px" onclick="cancelEgg()">Ei verwerfen</button>';
+    return;
+  }
+
+  // --- Kein Ei: Eltern-Auswahl ---
+  const box = state.box || [];
+  // Typen vorladen, damit Fusion synchron funktioniert
+  box.forEach(m => { if (!cache.pokemon[m.dex]) getPokemonData(m.dex).then(() => renderBreeding()); });
+
+  const options = box.map(m => {
+    const pd = cache.pokemon[m.dex];
+    const nm = monName(m, pd && pd.name);
+    return '<option value="' + m.uid + '">' + esc(nm) + ' (Lv.' + m.level + ')</option>';
+  }).join("");
+
+  body.innerHTML =
+    '<h3>🥚 Zuchtstation</h3>' +
+    '<p class="muted">Wähle zwei verschiedene Pokémon. Kosten: ' + BREED_COST_COINS + ' 🪙 · Brutdauer ' + (BREED_HATCH_MS / 3600000) + 'h.</p>' +
+    (box.length < 2
+      ? '<div class="empty-slot">Du brauchst mindestens 2 Pokémon in der Box.</div>'
+      : '<div class="breed-select">' +
+          '<label>Elternteil A</label><select id="breed-a">' + options + '</select>' +
+          '<label>Elternteil B</label><select id="breed-b">' + options + '</select>' +
+        '</div>' +
+        '<button class="btn green" onclick="startBreeding(document.getElementById(\'breed-a\').value, document.getElementById(\'breed-b\').value)">Züchten (' + BREED_COST_COINS + ' 🪙)</button>');
 }
 
 /* =====================================================================
@@ -4371,6 +5249,8 @@ function toggleTeam(uidv) {
     state.team.splice(idx, 1);
     toast("In die Box gelegt.");
   } else {
+    const addMon = getMon(uidv);
+    if (addMon && addMon.ko) { toast("Verletzt – erst im 🏥 Pokémon Center heilen."); return; }
     if (state.team.length >= 3) { toast("Team ist voll (max. 3)."); return; }
     state.team.push(uidv);
     toast("Ins Team aufgenommen!");
@@ -4862,10 +5742,10 @@ async function renderBox() {
   const parts = await Promise.all(sorted.map(async m => {
     const d = await getPokemonData(m.dex);
     const inTeam = state.team.includes(m.uid);
-    return '<div class="box-cell' + (inTeam ? " inteam" : "") + '" onclick="openMonDetail(\'' + m.uid + '\')">' +
+    return '<div class="box-cell' + (inTeam ? " inteam" : "") + '"' + (m.ko ? ' style="opacity:.5"' : '') + ' onclick="openMonDetail(\'' + m.uid + '\')">' +
       '<img src="' + SPRITE(monSpriteId(m), m.shiny) + '" alt="" onerror="this.style.opacity=.2">' +
       '<div class="bn">' + (m.shiny ? "✨" : "") + esc(monName(m, d.name)) + '</div>' +
-      '<div class="bl">Lv.' + m.level + (inTeam ? " ★" : "") + '</div>' +
+      '<div class="bl">Lv.' + m.level + (m.ko ? (m.healReadyAt ? " 🛌" : " 🩹") : (inTeam ? " ★" : "")) + '</div>' +
     '</div>';
   }));
   grid.innerHTML = sortBar + parts.join("");
@@ -4887,12 +5767,18 @@ function renderStats() {
   const pct = total ? Math.round((done / total) * 100) : 0;
   const best = state.habits.reduce((m, h) => Math.max(m, displayStreak(h)), 0);
   const caught = (state.catchLog || []).filter(c => days.includes(c.d)).length;
+  const wkFood = days.map(d => (state.dailyLog[d] || {}).food || null);
+  const kGoalRow = state.kcalGoal != null
+    ? '<div class="ws-row"><span>kcal-Ziel:</span><span>' + wkFood.filter(f => f && f.kcal != null && kcalGoalHit(f.kcal)).length + '/7 Tage</span></div>' : '';
+  const pGoalRow = state.proteinGoal != null
+    ? '<div class="ws-row"><span>Protein-Ziel:</span><span>' + wkFood.filter(f => f && f.protein != null && proteinGoalHit(f.protein)).length + '/7 Tage</span></div>' : '';
   el.innerHTML =
     '<div class="ws-title">📊 DIESE WOCHE</div>' +
     '<div class="ws-row"><span>Habits:</span><div class="ws-bar"><div class="ws-fill" style="width:' + pct + '%"></div></div><span>' + pct + '%</span></div>' +
     '<div class="ws-row"><span>Beste Streak:</span><span>🔥 ' + best + ' Tag' + (best === 1 ? "" : "e") + '</span></div>' +
     '<div class="ws-row"><span>Gefangene Pokémon:</span><span>' + caught + '</span></div>' +
-    '<div class="ws-row"><span>Team-Level gesamt:</span><span>&#8593; ' + teamLevelSum() + '</span></div>';
+    '<div class="ws-row"><span>Team-Level gesamt:</span><span>&#8593; ' + teamLevelSum() + '</span></div>' +
+    kGoalRow + pGoalRow;
 }
 
 /* =====================================================================
@@ -4900,6 +5786,7 @@ function renderStats() {
    ===================================================================== */
 function renderItems() {
   const el = document.getElementById("item-list");
+  if (!el) return;   // Item-Liste lebt jetzt im Rucksack-Modal (Stadt) – nur rendern, wenn offen
   let html = Object.keys(ITEMS).map(k => {
     const cnt = state.items[k] || 0;
     const usable = ITEMS[k].usable && cnt > 0;
@@ -5247,6 +6134,7 @@ const ADV = {
   floats: [],           // Schadenszahlen
   typeVfx: null, bursts: [], sparkles: [],  // wiederverwendete BT-Animationen
   theme: null, dmgShown: 0,                 // Hintergrund-Theme + animierter TotalDMG-Zähler
+  mods: { atk: 1, def: 1 }, bankCoins: 0, offers: [],  // Run-Upgrades, ungesicherte Beute, Kartenangebot
   last: 0
 };
 const ADV_LINEUP_MAX = 6;
@@ -5359,6 +6247,16 @@ function closeCityModal() {
   document.getElementById("city-modal-bg").classList.remove("open");
 }
 
+/* ---- Rucksack (Items – früher eigener Tab, jetzt Stadt-Modal) ---- */
+function openRucksack() {
+  openCityModal(
+    '<h3>🎒 Rucksack</h3>' +
+    '<p class="muted" style="margin-bottom:8px">Bälle wirfst du direkt auf Route 1, sobald ein wildes Pokémon unter 35% HP fangbar wird (grüner Rahmen).</p>' +
+    '<div id="item-list"></div>'
+  );
+  renderItems();   // füllt #item-list im gerade geöffneten Modal
+}
+
 /* ---- Stadt-Menü (ohne Canvas) ---- */
 function renderCityMenu() {
   const today = todayStr();
@@ -5381,6 +6279,12 @@ function renderCityMenu() {
         '<div class="city-menu-hint">Team heilen · Pokédex</div>' +
       '</button>' +
 
+      '<button class="city-menu-btn" onclick="openRucksack()">' +
+        '<span class="city-menu-icon">🎒</span>' +
+        '<div class="city-menu-label">Rucksack</div>' +
+        '<div class="city-menu-hint">Items · Bälle · Steine</div>' +
+      '</button>' +
+
       '<button class="city-menu-btn" onclick="openArena()">' +
         '<span class="city-menu-icon">🏆</span>' +
         '<div class="city-menu-label">Arena</div>' +
@@ -5391,6 +6295,18 @@ function renderCityMenu() {
         '<span class="city-menu-icon">🗺️</span>' +
         '<div class="city-menu-label">Adventure</div>' +
         '<div class="city-menu-hint">Dungeon · 6 Kämpfer aus der Box</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn" onclick="openGachaAutomat()">' +
+        '<span class="city-menu-icon">🎰</span>' +
+        '<div class="city-menu-label">Gacha-Automat</div>' +
+        '<div class="city-menu-hint">Marken einlösen</div>' +
+      '</button>' +
+
+      '<button class="city-menu-btn" onclick="openBreeding()">' +
+        '<span class="city-menu-icon">🥚</span>' +
+        '<div class="city-menu-label">Zuchtstation</div>' +
+        '<div class="city-menu-hint">Zwei Pokémon züchten</div>' +
       '</button>' +
 
       '<button class="city-menu-btn' + (bonusAvailable ? ' city-menu-btn--available' : ' city-menu-btn--claimed') + '" onclick="claimDailyReward()">' +
@@ -5496,38 +6412,99 @@ function martBuy(key) {
   openMart();
 }
 
-function openCenter() {
-  // Team-HP vollständig heilen (BT.fighters HP auf maxHp setzen)
-  let healed = false;
-  BT.fighters.forEach(f => {
-    if (f.hp < f.maxHp) { f.hp = f.maxHp; healed = true; }
+const CENTER_HEAL_H = 8;   // Heildauer pro Pokémon in Stunden
+const CENTER_BEDS   = 6;   // parallele Behandlungsplätze
+function centerCountdown(m) {
+  const ms = (m.healReadyAt || 0) - Date.now();
+  if (ms <= 0) return "fertig";
+  const h = Math.floor(ms / 3600000);
+  const min = Math.floor((ms % 3600000) / 60000);
+  return h > 0 ? (h + "h " + min + "m") : (min + "m");
+}
+// Fertige Behandlungen abschließen. silent=true unterdrückt Toast (z. B. beim Laden).
+function processCenterHealing(silent) {
+  const now = Date.now();
+  let changed = false;
+  state.box.forEach(m => {
+    if (m.ko && m.healReadyAt && now >= m.healReadyAt) { m.ko = false; m.healReadyAt = 0; changed = true; }
   });
-  if (healed) toast("💊 Dein Team wurde vollständig geheilt!");
-
+  if (changed) {
+    save();
+    if (document.getElementById("box-grid"))  renderBox();
+    if (document.getElementById("team-list")) renderTeam();
+    if (!silent) toast("💚 Ein Pokémon ist wieder fit!");
+  }
+}
+function centerTreat(uidv) {
+  const m = getMon(uidv);
+  if (!m || !m.ko || m.healReadyAt) return;
+  const bedsUsed = state.box.filter(x => x.ko && x.healReadyAt > 0).length;
+  if (bedsUsed >= CENTER_BEDS) { toast("Alle " + CENTER_BEDS + " Betten belegt."); return; }
+  m.healReadyAt = Date.now() + CENTER_HEAL_H * 3600000;
+  save();
+  refreshCenterModal();
+}
+function centerTreatAll() {
+  let bedsUsed = state.box.filter(x => x.ko && x.healReadyAt > 0).length;
+  state.box.forEach(m => {
+    if (m.ko && !m.healReadyAt && bedsUsed < CENTER_BEDS) {
+      m.healReadyAt = Date.now() + CENTER_HEAL_H * 3600000;
+      bedsUsed++;
+    }
+  });
+  save();
+  refreshCenterModal();
+}
+function centerModalHTML() {
+  const inTreat = state.box.filter(m => m.ko && m.healReadyAt > 0).sort((a, b) => a.healReadyAt - b.healReadyAt);
+  const injured = state.box.filter(m => m.ko && !m.healReadyAt);
+  const bedsFree = CENTER_BEDS - inTreat.length;
   const seenCount = Object.keys(state.seen || {}).length;
   const caughtDex = new Set(state.box.map(m => m.dex));
-
-  openCityModal(
+  const monRow = (m, right) =>
+    '<div style="display:flex;align-items:center;gap:8px;padding:4px 0">' +
+      '<img src="' + SPRITE(monSpriteId(m), m.shiny) + '" style="width:32px;height:32px;image-rendering:pixelated" onerror="this.style.opacity=.2">' +
+      '<span style="flex:1;font-size:9px">' + esc(monName(m)) + ' <span class="muted">Lv.' + m.level + '</span></span>' +
+      right +
+    '</div>';
+  return '<div id="center-modal-root">' +
     '<h3>🏥 Pokémon Center</h3>' +
-    '<p class="muted" style="margin-bottom:10px">' +
-      (healed
-        ? '✅ Dein Team wurde geheilt!'
-        : 'Dein Team ist in Top-Form!') +
-    '</p>' +
+    '<div class="panel dark" style="margin-bottom:10px">' +
+      '<div style="font-size:8px;color:var(--gold);margin-bottom:4px">🛌 IN BEHANDLUNG (' + inTreat.length + '/' + CENTER_BEDS + ')</div>' +
+      (inTreat.length
+        ? inTreat.map(m => monRow(m, '<span style="font-size:8px;color:#7fd0ff">⏳ ' + centerCountdown(m) + '</span>')).join("")
+        : '<p class="muted" style="font-size:8px">Kein Pokémon in Behandlung.</p>') +
+    '</div>' +
+    '<div class="panel dark" style="margin-bottom:10px">' +
+      '<div style="font-size:8px;color:var(--gold);margin-bottom:4px">🩹 VERLETZT</div>' +
+      (injured.length
+        ? injured.map(m => monRow(m,
+            '<button class="mini-btn"' + (bedsFree > 0 ? '' : ' disabled style="opacity:.4"') +
+            ' onclick="centerTreat(\'' + m.uid + '\')">Behandeln</button>')).join("") +
+          (bedsFree > 0
+            ? '<button class="btn" style="margin-top:6px" onclick="centerTreatAll()">Alle behandeln</button>'
+            : '<p class="muted" style="font-size:8px;margin-top:4px">Alle Betten belegt.</p>')
+        : '<p class="muted" style="font-size:8px">Kein verletztes Pokémon.</p>') +
+    '</div>' +
     '<div class="panel dark" style="margin-bottom:10px">' +
       '<div style="font-size:8px;color:var(--gold);margin-bottom:6px">📖 POKÉDEX-STATUS</div>' +
-      '<div style="font-size:8px;line-height:2;color:#c8d4e0">' +
-        'Gesehen: ' + seenCount + '<br>' +
-        'Gefangen: ' + caughtDex.size + ' / ' + MAX_DEX +
-      '</div>' +
+      '<div style="font-size:8px;line-height:2;color:#c8d4e0">Gesehen: ' + seenCount + '<br>Gefangen: ' + caughtDex.size + ' / ' + MAX_DEX + '</div>' +
     '</div>' +
-    '<button class="btn" onclick="closeCityModal();switchTab(\'dex\')">' +
-      '📖 Pokédex öffnen' +
-    '</button>' +
-    '<button class="btn" style="margin-top:6px" onclick="closeCityModal();switchTab(\'box\')">' +
-      '📦 Box öffnen' +
-    '</button>'
-  );
+    '<button class="btn" onclick="closeCityModal();switchTab(\'dex\')">📖 Pokédex öffnen</button>' +
+    '<button class="btn" style="margin-top:6px" onclick="closeCityModal();switchTab(\'team\')">📦 Box öffnen</button>' +
+  '</div>';
+}
+function refreshCenterModal() {
+  const root = document.getElementById("center-modal-root");
+  if (root) root.outerHTML = centerModalHTML();
+}
+function centerTick() {
+  processCenterHealing();
+  refreshCenterModal();   // Live-Countdown + Bett-Freigabe, nur wenn Center offen
+}
+function openCenter() {
+  processCenterHealing();
+  openCityModal(centerModalHTML());
 }
 
 function openLab() {
@@ -5710,7 +6687,7 @@ async function buildPlayerTeam() {
     if (!m) return null;
     const fighter = BT.fighters.find(f => f.uid === uid);
     const [btdata, sdata] = await Promise.all([getBattleData(m.dex), getPokemonStats(m.dex)]);
-    const maxHp = 20 + m.level * 3;
+    const maxHp = Math.round((20 + m.level * 3) * hunterStatMultiplier("vit"));
     const currentHp = fighter
       ? Math.round((fighter.hp / fighter.maxHp) * maxHp)
       : maxHp;
@@ -5822,11 +6799,12 @@ function arenaCalcDamage(attacker, move, defender) {
   const playerMon = attacker.uid ? getMon(attacker.uid) : null;
   if (playerMon) {
     atkBase = Math.round(atkBase *
-      (special ? megaSpAtkMultiplier(playerMon) : megaAtkMultiplier(playerMon)));
+      (special ? megaSpAtkMultiplier(playerMon) : megaAtkMultiplier(playerMon)) *
+      hunterStatMultiplier(special ? "int" : "str"));
   }
 
-  const atkScaled = calcStat(atkBase, attacker.level);
-  const defScaled = calcStat(defBase, defender.level);
+  const atkScaled = calcStat(atkBase, attacker.level, ivFor(attacker, special ? "special-attack" : "attack"));
+  const defScaled = calcStat(defBase, defender.level, ivFor(defender, special ? "special-defense" : "defense"));
   let dmg = ((attacker.level * 0.4 + 2) * (move.power || 40) * (atkScaled / defScaled)) / 50 + 2;
 
   // Zuneigung des Angreifers beeinflusst den Schaden
@@ -5836,8 +6814,9 @@ function arenaCalcDamage(attacker, move, defender) {
   const eff = effectiveness(move.type, defender.types);
   dmg *= eff;
 
-  // Kritischer Treffer (1/16 Chance)
-  const crit = Math.random() < 0.0625;
+  // Kritischer Treffer (Basis 1/16, PER-Stat erhöht relative Chance bis +30%)
+  const critChance = playerMon ? 0.0625 * hunterStatMultiplier("per") : 0.0625;
+  const crit = Math.random() < critChance;
   if (crit) dmg *= 1.5;
 
   // Zufall ±15%
@@ -6171,7 +7150,7 @@ async function buildAdvAllies(uids) {
   return (await Promise.all(uids.map(async uid => {
     const m = getMon(uid); if (!m) return null;
     const [btdata, sdata] = await Promise.all([getBattleData(m.dex), getPokemonStats(m.dex)]);
-    const maxHp = 20 + m.level * 3;
+    const maxHp = Math.round((20 + m.level * 3) * hunterStatMultiplier("vit"));
     return {
       uid, dex: m.dex, name: m.nickname || m.name || ("#" + m.dex),
       types: (cache.pokemon[m.dex] || {}).types || [],
@@ -6209,6 +7188,8 @@ async function startAdvStage(stage) {
   const dEl0 = document.getElementById("adv-totaldmg");
   if (dEl0) { dEl0.textContent = "TotalDMG: 0"; dEl0.classList.add("on"); }
   ADV.result = null; ADV.floats = []; ADV.acc = 0; ADV.fast = false;
+  ADV.mods = { atk: 1, def: 1 }; ADV.bankCoins = 0; ADV.offers = [];
+  const cEl0 = document.getElementById("adv-choice"); if (cEl0) cEl0.style.display = "none";
   ADV.auto = true; ADV.battlePhase = "loading";
   const rEl = document.getElementById("adv-result"); if (rEl) rEl.style.display = "none";
   document.getElementById("adventure-overlay").classList.add("open");
@@ -6231,6 +7212,7 @@ function closeAdventure() {
   document.getElementById("adventure-overlay").classList.remove("open");
   const rEl = document.getElementById("adv-result"); if (rEl) rEl.style.display = "none";
   const dEl = document.getElementById("adv-totaldmg"); if (dEl) dEl.classList.remove("on");
+  const cEl = document.getElementById("adv-choice"); if (cEl) cEl.style.display = "none";
   ADV.phase = "idle"; ADV.battlePhase = "idle";
 }
 
@@ -6402,7 +7384,7 @@ function advToggleAuto() {
 }
 function advCycleSpeed() { ADV.speed = ADV.speed >= 3 ? 1 : ADV.speed + 1; advSyncControls(); }
 function advSkip() {
-  if (ADV.battlePhase === "resolved") return;
+  if (ADV.battlePhase !== "running") return;
   ADV.fast = true;
   if (!ADV.auto) { ADV.auto = true; ADV.battlePhase = "running"; advSyncControls(); }
 }
@@ -6420,7 +7402,8 @@ function advUpdateRoundLabel() {
 /* ---- Kampf-Engine (Phase 2) ---- */
 function advBuildQueue() {
   const all = [...ADV.ally, ...ADV.foe].filter(m => !m.fainted);
-  all.sort((a, b) => calcStat(b.speed || 60, b.level) - calcStat(a.speed || 60, a.level));
+  const effSpeed = m => calcStat(m.speed || 60, m.level, ivFor(m, "speed")) * (ADV.ally.includes(m) ? hunterStatMultiplier("agi") : 1);
+  all.sort((a, b) => effSpeed(b) - effSpeed(a));
   ADV.turnQueue = all; ADV.qi = 0;
 }
 
@@ -6446,7 +7429,10 @@ function advStep() {
   if (!target) { advEndRound(); return; }
   const move = arenaEnemyPickMove(atk, target);
   advAttackFx(atk, target, move, isAlly ? "ally" : "foe");
-  const { damage, eff } = arenaCalcDamage(atk, move, target);
+  const calc = arenaCalcDamage(atk, move, target);
+  const eff = calc.eff;
+  let damage = calc.damage;
+  if (damage > 0) damage = isAlly ? Math.round(damage * b.mods.atk) : Math.max(1, Math.round(damage / b.mods.def));
   target.hp = Math.max(0, target.hp - damage);
   b.totalDmg += damage;
   target.hitFlash = 180;
@@ -6460,7 +7446,7 @@ function advStep() {
 
 function advEndRound() {
   const b = ADV;
-  if (!b.foe.some(m => !m.fainted))  { advNextStage(); return; }
+  if (!b.foe.some(m => !m.fainted))  { advClearFloor(); return; }
   if (!b.ally.some(m => !m.fainted)) { advFinish("lose"); return; }
   b.round++;
   advUpdateRoundLabel();
@@ -6468,13 +7454,67 @@ function advEndRound() {
   advBuildQueue();
 }
 
-function advNextStage() {
+const ADV_UPGRADES = [
+  { id:"atk",    icon:"⚔️", name:"Angriff +20%",      desc:"Dauerhaft (stapelbar)" },
+  { id:"def",    icon:"🛡️", name:"Verteidigung +20%",  desc:"Weniger Schaden nehmen" },
+  { id:"heal",   icon:"❤️", name:"Team heilen 40%",    desc:"Lebende Verbündete" },
+  { id:"maxhp",  icon:"💪", name:"Max-HP +15%",        desc:"Erhöht & heilt" },
+  { id:"revive", icon:"✨", name:"Wiederbeleben 50%",   desc:"Ein K.O.-Mon zurück", needsFaint:true }
+];
+
+function advClearFloor() {
   const b = ADV;
-  if (b.stage >= ADV_STAGES) { advFinish("win"); return; }
+  b.bankCoins += 15 + b.stage * 12;                       // Beute für geräumte Etage (ungesichert)
+  state.advProgress = Math.max(state.advProgress || 0, b.stage);
+  save();
+  if (!b.ally.some(m => !m.fainted)) { advFinish("bank"); return; }  // geräumt, aber Team am Ende → auto-sichern
+  b.battlePhase = "choice";
+  const pool = ADV_UPGRADES.filter(u => !u.needsFaint || b.ally.some(m => m.fainted));
+  b.offers = [...pool].sort(() => Math.random() - 0.5).slice(0, 3);
+  advRenderChoice();
+}
+
+function advRenderChoice() {
+  const el = document.getElementById("adv-choice"); if (!el) return;
+  const b = ADV;
+  const cards = b.offers.map(u =>
+    '<button class="adv-card" onclick="advPickUpgrade(\'' + u.id + '\')">' +
+      '<span class="adv-card-ic">' + u.icon + '</span>' +
+      '<span class="adv-card-name">' + u.name + '</span>' +
+      '<span class="adv-card-desc">' + u.desc + '</span>' +
+    '</button>').join("");
+  el.innerHTML =
+    '<div class="adv-choice-box">' +
+      '<div class="adv-choice-title">Etage ' + b.stage + ' geräumt</div>' +
+      '<div class="adv-choice-sub">Beute (ungesichert): 🪙 ' + b.bankCoins + '</div>' +
+      '<div class="adv-choice-hint">Upgrade wählen und tiefer — oder sichern:</div>' +
+      '<div class="adv-cards">' + cards + '</div>' +
+      '<button class="adv-bank-btn" onclick="advBank()">🪙 Aussteigen & ' + b.bankCoins + ' sichern</button>' +
+    '</div>';
+  el.style.display = "flex";
+}
+
+function advApplyUpgrade(id) {
+  const b = ADV, living = b.ally.filter(m => !m.fainted);
+  if (id === "atk")       b.mods.atk *= 1.2;
+  else if (id === "def")  b.mods.def *= 1.2;
+  else if (id === "heal") living.forEach(m => m.hp = Math.min(m.maxHp, m.hp + Math.round(m.maxHp * 0.4)));
+  else if (id === "maxhp") living.forEach(m => { const inc = Math.round(m.maxHp * 0.15); m.maxHp += inc; m.hp += inc; });
+  else if (id === "revive") { const f = b.ally.find(m => m.fainted); if (f) { f.fainted = false; f.hp = Math.round(f.maxHp * 0.5); } }
+}
+
+function advPickUpgrade(id) {
+  if (ADV.battlePhase !== "choice") return;
+  advApplyUpgrade(id);
+  advDescend();
+}
+
+function advDescend() {
+  const b = ADV;
+  const el = document.getElementById("adv-choice"); if (el) el.style.display = "none";
   b.battlePhase = "loading";
   b.stage++;
   b.theme = ADV_THEMES[(b.stage - 1) % ADV_THEMES.length];
-  b.ally.forEach(m => { if (!m.fainted) m.hp = Math.min(m.maxHp, m.hp + Math.round(m.maxHp * ADV_STAGE_HEAL)); });
   buildEnemyTeam(advFoeSpecs(b.stage)).then(foe => {
     b.foe = foe;
     b.foe.forEach(m => { m.hitFlash = 0; m.dir = -1; m.lunge = 0; m.lx = 0; m.ly = 0; m.auraT = -1; m.auraColor = null; });
@@ -6482,37 +7522,43 @@ function advNextStage() {
     advAssignSlots();
     advBuildQueue();
     advUpdateRoundLabel();
-    toast("⚔️ Stage " + b.stage + " / " + ADV_STAGES);
+    toast("⚔️ Etage " + b.stage);
     b.battlePhase = "running";
   });
 }
 
-function advFinish(result) {
+function advBank() {
+  if (ADV.battlePhase !== "choice") return;
+  const el = document.getElementById("adv-choice"); if (el) el.style.display = "none";
+  advFinish("bank");
+}
+
+function advFinish(result) {   // result: "bank" | "lose"
   const b = ADV;
   b.battlePhase = "resolved";
   b.result = result;
-  if (result === "win") {
-    state.advProgress = Math.max(state.advProgress || 0, ADV_STAGES);
-    state.coins = (state.coins || 0) + (40 + b.stage * 10);
-    grantTeamExp(50 + b.stage * 10, true);
-  } else {
-    state.advProgress = Math.max(state.advProgress || 0, b.stage - 1);
+  if (result === "bank") {
+    state.coins = (state.coins || 0) + b.bankCoins;
+    grantTeamExp(30 + b.stage * 8, true);
   }
+  // advProgress wurde pro geräumter Etage gesetzt; bei Wipe bleibt die ungesicherte Beute verloren
   save();
   if (typeof renderTrainerCard === "function") renderTrainerCard();
   advResultOverlay();
 }
 
 function advResultOverlay() {
-  const el = document.getElementById("adv-result");
-  if (!el) return;
-  const win = ADV.result === "win";
+  const el = document.getElementById("adv-result"); if (!el) return;
+  const b = ADV, banked = b.result === "bank";
   el.innerHTML =
     '<div class="adv-result-box">' +
-      '<div class="adv-result-title" style="color:' + (win ? "#50c878" : "#e04038") + '">' +
-        (win ? "🏆 DUNGEON GESCHAFFT!" : "💀 NIEDERLAGE") + '</div>' +
-      '<div class="adv-result-sub">Stage ' + ADV.stage + ' / ' + ADV_STAGES +
-        ' · Gesamt-Schaden ' + ADV.totalDmg + '</div>' +
+      '<div class="adv-result-title" style="color:' + (banked ? "#50c878" : "#e04038") + '">' +
+        (banked ? "🪙 BEUTE GESICHERT" : "💀 WIPE — BEUTE VERLOREN") + '</div>' +
+      '<div class="adv-result-sub">' +
+        (banked ? "Gesichert: 🪙 " + b.bankCoins + "<br>" : "Ungesicherte Beute verloren.<br>") +
+        "Etage erreicht: " + b.stage + " · Rekord: " + (state.advProgress || 0) + "<br>" +
+        "Gesamt-Schaden: " + b.totalDmg +
+      '</div>' +
       '<button class="btn" onclick="closeAdventure()">Schließen</button>' +
     '</div>';
   el.style.display = "flex";
@@ -6739,7 +7785,9 @@ function initBattle() {
   rb.onclick = () => {
     BT.wilds.forEach(w => { w.hp = 0; });
     BT.wilds = []; BT.wild = null;
-    BT.fighters.forEach(f => { f.target = null; f.hp = f.maxHp; f.faintT = 0; });
+    BT.fighters.forEach(f => { f.target = null; f.hp = f.maxHp; f.faintT = 0; f.dead = false; });
+    state.box.forEach(m => { m.ko = false; m.healReadyAt = 0; });
+    save(); renderTeam(); renderBox();
     BT.anchorWaiting = false; BT.anchorWaitPos = null;
     BT.ballAnim = null; BT.typeVfx = null;
     repositionFighters();
@@ -6766,7 +7814,7 @@ function syncFighters() {
     if (BT.fighters.some(f => f.uid === uidv)) return;
     const m = getMon(uidv);
     if (!m) return;
-    const maxHp = 25 + m.level * 3;
+    const maxHp = Math.round((25 + m.level * 3) * hunterStatMultiplier("vit"));
     const base = findWalkableNear(BT.mapW / 2 + (i - 1) * 48, BT.mapH / 2);
     const f = {
       uid: uidv,
@@ -7282,15 +8330,11 @@ function updateBattle(dt, now) {
     if (!m) return;
     if (m.level !== f.lastLevel) {
       const ratio = f.maxHp ? f.hp / f.maxHp : 1;
-      f.maxHp = 25 + m.level * 3;
+      f.maxHp = Math.round((25 + m.level * 3) * hunterStatMultiplier("vit"));
       f.hp = Math.max(1, Math.min(f.maxHp, f.maxHp * ratio));
       f.lastLevel = m.level;
     }
-    if (f.faintT > 0) {
-      f.faintT -= dt;
-      if (f.faintT <= 0) { f.hp = f.maxHp; addFloat(f.wx, f.wy - 30, "Zurück!", "#50c878", 8); }
-      return;
-    }
+    if (f.faintT > 0) { f.faintT = Math.max(0, f.faintT - dt); return; }
     f.bob += dt * 6;
     f.lunge = Math.max(0, f.lunge - dt);
     f.hitFlash = Math.max(0, f.hitFlash - dt);
@@ -7328,6 +8372,17 @@ function updateBattle(dt, now) {
   // Kämpfe: Legenden-Event = ganzes Team gegen 1 Legende, sonst mehrere 1v1-Kämpfe parallel
   if (BT.legendActive) updateLegendBattle(dt, now);
   else updateWildBattles(dt, now);
+  // K.O.-Kämpfer entfernen: Mon → verletzt in die Box, Team-Slot wird frei (2B)
+  if (BT.fighters.some(f => f.dead)) {
+    BT.fighters.filter(f => f.dead).forEach(f => {
+      const m = getMon(f.uid);
+      if (m) { m.ko = true; m.healReadyAt = 0; }
+      const i = state.team.indexOf(f.uid);
+      if (i >= 0) state.team.splice(i, 1);
+    });
+    BT.fighters = BT.fighters.filter(f => !f.dead);
+    save(); renderTeam(); renderBox();
+  }
 
   // Kamera rahmt Team-Anker (und im Kampf zusätzlich das fokussierte Wild)
   updateCamera();
@@ -8199,7 +9254,10 @@ function wildHit(w, f) {
   f.hp = Math.max(0, f.hp - dmg);
   f.hitFlash = 0.25;
   addFloat(f.wx, f.wy - 30, String(dmg), "#f8f8f8", 8);
-  if (f.hp <= 0) { f.faintT = 8; addFloat(f.wx, f.wy - 44, "K.O.!", "#e04038", 9); }
+  if (f.hp <= 0 && !f.dead) {
+    f.dead = true; f.faintT = 999; f.target = null;   // Aufräumen am Frame-Ende (updateBattle)
+    addFloat(f.wx, f.wy - 44, "K.O.!", "#e04038", 9);
+  }
 }
 
 /* Gibt den kombinierten Multiplikator für einen Stat-Slot ('atk','def','spAtk','spDef','speed')
@@ -9306,6 +10364,133 @@ function daysSince(dstr) {
   const start = new Date(dstr + "T00:00:00");
   return Math.max(0, Math.floor((Date.now() - start) / 86400000)) + 1;
 }
+/* ---------- Pentagon-Radar-Chart ---------- */
+// Zeichnet 5 Achsen (je Stat, feste Reihenfolge str,vit,agi,int,per), Gitternetz
+// und die gefüllte Stat-Fläche. Achsen-Skala dynamisch (mind. 10).
+function drawHunterRadar(canvas) {
+  if (!canvas) return;
+  const stats = Object.keys(HUNTER_STATS);
+  const n = stats.length;
+  const dpr = window.devicePixelRatio || 1;
+  const size = 200;
+  canvas.width = size * dpr; canvas.height = size * dpr;
+  canvas.style.width = size + "px"; canvas.style.height = size + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+  const cx = size / 2, cy = size / 2 + 6;
+  const R = size * 0.34;
+  const levels = stats.map(k => (state.hunterStats[k] || {}).level || 1);
+  const maxLevel = Math.max(10, Math.ceil(Math.max.apply(null, levels) / 5) * 5);
+  const ang = i => (-Math.PI / 2) + (i * 2 * Math.PI / n);
+  const pt = (i, r) => ({ x: cx + Math.cos(ang(i)) * r, y: cy + Math.sin(ang(i)) * r });
+  // Gitternetz (4 konzentrische Fünfecke)
+  ctx.strokeStyle = "rgba(79,214,255,.14)"; ctx.lineWidth = 1;
+  for (let ring = 1; ring <= 4; ring++) {
+    const rr = R * ring / 4;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) { const p = pt(i, rr); i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); }
+    ctx.closePath(); ctx.stroke();
+  }
+  // Achsenlinien + Labels
+  ctx.strokeStyle = "rgba(79,214,255,.20)";
+  ctx.fillStyle = "#7fb8d8";
+  ctx.font = "bold 9px 'Segoe UI',sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (let i = 0; i < n; i++) {
+    const edge = pt(i, R);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(edge.x, edge.y); ctx.stroke();
+    const lp = pt(i, R + 15);
+    ctx.fillText(HUNTER_STATS[stats[i]].label, lp.x, lp.y);
+  }
+  // Stat-Fläche
+  const poly = stats.map((k, i) => pt(i, R * Math.min(1, ((state.hunterStats[k] || {}).level || 1) / maxLevel)));
+  const grad = ctx.createRadialGradient(cx, cy, 4, cx, cy, R);
+  grad.addColorStop(0, "rgba(79,214,255,.45)");
+  grad.addColorStop(1, "rgba(79,214,255,.12)");
+  ctx.beginPath();
+  poly.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.strokeStyle = "#4fd6ff"; ctx.lineWidth = 2;
+  ctx.shadowColor = "#4fd6ff"; ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  poly.forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#bfefff"; ctx.fill();
+  });
+}
+
+/* ---------- Hunter-Panel (Hunter-Tab, unter Trainer-Card) ---------- */
+function renderHunterPanel() {
+  const mount = document.getElementById("hunter-panel-mount");
+  if (!mount) return;
+  if (!state.hunterStats) { mount.innerHTML = ""; return; }
+  const rank = hunterRank();
+  const rows = Object.keys(HUNTER_STATS).map(k => {
+    const s = state.hunterStats[k] || { xp:0, level:1 };
+    const meta = HUNTER_STATS[k];
+    const pct = Math.round((s.xp / HUNTER_STAT_XP_PER_LEVEL) * 100);
+    return '<div class="hp-statrow">' +
+      '<span class="icon">' + meta.icon + '</span>' +
+      '<span class="name">' + meta.label + '</span>' +
+      '<span class="track"><span class="fill" style="width:' + pct + '%;background:' + meta.color + '"></span></span>' +
+      '<span class="lvl">' + s.level + '</span>' +
+    '</div>';
+  }).join("");
+  const next = hunterNextRankThreshold(rank.sum);
+  const helpText =
+    'Jeder erledigte Habit gibt <b>+' + HUNTER_STAT_XP_PER_COMPLETE + ' XP</b> auf einen von fünf Hunter-Stats – je nach Kategorie: ' +
+    '💪 Fitness → STR, 🥗/😴 Ernährung &amp; Schlaf → VIT, 🧠 Lernen → INT, 🧘 Mindfulness → PER. ' +
+    'Eigene Habits wählen ihren Zielstat selbst; Zeit-Habits geben zusätzlich AGI. ' +
+    'Alle <b>' + HUNTER_STAT_XP_PER_LEVEL + ' XP</b> steigt ein Stat ein Level (Balken = Fortschritt zum nächsten). ' +
+    'Höhere Level verstärken dein Team im Kampf um bis zu <b>+' + Math.round(HUNTER_STAT_MULT_CAP * 100) + '%</b>: ' +
+    '⚔️ STR = physischer Schaden, ❤️ VIT = max. KP, 💨 AGI = Initiative, 🧠 INT = Spezial-Schaden, 👁️ PER = Kritchance. ' +
+    'Dein <b>Hunter-Rang (E–S)</b> ergibt sich aus der Summe aller Stat-Level.';
+  mount.innerHTML =
+    '<div class="hunter-panel">' +
+      '<div class="hp-head">' +
+        '<span class="hp-title">Hunter-Status</span>' +
+        '<span style="display:flex;align-items:center;gap:8px">' +
+          '<span class="hp-rank"><span class="rlabel">RANG</span>' +
+            '<span class="rval rank-' + rank.rank + '">' + rank.rank + '</span></span>' +
+          '<span class="hp-help" onclick="document.getElementById(\'hp-help-text\').classList.toggle(\'open\')" title="Erklärung">?</span>' +
+        '</span>' +
+      '</div>' +
+      '<div class="hp-help-text" id="hp-help-text">' + helpText + '</div>' +
+      '<div class="hp-canvas-wrap"><canvas id="hunter-radar"></canvas></div>' +
+      '<div class="hp-statlist">' + rows + '</div>' +
+      '<div class="hp-foot">Stat-Summe ' + rank.sum + ' · nächster Rang bei ' + (next === null ? "MAX" : next) + '</div>' +
+      renderEmergencyBlock() +
+    '</div>';
+  drawHunterRadar(document.getElementById("hunter-radar"));
+}
+
+/* Emergency-Quest- / Debuff-Statusblock im Hunter-Panel */
+function renderEmergencyBlock() {
+  const q = state.emergencyQuest;
+  const d = state.hunterDebuff;
+  let html = "";
+  if (q && q.date === todayStr()) {
+    const meta = HUNTER_STATS[q.stat];
+    html += '<div class="eq-box eq-active">' +
+      '<div class="eq-title">⚠️ NOTFALL-QUEST</div>' +
+      '<div class="eq-body">' + meta.icon + ' <b>' + meta.label + '</b> verkümmert. ' +
+        'Erfülle heute einen <b>' + CATS[q.cat].label + '</b>-Habit.</div>' +
+      '<div class="eq-reward">Belohnung: +' + EQ_REWARD_XP + ' ' + meta.label + '-XP · Bonus-Marke</div>' +
+    '</div>';
+  }
+  if (d) {
+    html += '<div class="eq-box eq-debuff">' +
+      '<div class="eq-title">💀 FLUCH AKTIV</div>' +
+      '<div class="eq-body">−' + Math.round(EQ_DEBUFF_MALUS * 100) + '% Kampfkraft. ' +
+        'Erfülle einen <b>' + CATS[d.cat].label + '</b>-Habit, um den Fluch zu brechen.</div>' +
+    '</div>';
+  }
+  return html;
+}
+
 function renderTrainerCard() {
   const el = document.getElementById("trainer-card");
   if (!el) return;
@@ -9697,11 +10882,11 @@ async function getPokemonStats(dex) {
 }
 // Skaliert Basiswerte auf ein Level (offizielle Formel, IV fix 31).
 // baseStats: { hp, attack, defense, "special-attack", "special-defense", speed }
-function calcStats(baseStats, level) {
-  const IV = 31;
+function calcStats(baseStats, level, ivs) {
   const lv = level && level > 0 ? level : 1;
   const result = {};
   Object.entries(baseStats || {}).forEach(([key, base]) => {
+    const IV = (ivs && ivs[key] !== undefined) ? ivs[key] : 31;
     if (!base) { result[key] = key === "hp" ? 1 : 0; return; }
     if (key === "hp") {
       result[key] = Math.max(1, Math.floor(((2 * base + IV) * lv) / 100) + lv + 10);
@@ -9711,9 +10896,9 @@ function calcStats(baseStats, level) {
   });
   return result;
 }
-// Skaliert einen einzelnen Basiswert (für Kampf-Schaden: ANG/VER/INIT).
-function calcStat(base, level) {
-  const IV = 31;
+// Skaliert einen einzelnen Basiswert (für Kampf-Schaden: ANG/VER/INIT). iv optional, default 31.
+function calcStat(base, level, iv) {
+  const IV = iv !== undefined ? iv : 31;
   const lv = level && level > 0 ? level : 1;
   return Math.floor(((2 * (base || 0) + IV) * lv) / 100) + 5;
 }
@@ -9883,18 +11068,21 @@ async function renderMonDetailModal(mon, activeTab = "stats") {
       ["special-attack","SpAtk"],["special-defense","SpDef"],["speed","Speed"]];
     // Zahl = aktueller Wert (Lv. mon.level) / Maximum bei Lv. 100.
     // Balken = Fortschritt zum Maximum (val / max100).
-    const scaled = calcStats(stats, mon.level);
-    const maxed  = calcStats(stats, 100);
-    bodyHTML = '<div style="font-size:7px;color:#909080;text-align:center;margin-bottom:6px">Aktuell (Lv. ' + mon.level + ') / Max (Lv. 100)</div>' +
+    const scaled = calcStats(stats, mon.level, mon.iv);
+    const maxed  = calcStats(stats, 100, mon.iv);
+    const ivPct = Math.round(Object.values(mon.iv || {}).reduce((a,b) => a+b, 0) / (31 * 6) * 100);
+    bodyHTML = '<div style="font-size:7px;color:#909080;text-align:center;margin-bottom:2px">Aktuell (Lv. ' + mon.level + ') / Max (Lv. 100)</div>' +
+      '<div style="font-size:8px;color:#f0c020;text-align:center;margin-bottom:6px">🧬 Gesamt-IV: ' + ivPct + '%</div>' +
       '<div class="mdm-stats">' + statDefs.map(([k, l]) => {
       const base = stats[k] || 0;
       const val = scaled[k] || 0;
       const max = maxed[k] || 0;
+      const iv = (mon.iv && mon.iv[k] !== undefined) ? mon.iv[k] : 31;
       const pct = max ? Math.min(100, Math.round(val / max * 100)) : 0;
       const color = base >= 100 ? "#50c878" : base >= 70 ? "#f8c030" : "#e04038";
       return '<div class="mdm-stat-row">' +
         '<span class="mdm-stat-name">' + l + '</span>' +
-        '<span class="mdm-stat-val">' + val + ' <span style="color:#909080;font-size:7px">/ ' + max + '</span></span>' +
+        '<span class="mdm-stat-val">' + val + ' <span style="color:#909080;font-size:7px">/ ' + max + ' · IV ' + iv + '</span></span>' +
         '<div class="bar" style="flex:1"><div class="fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
         '</div>';
     }).join("") + '</div>';
