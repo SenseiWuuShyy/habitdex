@@ -763,6 +763,37 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   margin-top:6px;
 }
 
+/* ===== Ausgaben-Tracking (Analyse-Subtab) ===== */
+.an-subtab-row{display:flex;gap:6px;margin-bottom:10px}
+.an-subtab-btn{
+  font-family:inherit;font-size:8px;color:var(--white);cursor:pointer;
+  border:2px solid var(--line);border-radius:5px;background:var(--bg2);
+  padding:6px 10px;opacity:.6;flex:1;text-align:center;
+}
+.an-subtab-btn.active{opacity:1;background:var(--blue);border-color:#204878}
+.exp-import-box{
+  background:var(--bg2);border:2px solid var(--line);border-radius:8px;
+  padding:10px;margin-bottom:10px;
+}
+.exp-group-title{font-size:8px;color:var(--gold);margin:8px 0 4px}
+.exp-bon-entry{
+  background:var(--bg2);border:2px solid var(--line);border-radius:6px;
+  padding:8px 10px;margin-bottom:6px;font-size:8px;
+}
+.exp-bon-head{display:flex;justify-content:space-between;color:var(--white)}
+.exp-bon-diff{color:var(--red);font-size:7px;margin-top:2px}
+.exp-bon-del{
+  font-family:inherit;font-size:7px;color:#8898b0;background:none;
+  border:1px solid var(--line);border-radius:4px;padding:3px 6px;cursor:pointer;
+  margin-top:6px;
+}
+.exp-paste-input{
+  font-family:inherit;font-size:8px;width:100%;padding:6px 8px;margin-bottom:8px;
+  background:var(--bg);color:var(--white);
+  border:2px solid var(--line);border-radius:6px;
+  resize:vertical;min-height:70px;
+}
+
 /* ===== Tages-Notiz Absenden + Notizspeicher ===== */
 .dl-note-sent{font-size:9px;color:var(--hpgreen);padding:6px 0;line-height:1.8}
 .dl-note-prev{font-size:8px;color:#8898b0;line-height:1.7;
@@ -1249,6 +1280,11 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 
     <!-- TAB: ANALYSE -->
     <section class="tab" id="tab-analyse">
+      <div class="an-subtab-row">
+        <button class="an-subtab-btn active" data-sub="trainer" onclick="switchAnSubtab('trainer')">📊 Trainer</button>
+        <button class="an-subtab-btn" data-sub="expenses" onclick="switchAnSubtab('expenses')">🧾 Ausgaben</button>
+      </div>
+      <div id="an-panel-trainer">
       <h2>&#9654; DIESE WOCHE</h2>
       <div class="panel dark" id="week-stats"></div>
 
@@ -1275,6 +1311,10 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
         <button class="btn" onclick="document.getElementById('backup-import-file').click()">📥 Daten importieren</button>
         <input type="file" id="backup-import-file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
         <button class="btn red" onclick="resetAll()">🗑 Alles zurücksetzen</button>
+      </div>
+      </div>
+      <div id="an-panel-expenses" style="display:none">
+        <div id="expenses-content"></div>
       </div>
     </section>
   </main>
@@ -2085,6 +2125,7 @@ function effectiveness(atkType, defTypes) {
    ===================================================================== */
 let state = null;
 let cache = null; // { pokemon:{}, evo:{}, evoDone:{}, battle:{dex:{speed,moves}} }
+let expenses = null; // { v, bons:[], items:[], monthlyCats:{} } — eigener localStorage-Key, siehe loadExpenses()
 let dlNoteBuffer = "";        // Tipp-Puffer für die Tages-Notiz (nicht persistiert)
 let noteArchiveOpen = false;  // Notizspeicher im Analyse-Tab auf/zu (nicht persistiert)
 let pendingStoneKey = null;   // aktuell einzusetzender Stein-Key (Stein-Auswahlgrid)
@@ -2279,6 +2320,171 @@ let saveTimer = null;
 function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200); }
 function saveCache() {
   try { localStorage.setItem("habitdex_cache", JSON.stringify(cache)); } catch (e) {}
+}
+
+/* =====================================================================
+   AUSGABEN-TRACKING (Analyse-Subtab, Phase 1)
+   Eigener State, eigener localStorage-Key — unabhängig vom Spiel-State,
+   nicht Teil von exportBackup()/importBackup().
+   ===================================================================== */
+const EXP_CATS = {
+  obstgemuese:      { label: "Obst & Gemüse",       group: "Lebensmittel" },
+  fleischfisch:      { label: "Fleisch & Fisch",     group: "Lebensmittel" },
+  milch:             { label: "Milch",               group: "Lebensmittel" },
+  eier:              { label: "Eier",                group: "Lebensmittel" },
+  brot:              { label: "Brot & Backwaren",    group: "Lebensmittel" },
+  trockenkonserven:  { label: "Trocken & Konserven", group: "Lebensmittel" },
+  tiefkuehl:         { label: "Tiefkühl",             group: "Lebensmittel" },
+  fertiggerichte:    { label: "Fertiggerichte",       group: "Lebensmittel" },
+  suesses:           { label: "Süßes & Snacks",       group: "Lebensmittel" },
+  getraenke:         { label: "Getränke",             group: "Lebensmittel" },
+  alkohol:           { label: "Alkohol",              group: "Lebensmittel" },
+  koerperpflege:     { label: "Körperpflege",         group: "Drogerie" },
+  gesundheit:        { label: "Gesundheit",           group: "Drogerie" },
+  reinigung:         { label: "Reinigung",            group: "Haushalt" },
+  verbrauch:         { label: "Verbrauchsmaterial",   group: "Haushalt" },
+  nonfood:           { label: "Non-Food",             group: "Sonstiges" },
+  pfand:             { label: "Pfand",                group: "Sonstiges" },
+  rabatt:            { label: "Rabatt",               group: "Sonstiges" }
+};
+const EXP_GROUP_ORDER = ["Lebensmittel", "Drogerie", "Haushalt", "Sonstiges"];
+const EXP_RAW_DAYS = 90;
+
+function round2(n) { return Math.round((n + Number.EPSILON) * 100) / 100; }
+
+function defaultExpenses() {
+  return { v: 1, bons: [], items: [], monthlyCats: {} };
+}
+function loadExpenses() {
+  try { expenses = JSON.parse(localStorage.getItem("habitdex_expenses")) || defaultExpenses(); }
+  catch (e) { expenses = defaultExpenses(); }
+  const d = defaultExpenses();
+  for (const k in d) if (expenses[k] === undefined) expenses[k] = d[k];
+}
+function saveExpenses() {
+  try { localStorage.setItem("habitdex_expenses", JSON.stringify(expenses)); }
+  catch (e) {}
+}
+
+// Faltet alle Positionen eines Bons in expenses.monthlyCats (Kategorie-Monatssummen).
+function foldBonToMonthly(bonId) {
+  expenses.items.filter(i => i.bonId === bonId).forEach(i => {
+    const mk = i.date.slice(0, 7);
+    if (!expenses.monthlyCats[mk]) expenses.monthlyCats[mk] = {};
+    const c = expenses.monthlyCats[mk][i.cat] || { sum: 0, n: 0 };
+    c.sum = round2(c.sum + i.price);
+    c.n++;
+    expenses.monthlyCats[mk][i.cat] = c;
+  });
+}
+
+// Entfernt Bons/Positionen älter als EXP_RAW_DAYS Tage — vorher gefaltet, nie ohne Faltung gelöscht.
+function pruneExpenses() {
+  const cutoff = dateStr(new Date(Date.now() - EXP_RAW_DAYS * 86400000));
+  const oldBons = expenses.bons.filter(b => b.date < cutoff);
+  if (!oldBons.length) return;
+  oldBons.forEach(b => foldBonToMonthly(b.id));
+  const oldIds = new Set(oldBons.map(b => b.id));
+  expenses.bons = expenses.bons.filter(b => !oldIds.has(b.id));
+  expenses.items = expenses.items.filter(i => !oldIds.has(i.bonId));
+  saveExpenses();
+}
+
+// Gemeinsame Kernlogik für Datei- und Text-Import: validiert, dedupliziert,
+// speichert. Gibt true bei Erfolg zurück, false bei Fehler/Duplikat.
+function processExpensesImport(jsonText) {
+  let data;
+  try { data = JSON.parse(jsonText); }
+  catch (e) { toast("⚠ Kein gültiges JSON."); return false; }
+
+  if (!data || typeof data !== "object" || !data.bon || !Array.isArray(data.items) ||
+      !data.bon.id || !data.bon.date || !data.bon.shop || data.bon.total == null) {
+    toast("⚠ Keine gültige Bon-Datei.");
+    return false;
+  }
+  if (expenses.bons.some(b => b.id === data.bon.id)) {
+    toast("⚠ Dieser Bon wurde bereits importiert.");
+    return false;
+  }
+
+  let unsureCount = 0;
+  const newItems = data.items.map(raw => {
+    let cat = raw.cat;
+    let unsure = !!raw.unsure;
+    if (!EXP_CATS[cat]) { cat = "nonfood"; unsure = true; }
+    if (unsure) unsureCount++;
+    return {
+      id: uid(),
+      bonId: data.bon.id,
+      date: data.bon.date,
+      cat: cat,
+      name: String(raw.name || "?").slice(0, 80),
+      qty: Number(raw.qty) || 1,
+      unit: raw.unit || null,
+      price: Number(raw.price) || 0,
+      own: !!raw.own,
+      promo: !!raw.promo,
+      unsure: unsure
+    };
+  });
+
+  const sumItems = round2(newItems.reduce((s, i) => s + i.price, 0));
+  const total = round2(Number(data.bon.total));
+  const diff = round2(total - sumItems);
+
+  expenses.bons.push({
+    id: data.bon.id,
+    date: data.bon.date,
+    shop: String(data.bon.shop).slice(0, 60),
+    total: total,
+    sumItems: sumItems,
+    diff: diff,
+    photoRef: data.bon.photoRef || null
+  });
+  expenses.items.push(...newItems);
+
+  saveExpenses();
+  pruneExpenses();       // faltet den Bon sofort, falls sein Datum > 90 Tage zurückliegt
+  renderExpenses();
+
+  let msg = "✅ Bon importiert: " + sumItems.toFixed(2) + " €";
+  if (Math.abs(diff) > 0.05) msg += " (⚠ Differenz zur Bonsumme: " + diff.toFixed(2) + " €)";
+  if (unsureCount) msg += " · " + unsureCount + " unsichere Position(en)";
+  toast(msg);
+  return true;
+}
+
+// Datei-Import: liest die Datei ein, Kernlogik übernimmt processExpensesImport().
+function importExpensesFile(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    processExpensesImport(reader.result);
+    input.value = "";
+  };
+  reader.onerror = () => { toast("⚠ Datei konnte nicht gelesen werden."); input.value = ""; };
+  reader.readAsText(file);
+}
+
+// Text-Import: liest #exp-paste-input aus, leert es nur bei Erfolg.
+function importExpensesText() {
+  const ta = document.getElementById("exp-paste-input");
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (!text) { toast("⚠ Kein Text eingefügt."); return; }
+  const ok = processExpensesImport(text);
+  if (ok) ta.value = "";
+}
+
+function deleteBon(bonId) {
+  if (!confirm("Bon wirklich löschen?")) return;
+  expenses.bons = expenses.bons.filter(b => b.id !== bonId);
+  expenses.items = expenses.items.filter(i => i.bonId !== bonId);
+  saveExpenses();
+  renderExpenses();
+  toast("🗑 Bon gelöscht.");
 }
 
 /* =====================================================================
@@ -4141,9 +4347,107 @@ function switchTab(name) {
   if (name === "team") { renderTeam(); renderBox(); }
   if (name === "dex") renderDex();
   if (name === "inputlog") renderInputLog();
-  if (name === "analyse") { renderStats(); renderAnalyse(); }
+  if (name === "analyse") {
+    renderStats(); renderAnalyse();
+    switchAnSubtab((function () { try { return localStorage.getItem("habitdex_an_subtab") || "trainer"; } catch (e) { return "trainer"; } })());
+  }
   // "shop" ist entfernt, "city" braucht kein renderCity() — der Loop übernimmt
 }
+
+/* ---- Ausgaben-Subtab (Analyse-Tab) ---- */
+function switchAnSubtab(name) {
+  const trainerPanel = document.getElementById("an-panel-trainer");
+  const expPanel = document.getElementById("an-panel-expenses");
+  if (trainerPanel) trainerPanel.style.display = name === "trainer" ? "" : "none";
+  if (expPanel) expPanel.style.display = name === "expenses" ? "" : "none";
+  document.querySelectorAll(".an-subtab-btn").forEach(b => b.classList.toggle("active", b.dataset.sub === name));
+  try { localStorage.setItem("habitdex_an_subtab", name); } catch (e) {}
+  if (name === "expenses") renderExpenses();
+}
+
+function renderExpenses() {
+  const el = document.getElementById("expenses-content");
+  if (!el) return;
+
+  const weekDates = isoWeekDates();               // Mo–So, lokal — bestehender Helper
+  const monthKey = todayStr().slice(0, 7);
+
+  const weekItems = expenses.items.filter(i => weekDates.includes(i.date));
+  const weekSum = round2(weekItems.reduce((s, i) => s + i.price, 0));
+
+  const monthItems = expenses.items.filter(i => i.date.slice(0, 7) === monthKey);
+  const monthItemsSum = round2(monthItems.reduce((s, i) => s + i.price, 0));
+  const monthFolded = expenses.monthlyCats[monthKey] || {};
+  const monthFoldedSum = round2(Object.values(monthFolded).reduce((s, c) => s + c.sum, 0));
+  const monthSum = round2(monthItemsSum + monthFoldedSum);
+
+  const catSums = {};
+  monthItems.forEach(i => { catSums[i.cat] = round2((catSums[i.cat] || 0) + i.price); });
+  Object.entries(monthFolded).forEach(([cat, c]) => { catSums[cat] = round2((catSums[cat] || 0) + c.sum); });
+  const maxCat = Math.max(1, ...Object.values(catSums).map(v => Math.abs(v)));
+
+  let html =
+    '<div class="exp-import-box">' +
+      '<textarea id="exp-paste-input" class="exp-paste-input" rows="3" placeholder="JSON aus dem Bon-Chat hier einfügen…"></textarea>' +
+      '<button class="btn green" onclick="importExpensesText()">📋 Text importieren</button>' +
+      '<button class="btn" style="margin-top:6px" onclick="document.getElementById(\'exp-import-file\').click()">📥 Datei importieren</button>' +
+      '<input type="file" id="exp-import-file" accept="application/json,.json" style="display:none" onchange="importExpensesFile(event)">' +
+    '</div>';
+
+  html +=
+    '<div class="panel dark an-panel">' +
+      '<div class="an-title">🧾 Diese Woche (Mo&ndash;So)</div>' +
+      '<div class="an-lead">Ausgegeben: <span class="an-val">' + weekSum.toFixed(2) + ' €</span></div>' +
+    '</div>' +
+    '<div class="panel dark an-panel">' +
+      '<div class="an-title">🧾 Dieser Monat</div>' +
+      '<div class="an-lead">Ausgegeben: <span class="an-val">' + monthSum.toFixed(2) + ' €</span></div>' +
+    '</div>';
+
+  html += '<div class="panel dark an-panel"><div class="an-title">Kategorien (dieser Monat)</div>';
+  if (!Object.keys(catSums).length) {
+    html += '<div class="an-hint">Noch keine Daten für diesen Monat.</div>';
+  } else {
+    EXP_GROUP_ORDER.forEach(group => {
+      const keys = Object.keys(EXP_CATS)
+        .filter(k => EXP_CATS[k].group === group && catSums[k])
+        .sort((a, b) => catSums[b] - catSums[a]);
+      if (!keys.length) return;
+      html += '<div class="exp-group-title">' + group + '</div>';
+      keys.forEach(k => {
+        const v = catSums[k];
+        const pct = Math.round(Math.abs(v) / maxCat * 100);
+        html +=
+          '<div class="an-row">' +
+             '<span class="an-label" style="width:104px;font-size:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + EXP_CATS[k].label + '</span>' +
+            '<div class="an-bar-track"><div class="an-bar-fill pos" style="width:' + pct + '%"></div></div>' +
+            '<span class="an-val" style="min-width:50px">' + v.toFixed(2) + ' €</span>' +
+          '</div>';
+      });
+    });
+  }
+  html += '</div>';
+
+  html += '<div class="panel dark an-panel"><div class="an-title">Erfasste Bons (' + expenses.bons.length + ')</div>';
+  if (!expenses.bons.length) {
+    html += '<div class="an-hint">Noch keine Bons importiert.</div>';
+  } else {
+    [...expenses.bons].sort((a, b) => b.date.localeCompare(a.date)).forEach(b => {
+      const diffWarn = Math.abs(b.diff) > 0.05;
+      html +=
+        '<div class="exp-bon-entry">' +
+                              '<div class="exp-bon-head"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(b.shop) + ' &middot; ' + b.date.slice(8,10) + '.' + b.date.slice(5,7) + '.' + '</span>' +
+          '<span style="margin-left:14px;flex:none">' + b.total.toFixed(2) + ' €</span></div>' +
+          (diffWarn ? '<div class="exp-bon-diff">⚠ Differenz zur Bonsumme: ' + b.diff.toFixed(2) + ' €</div>' : '') +
+          '<button class="exp-bon-del" onclick="deleteBon(\'' + b.id + '\')">🗑 Löschen</button>' +
+        '</div>';
+    });
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 function openModal(id) { document.getElementById(id).classList.add("open"); }
 
@@ -12057,6 +12361,8 @@ document.getElementById("city-modal-bg").addEventListener("click", e => {
 });
 
 loadAll();
+loadExpenses();
+pruneExpenses();
 currentDay = todayStr();
 freezePausedStreaks();   // pausierte Tages-Streaks beim Start einfrieren
 ensureTodayStats();
