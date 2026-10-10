@@ -276,7 +276,7 @@ h2:first-child{margin-top:0}
   text-align: left;
   box-shadow: 0 2px 0 rgba(0,0,0,.35);
   font-family: inherit;
-  color: var(--white);
+  color: var(--ink);
   transition: transform .08s;
 }
 .city-menu-btn:active { transform: translateY(2px); box-shadow: none; }
@@ -288,8 +288,8 @@ h2:first-child{margin-top:0}
   opacity: 0.55;
 }
 .city-menu-icon { font-size: 28px; flex: none; }
-.city-menu-label { font-size: 10px; color: var(--white); margin-bottom: 3px; }
-.city-menu-hint  { font-size: 7px;  color: #8898b0; line-height: 1.6; }
+.city-menu-label { font-size: 10px; color: var(--ink); margin-bottom: 3px; }
+.city-menu-hint  { font-size: 7px;  color: #585064; line-height: 1.6; }
 
 /* ===== Adventure-Overlay ===== */
 #adventure-overlay{
@@ -586,6 +586,48 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
   border:2px solid var(--line);border-radius:5px;opacity:.5;line-height:1.5;
 }
 .type-chip.sel{opacity:1;background:#fff;outline:2px solid var(--blue)}
+.type-chip.day-chip{min-width:0;padding:7px 2px}
+.panel.offday{opacity:.55}
+.offday-toggle{text-align:center;cursor:pointer;margin:4px 0 8px}
+/* ===== Wochenleiste (Phase 2) ===== */
+.wl-nav{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.wl-nav .mini-btn:disabled{opacity:.35;cursor:default}
+.wl-label{flex:1;text-align:center;font-size:8px;color:var(--white)}
+.wl-days{display:flex;gap:4px;margin-bottom:8px}
+.wl-day{
+  flex:1;min-width:0;font-family:inherit;background:var(--bg2);color:var(--white);
+  border:2px solid var(--line);border-radius:6px;padding:5px 0 4px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+.wl-day.today{border-color:var(--gold)}
+.wl-day.sel{background:var(--panel);color:var(--ink)}
+.wl-day.future{opacity:.65}
+.wl-dow{font-size:7px}
+.wl-date{font-size:9px}
+.wl-dot{width:6px;height:6px;border-radius:50%;background:transparent}
+.wl-dot.all{background:var(--hpgreen)}
+.wl-dot.part{background:var(--gold)}
+.wl-dot.none{background:var(--red)}
+.wl-today-btn{display:block;margin:0 auto 10px}
+/* ===== Tagesansicht (Phase 2) ===== */
+.dayv-head .dayv-title{font-size:10px;color:var(--gold);margin-bottom:6px}
+.dayv-head .dayv-sub{font-size:7px;color:#8898b0;margin-bottom:6px}
+.dayv-head .dayv-sum{font-size:9px}
+.dayv-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #c8c8b0;font-size:9px}
+.dayv-list .dayv-row:last-child{border-bottom:none}
+.dayv-ic{width:14px;text-align:center}
+.dayv-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dayv-meta{font-size:7px;color:#707060}
+.dayv-row.done .dayv-ic{color:#287848}
+.dayv-row.missed .dayv-ic,.dayv-row.missed .dayv-name{color:var(--red)}
+.dayv-row.neutral,.dayv-row.paused,.dayv-row.planned{opacity:.6}
+.dayv-note{font-size:7px;color:#707060;padding:0 0 6px 22px}
+.dayv-group{font-size:8px;color:#8898b0;margin:12px 0 6px}
+.dayv-row.due .dayv-ic,.dayv-row.due .dayv-name{color:#b8860b}
+#dayv-log-slot .daily-log-panel{margin-top:4px}
+.goal-dates{display:flex;align-items:center;gap:6px}
+.goal-dates input{flex:1;min-width:0}
+.goal-dates span{font-size:8px;color:#8898b0}
 .panel.negative{background:#f8e0dc;box-shadow:0 3px 0 rgba(0,0,0,.4), inset 0 0 0 2px #f0b0a8}
 .habit-streak.neg{color:#c02820;font-weight:bold}
 .count-box{display:flex;align-items:center;gap:8px;margin-top:8px}
@@ -1188,6 +1230,77 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
 .hunter-panel .eq-debuff .eq-title{color:#ff5470; text-shadow:0 0 8px rgba(255,84,112,.6)}
 .hunter-panel .eq-body{color:var(--sl-text)}
 .hunter-panel .eq-reward{margin-top:5px; color:var(--sl-muted); font-size:8px}
+
+/* ===== Einkaufsliste (Analyse-Subtab „Einkauf“) ===== */
+.ek-add{margin-bottom:12px}
+.ek-add-row{display:flex;gap:6px;margin-top:6px;align-items:stretch}
+.ek-input{
+  width:100%;font-family:inherit;font-size:11px;padding:10px;
+  border:3px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);
+}
+.ek-add-row .ek-qty,.modal .ek-add-row .ek-qty{width:84px;flex:none}
+.ek-add-row .ek-unit,.modal .ek-add-row .ek-unit{flex:1;min-width:0;width:auto}
+.ek-add-btn{width:52px;flex:none;margin:0;padding:0;font-size:16px}
+#ek-list{scroll-margin-top:64px}
+.ek-head{font-size:9px;color:var(--gold);margin:4px 0 8px}
+.ek-item{
+  display:flex;align-items:center;gap:8px;min-height:46px;
+  padding:8px 10px;margin-bottom:6px;cursor:pointer;
+  background:#c8f0b4;color:#1e2a1c;
+  border:3px solid #4a8a3a;border-radius:8px;box-shadow:0 2px 0 rgba(0,0,0,.35);
+  user-select:none;-webkit-user-select:none;
+}
+.ek-item:active{transform:translateY(1px)}
+.ek-item.done{background:#c8453c;color:#fff;border-color:#8c2a24}
+.ek-mark{
+  width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;
+  border:3px solid currentColor;border-radius:5px;font-size:12px;background:rgba(255,255,255,.55);
+}
+.ek-item.done .ek-mark{background:rgba(255,255,255,.2)}
+.ek-body{flex:1;min-width:0}
+.ek-name{font-size:10px;word-break:break-word;line-height:1.5}
+.ek-item.done .ek-name{text-decoration:line-through}
+.ek-rcp{font-size:6px;margin-top:3px;color:#3a5a32}
+.ek-item.done .ek-rcp{color:#ffd8d4}
+.ek-qtyl{font-size:8px;flex:none;white-space:nowrap}
+.ek-edit{flex:none}
+.ek-divider{font-size:7px;color:#8898b0;margin:12px 0 6px}
+.ek-alldone{font-size:8px;color:var(--hpgreen);margin:4px 0 8px;line-height:1.8}
+.ek-list-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.ek-recipe-head{display:flex;align-items:center;gap:8px;cursor:pointer}
+.ek-recipe-name{flex:1;min-width:0;font-size:10px;color:var(--white);word-break:break-word}
+.ek-recipe-meta{font-size:7px;color:#8898b0;line-height:1.8;margin-top:3px}
+.ek-recipe-arrow{font-size:10px;color:#8898b0;flex:none}
+.ek-recipe-body{margin-top:8px;padding-top:8px;border-top:2px solid var(--line)}
+.ek-ing-line{display:flex;justify-content:space-between;gap:8px;font-size:8px;color:var(--white);line-height:1.9}
+.ek-ing-line span:last-child{flex:none;color:var(--gold)}
+.ek-recipe-actions{display:flex;gap:6px;margin-top:10px}
+.ek-recipe-actions .btn{margin:0;flex:1;padding:9px 4px;font-size:8px}
+.ek-ing-row{display:flex;gap:5px;align-items:center;margin-bottom:6px}
+.modal .ek-ing-row input.ek-ing-name{flex:1;min-width:0;width:auto;padding:8px}
+.modal .ek-ing-row input.ek-ing-qty{width:58px;flex:none;padding:8px}
+.modal .ek-ing-row select.ek-ing-unit{width:70px;flex:none;padding:8px 2px;font-size:9px}
+.ek-ing-del{
+  flex:none;font-family:inherit;font-size:9px;color:var(--white);cursor:pointer;
+  background:var(--red);border:2px solid var(--line);border-radius:5px;padding:7px 8px;
+}
+.ek-known-row{display:flex;gap:6px;margin-top:6px}
+.ek-known-row .btn{margin:0;flex:1;padding:10px 4px;font-size:8px}
+.ek-known-box{
+  display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;padding:7px;
+  border:2px solid var(--line);border-radius:6px;background:#fff;
+  max-height:170px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.ek-known-chip{
+  font-family:inherit;font-size:8px;line-height:1.4;cursor:pointer;
+  background:var(--panel2);color:var(--ink);
+  border:2px solid var(--line);border-radius:5px;padding:7px 8px;
+  word-break:break-word;text-align:left;
+}
+.ek-known-chip:active{transform:translateY(1px)}
+/* Im Einkaufs-Subtab Platz für die Liste schaffen: Battle-Canvas ausblenden */
+body.ek-mode #battle{visibility:hidden;pointer-events:none}
+body.ek-mode main{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
@@ -1202,6 +1315,8 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
     <!-- TAB: HABITS -->
     <section class="tab active" id="tab-habits">
       <h2>&#9654; Tägliche Habits</h2>
+      <div id="week-strip"></div>
+      <div id="today-view">
       <p class="muted" style="margin-bottom:8px">Tipp: Habit lange gedrückt halten, um die Reihenfolge zu ändern.</p>
 
       <div class="panel daily-log-panel" id="daily-log-panel">
@@ -1240,6 +1355,8 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <h2>&#9654; Langfristige Ziele</h2>
       <div id="goal-list"></div>
       <button class="btn" onclick="openGoalModal()">+ Neues Ziel</button>
+      </div>
+      <div id="day-view" style="display:none"></div>
     </section>
 
     <!-- TAB: TEAM -->
@@ -1283,6 +1400,7 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <div class="an-subtab-row">
         <button class="an-subtab-btn active" data-sub="trainer" onclick="switchAnSubtab('trainer')">📊 Trainer</button>
         <button class="an-subtab-btn" data-sub="expenses" onclick="switchAnSubtab('expenses')">🧾 Ausgaben</button>
+        <button class="an-subtab-btn" data-sub="einkauf" onclick="switchAnSubtab('einkauf')">🛒 Einkauf</button>
       </div>
       <div id="an-panel-trainer">
       <h2>&#9654; DIESE WOCHE</h2>
@@ -1315,6 +1433,20 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       </div>
       <div id="an-panel-expenses" style="display:none">
         <div id="expenses-content"></div>
+      </div>
+      <div id="an-panel-einkauf" style="display:none">
+        <div class="ek-add">
+          <input id="ek-name-input" class="ek-input" maxlength="40" placeholder="Lebensmittel hinzufügen…" autocomplete="off" onkeydown="if(event.key==='Enter')ekAddItem()">
+          <div class="ek-add-row">
+            <input id="ek-qty-input" class="ek-input ek-qty" maxlength="8" inputmode="decimal" placeholder="Menge" autocomplete="off" onkeydown="if(event.key==='Enter')ekAddItem()">
+            <select id="ek-unit-input" class="ek-input ek-unit"></select>
+            <button class="btn green ek-add-btn" onclick="ekAddItem()">+</button>
+          </div>
+        </div>
+        <div id="ek-list"></div>
+        <h2>&#9654; Rezepte</h2>
+        <div id="ek-recipes"></div>
+        <button class="btn green" onclick="openEkRecipeModal(null)">+ Neues Rezept</button>
       </div>
     </section>
   </main>
@@ -1381,6 +1513,11 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
         <label id="target-label">Zielwert</label>
         <input id="habit-target-input" type="number" min="1" placeholder="8">
       </div>
+      <div id="days-wrap" style="display:none">
+        <label>Feste Tage (optional)</label>
+        <div class="type-row" id="days-row"></div>
+        <div class="hint">Leer = frei wählbar wie bisher. Mit festen Tagen erscheint der Habit nur an diesen Tagen – Sa/So zusätzlich, solange das Wochenziel offen ist.</div>
+      </div>
       <label>Kategorie</label>
       <div class="cat-row" id="cat-row"></div>
       <div id="stat-target-wrap" style="display:none">
@@ -1439,6 +1576,13 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <input id="goal-target-input" type="number" min="1" placeholder="300">
       <label>Einheit</label>
       <input id="goal-unit-input" maxlength="15" placeholder="Seiten">
+      <label>Zeitraum (optional)</label>
+      <div class="goal-dates">
+        <input id="goal-start-input" type="date">
+        <span>bis</span>
+        <input id="goal-end-input" type="date">
+      </div>
+      <div class="hint">Leer = ohne Termin, wie bisher. Mit Zeitraum erscheint das Ziel in der Tagesansicht der betroffenen Tage.</div>
       <div style="height:12px"></div>
       <button class="btn green" onclick="saveGoal()">Speichern</button>
       <button class="btn red" onclick="closeModal('goal-modal')">Abbrechen</button>
@@ -1609,6 +1753,44 @@ nav button.active{color:var(--gold);background:rgba(255,255,255,.06)}
       <button class="btn green" onclick="saveTask()">Speichern</button>
       <button class="btn red" onclick="closeModal('task-modal')">Abbrechen</button>
       <button class="btn red" id="task-delete-btn" onclick="deleteTask()" style="display:none;margin-top:6px">🗑 Löschen</button>
+    </div>
+  </div>
+
+  <!-- Einkauf: Eintrag bearbeiten -->
+  <div class="modal-bg" id="ek-item-modal">
+    <div class="modal">
+      <h3>✎ Eintrag bearbeiten</h3>
+      <label>Lebensmittel</label>
+      <input id="ek-item-name" maxlength="40" autocomplete="off">
+      <label>Menge &amp; Einheit (optional)</label>
+      <div class="ek-add-row">
+        <input id="ek-item-qty" class="ek-qty" maxlength="8" inputmode="decimal" autocomplete="off">
+        <select id="ek-item-unit" class="ek-unit"></select>
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn green" onclick="ekSaveItem()">Speichern</button>
+      <button class="btn" onclick="closeModal('ek-item-modal')">Abbrechen</button>
+      <button class="btn red" onclick="ekDeleteItem()">🗑 Löschen</button>
+    </div>
+  </div>
+
+  <!-- Einkauf: Rezept anlegen / bearbeiten -->
+  <div class="modal-bg" id="ek-recipe-modal">
+    <div class="modal">
+      <h3 id="ek-recipe-title">Neues Rezept</h3>
+      <label>Name</label>
+      <input id="ek-recipe-name" maxlength="40" placeholder="z.B. Chicken Teriyaki" autocomplete="off">
+      <label>Zutaten</label>
+      <div id="ek-recipe-rows"></div>
+      <div class="ek-known-row">
+        <button class="btn" onclick="ekDraftAddRow()">+ Zutat</button>
+        <button class="btn" id="ek-known-btn" onclick="ekToggleKnown()">▾ Bekannte</button>
+      </div>
+      <div id="ek-known-box"></div>
+      <div style="height:12px"></div>
+      <button class="btn green" onclick="ekSaveRecipe()">Speichern</button>
+      <button class="btn" onclick="closeModal('ek-recipe-modal')">Abbrechen</button>
+      <button class="btn red" id="ek-recipe-del" style="display:none" onclick="ekDeleteRecipe()">🗑 Rezept löschen</button>
     </div>
   </div>
 
@@ -2138,7 +2320,7 @@ let focusSetupTaskDraft = "";
 
 function defaultState() {
   return {
-    habits: [],       // {id,name,emoji,category,reminder,doneDate,rewardDate,streak,lastDoneDate,lastFreezeStreak,history:{date:{done,note,frozen}}}
+    habits: [],       // {id,name,emoji,category,reminder,doneDate,rewardDate,streak,lastDoneDate,lastFreezeStreak,history:{date:{done,note,frozen}},activeDays:[0-6]|null,createdAt:"YYYY-MM-DD"}
     people: [],       // {id,name,type:"freund"|"familie"|"mentor"|"kollege",rhythm:"weekly"|"monthly"|"quarterly",contacts:[{date:"YYYY-MM-DD",note:""}]}
     goals: [],        // {id,name,target,current,unit,claimed}
     box: [],          // {uid,dex,level,exp,shiny,moveIdx,ko,healReadyAt}
@@ -2187,7 +2369,10 @@ function defaultState() {
     },
     hunterStatSeen: {},   // { statKey: "YYYY-MM-DD" } — letzter Tag mit XP-Zuwachs je Stat
     emergencyQuest: null, // aktive Quest: { stat, cat, date } | null
-    hunterDebuff: null    // aktiver Penalty: { cat, since:"YYYY-MM-DD" } | null
+    hunterDebuff: null,   // aktiver Penalty: { cat, since:"YYYY-MM-DD" } | null
+    einkauf: { v: 1, list: [], recipes: [] }
+    // list:    [{ id, name, qty:"", unit:"", done:false, recipeId:null|string, recipeName:null|string }]
+    // recipes: [{ id, name, createdAt:ms, lastUsedAt:null|ms, ingredients:[{ id, name, qty:"", unit:"" }] }]
     // Jedes Element: { id, title, source, type, tags:[], takeaway, date:"YYYY-MM-DD" }
     // Jedes Element hat diese Struktur:
     // {
@@ -2221,6 +2406,20 @@ function loadAll() {
     if (h.pausedUntil === undefined) h.pausedUntil = null;   // Pausenmodus (4b)
     if (h.lastWeekKey === undefined) h.lastWeekKey = null;   // Wochenziel-Streak (4a)
     if (h.statTarget === undefined) h.statTarget = (h.category === "eigene") ? "str" : null;  // Hunter-Stat-Zielstat
+    // Feste Wochentage (nur weekly), 0 = Mo … 6 = So
+    if (h.type !== "weekly" || !Array.isArray(h.activeDays) || !h.activeDays.length) h.activeDays = null;
+    else h.activeDays = [...new Set(h.activeDays.filter(d => Number.isInteger(d) && d >= 0 && d <= 6))].sort((a, b) => a - b);
+    if (h.activeDays && !h.activeDays.length) h.activeDays = null;
+    // Anlagedatum (Vorbereitung Tagesansicht, Phase 2)
+    if (!h.createdAt) {
+      const hk = Object.keys(h.history).sort();
+      h.createdAt = hk.length ? hk[0] : todayStr();
+    }
+  });
+  // Ziele: optionaler Zeitraum (Phase 3)
+  (state.goals || []).forEach(g => {
+    if (g.startDate === undefined) g.startDate = null;
+    if (g.endDate === undefined) g.endDate = null;
   });
   state.seen = state.seen || {};
   if (!state.monthlyArchive) state.monthlyArchive = {};
@@ -2244,6 +2443,9 @@ function loadAll() {
   if (state.lastSeen === undefined) state.lastSeen = Date.now();
   if (!state.people) state.people = [];
   if (!state.stackBonusGiven) state.stackBonusGiven = {};
+  if (!state.einkauf || typeof state.einkauf !== "object") state.einkauf = { v: 1, list: [], recipes: [] };
+  if (!Array.isArray(state.einkauf.list)) state.einkauf.list = [];
+  if (!Array.isArray(state.einkauf.recipes)) state.einkauf.recipes = [];
   // Bereits gefangene Pokémon als „gesehen“ nachtragen + Detail-Felder migrieren
   (state.box || []).forEach(m => {
     state.seen[m.dex] = true;
@@ -2488,6 +2690,430 @@ function deleteBon(bonId) {
 }
 
 /* =====================================================================
+   EINKAUFSLISTE (Analyse-Subtab „Einkauf“) — Liste + Rezepte
+   Speicher: state.einkauf (läuft dadurch im Gesamt-Backup mit).
+   ===================================================================== */
+const EK_UNITS = ["", "Stück", "g", "kg", "ml", "l", "Pck.", "Bund", "Dose", "EL", "TL"];
+let ekEditItemId = null;     // ID des im Modal bearbeiteten Listeneintrags
+let ekOpenRecipeId = null;   // aufgeklapptes Rezept (nicht persistiert)
+let ekDraft = null;          // Rezept-Entwurf im Modal: { id|null, ingredients:[{id,name,qty,unit}] }
+let ekKnownOpen = false;     // „Bekannte“-Block im Rezept-Modal aufgeklappt?
+let ekKnownCache = [];       // gerenderte Namensliste — Chips übergeben nur deren Index
+
+function ekState() {
+  if (!state.einkauf || typeof state.einkauf !== "object") state.einkauf = { v: 1, list: [], recipes: [] };
+  if (!Array.isArray(state.einkauf.list)) state.einkauf.list = [];
+  if (!Array.isArray(state.einkauf.recipes)) state.einkauf.recipes = [];
+  return state.einkauf;
+}
+
+function ekUnitOptions(sel) {
+  return EK_UNITS.map(u =>
+    '<option value="' + esc(u) + '"' + (u === sel ? " selected" : "") + ">" + (u ? esc(u) : "–") + "</option>"
+  ).join("");
+}
+
+function ekFmtQty(qty, unit) {
+  return [qty, unit].filter(x => x && String(x).trim()).join(" ");
+}
+
+function ekFmtDate(ts) {
+  return new Date(ts).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" });
+}
+
+function renderEinkauf() {
+  const unitSel = document.getElementById("ek-unit-input");
+  if (unitSel && !unitSel.options.length) unitSel.innerHTML = ekUnitOptions("");
+  renderEkList();
+  renderEkRecipes();
+}
+
+/* ---- Einkaufsliste ---- */
+function renderEkList() {
+  const el = document.getElementById("ek-list");
+  if (!el) return;
+  const list = ekState().list;
+  const open = list.filter(i => !i.done);
+  const done = list.filter(i => i.done);
+
+  if (!list.length) {
+    el.innerHTML =
+      '<div class="ek-head">🛒 Einkaufsliste</div>' +
+      '<div class="empty-slot">Liste ist leer.<br>Oben etwas hinzufügen oder ein Rezept nutzen.</div>';
+    return;
+  }
+
+  let h = '<div class="ek-head">🛒 Einkaufsliste · ' + open.length + " offen</div>";
+  if (open.length === 0 && done.length > 0) h += '<div class="ek-alldone">✅ Alles erledigt!</div>';
+  h += open.map(ekItemHtml).join("");
+  if (done.length) {
+    h += '<div class="ek-divider">Erledigt (' + done.length + ")</div>";
+    h += done.map(ekItemHtml).join("");
+  }
+
+  h += '<div class="ek-list-actions">';
+  if (done.length) h += '<button class="mini-btn" onclick="ekClearDone()">✓ Erledigte entfernen</button>';
+  h += '<button class="mini-btn" onclick="openEkRecipeModal(null, true)">📖 Als Rezept speichern</button>';
+  h += '<button class="mini-btn" onclick="ekClearAll()">🗑 Liste leeren</button>';
+  h += "</div>";
+
+  el.innerHTML = h;
+}
+
+function ekItemHtml(it) {
+  const q = ekFmtQty(it.qty, it.unit);
+  return '<div class="ek-item' + (it.done ? " done" : "") + "\" onclick=\"ekToggle('" + it.id + "')\">" +
+    '<div class="ek-mark">' + (it.done ? "✔" : "") + "</div>" +
+    '<div class="ek-body">' +
+      '<div class="ek-name">' + esc(it.name) + "</div>" +
+      (it.recipeName ? '<div class="ek-rcp">🍳 ' + esc(it.recipeName) + "</div>" : "") +
+    "</div>" +
+    (q ? '<div class="ek-qtyl">' + esc(q) + "</div>" : "") +
+    '<button class="mini-btn ek-edit" onclick="event.stopPropagation();openEkItemModal(\'' + it.id + '\')">✎</button>' +
+  "</div>";
+}
+
+function ekAddItem() {
+  const nameEl = document.getElementById("ek-name-input");
+  const qtyEl = document.getElementById("ek-qty-input");
+  const unitEl = document.getElementById("ek-unit-input");
+  const name = (nameEl.value || "").trim();
+  if (!name) { toast("Bitte einen Namen eingeben."); return; }
+  ekState().list.push({
+    id: uid(),
+    name: name,
+    qty: (qtyEl.value || "").trim().slice(0, 8),
+    unit: unitEl.value || "",
+    done: false,
+    recipeId: null,
+    recipeName: null
+  });
+  nameEl.value = "";
+  qtyEl.value = "";
+  unitEl.value = "";
+  nameEl.focus();
+  save();
+  renderEkList();
+}
+
+function ekToggle(id) {
+  const it = ekState().list.find(i => i.id === id);
+  if (!it) return;
+  it.done = !it.done;
+  save();
+  renderEkList();
+}
+
+function openEkItemModal(id) {
+  const it = ekState().list.find(i => i.id === id);
+  if (!it) return;
+  ekEditItemId = id;
+  document.getElementById("ek-item-name").value = it.name || "";
+  document.getElementById("ek-item-qty").value = it.qty || "";
+  document.getElementById("ek-item-unit").innerHTML = ekUnitOptions(it.unit || "");
+  openModal("ek-item-modal");
+}
+
+function ekSaveItem() {
+  const it = ekState().list.find(i => i.id === ekEditItemId);
+  if (!it) return;
+  const name = (document.getElementById("ek-item-name").value || "").trim();
+  if (!name) { toast("Bitte einen Namen eingeben."); return; }
+  it.name = name;
+  it.qty = (document.getElementById("ek-item-qty").value || "").trim().slice(0, 8);
+  it.unit = document.getElementById("ek-item-unit").value || "";
+  save();
+  closeModal("ek-item-modal");
+  renderEkList();
+}
+
+function ekDeleteItem() {
+  if (!ekEditItemId) return;
+  if (!confirm("Eintrag löschen?")) return;
+  const s = ekState();
+  s.list = s.list.filter(i => i.id !== ekEditItemId);
+  ekEditItemId = null;
+  save();
+  closeModal("ek-item-modal");
+  renderEkList();
+}
+
+function ekClearDone() {
+  const s = ekState();
+  s.list = s.list.filter(i => !i.done);
+  save();
+  renderEkList();
+}
+
+function ekClearAll() {
+  if (!confirm("Ganze Liste leeren?")) return;
+  ekState().list = [];
+  save();
+  renderEkList();
+}
+
+/* ---- Rezepte ---- */
+function renderEkRecipes() {
+  const el = document.getElementById("ek-recipes");
+  if (!el) return;
+  const recipes = ekState().recipes;
+  if (!recipes.length) {
+    el.innerHTML = '<div class="empty-slot">Noch keine Rezepte.<br>Lege dein erstes Gericht an!</div>';
+    return;
+  }
+  const sorted = recipes.slice().sort((a, b) => (a.name || "").localeCompare(b.name || "", "de"));
+  el.innerHTML = sorted.map(r => {
+    const n = (r.ingredients || []).length;
+    const isOpen = ekOpenRecipeId === r.id;
+    const meta = n + " Zutat" + (n === 1 ? "" : "en") +
+      (r.lastUsedAt ? " · zuletzt eingekauft: " + ekFmtDate(r.lastUsedAt) : " · noch nie eingekauft");
+    let h = '<div class="panel dark">' +
+      "<div class=\"ek-recipe-head\" onclick=\"toggleEkRecipe('" + r.id + "')\">" +
+        "<div>" +
+          '<div class="ek-recipe-name">' + esc(r.name) + "</div>" +
+          '<div class="ek-recipe-meta">' + esc(meta) + "</div>" +
+        "</div>" +
+        '<div class="ek-recipe-arrow">' + (isOpen ? "▴" : "▾") + "</div>" +
+      "</div>";
+    if (isOpen) {
+      h += '<div class="ek-recipe-body">' +
+        (r.ingredients || []).map(ing =>
+          '<div class="ek-ing-line"><span>' + esc(ing.name) + "</span><span>" +
+          esc(ekFmtQty(ing.qty, ing.unit)) + "</span></div>"
+        ).join("") +
+        '<div class="ek-recipe-actions">' +
+          "<button class=\"btn green\" onclick=\"ekAddRecipeToList('" + r.id + "')\">🛒 Zur Liste</button>" +
+          "<button class=\"btn\" onclick=\"openEkRecipeModal('" + r.id + "')\">✎ Bearbeiten</button>" +
+        "</div>" +
+      "</div>";
+    }
+    return h + "</div>";
+  }).join("");
+}
+
+function toggleEkRecipe(id) {
+  ekOpenRecipeId = (ekOpenRecipeId === id) ? null : id;
+  renderEkRecipes();
+}
+
+function ekAddRecipeToList(id) {
+  const s = ekState();
+  const r = s.recipes.find(x => x.id === id);
+  if (!r) return;
+  if (s.list.some(i => i.recipeId === id && !i.done)) {
+    if (!confirm("„" + r.name + "“ ist schon auf der Liste. Trotzdem nochmal hinzufügen?")) return;
+  }
+  // Nur Primitive kopieren — die gespeicherte Zutatenliste bleibt unangetastet (Snapshot).
+  (r.ingredients || []).forEach(ing => {
+    s.list.push({
+      id: uid(),
+      name: String(ing.name || ""),
+      qty: String(ing.qty || ""),
+      unit: String(ing.unit || ""),
+      done: false,
+      recipeId: r.id,
+      recipeName: String(r.name || "")
+    });
+  });
+  const n = (r.ingredients || []).length;
+  r.lastUsedAt = Date.now();
+  save();
+  renderEkList();
+  renderEkRecipes();
+  toast("🛒 " + n + " Zutat" + (n === 1 ? "" : "en") + " hinzugefügt.");
+  const listEl = document.getElementById("ek-list");
+  if (listEl) listEl.scrollIntoView({ block: "start" });
+}
+
+/* ---- Rezept-Modal ---- */
+function openEkRecipeModal(id, fromList) {
+  const s = ekState();
+  const titleEl = document.getElementById("ek-recipe-title");
+  const nameEl = document.getElementById("ek-recipe-name");
+  const delBtn = document.getElementById("ek-recipe-del");
+
+  if (id) {
+    const r = s.recipes.find(x => x.id === id);
+    if (!r) return;
+    ekDraft = {
+      id: r.id,
+      ingredients: (r.ingredients || []).map(ing => ({
+        id: ing.id || uid(),
+        name: String(ing.name || ""),
+        qty: String(ing.qty || ""),
+        unit: String(ing.unit || "")
+      }))
+    };
+    if (!ekDraft.ingredients.length) ekDraft.ingredients.push({ id: uid(), name: "", qty: "", unit: "" });
+    titleEl.textContent = "Rezept bearbeiten";
+    nameEl.value = r.name || "";
+    delBtn.style.display = "";
+  } else {
+    let rows;
+    if (fromList === true) {
+      if (!s.list.length) { toast("Die Liste ist leer."); return; }
+      rows = s.list.map(it => ({
+        id: uid(),
+        name: String(it.name || ""),
+        qty: String(it.qty || ""),
+        unit: String(it.unit || "")
+      }));
+    } else {
+      rows = [{ id: uid(), name: "", qty: "", unit: "" }];
+    }
+    ekDraft = { id: null, ingredients: rows };
+    titleEl.textContent = "Neues Rezept";
+    nameEl.value = "";
+    delBtn.style.display = "none";
+  }
+
+  ekKnownOpen = false;
+  renderEkRecipeRows();
+  renderEkKnown();
+  openModal("ek-recipe-modal");
+}
+
+function renderEkRecipeRows() {
+  const el = document.getElementById("ek-recipe-rows");
+  if (!el || !ekDraft) return;
+  el.innerHTML = ekDraft.ingredients.map((ing, i) =>
+    '<div class="ek-ing-row">' +
+      '<input class="ek-ing-name" maxlength="40" placeholder="Zutat" value="' + esc(ing.name) +
+        '" autocomplete="off" oninput="ekDraftSet(' + i + ",'name',this.value)\">" +
+      '<input class="ek-ing-qty" maxlength="8" inputmode="decimal" placeholder="Menge" value="' + esc(ing.qty) +
+        '" autocomplete="off" oninput="ekDraftSet(' + i + ",'qty',this.value)\">" +
+      '<select class="ek-ing-unit" onchange="ekDraftSet(' + i + ",'unit',this.value)\">" +
+        ekUnitOptions(ing.unit) + "</select>" +
+      '<button class="ek-ing-del" onclick="ekDraftRemoveRow(' + i + ')">✕</button>' +
+    "</div>"
+  ).join("");
+}
+
+/* Alle je verwendeten Zutaten: aus allen Rezepten + allen Listeneintraegen
+   (offen und erledigt), case-insensitiv entdoppelt, alphabetisch sortiert. */
+function ekKnownIngredients() {
+  const s = ekState();
+  const seen = new Set();
+  const names = [];
+  const push = n => {
+    const name = String(n || "").trim();
+    if (!name) return;
+    const key = name.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    names.push(name);
+  };
+  s.recipes.forEach(r => (r.ingredients || []).forEach(ing => push(ing.name)));
+  s.list.forEach(it => push(it.name));
+  return names.sort((a, b) => a.localeCompare(b, "de"));
+}
+
+function renderEkKnown() {
+  const btn = document.getElementById("ek-known-btn");
+  const box = document.getElementById("ek-known-box");
+  if (!btn || !box) return;
+  ekKnownCache = ekKnownIngredients();
+  if (!ekKnownCache.length) {
+    btn.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+  btn.style.display = "";
+  btn.textContent = (ekKnownOpen ? "▴" : "▾") + " Bekannte (" + ekKnownCache.length + ")";
+  box.innerHTML = ekKnownOpen
+    ? '<div class="ek-known-box">' + ekKnownCache.map((n, i) =>
+        '<button class="ek-known-chip" onclick="ekPickKnown(' + i + ')">' + esc(n) + "</button>"
+      ).join("") + "</div>"
+    : "";
+}
+
+function ekToggleKnown() {
+  ekKnownOpen = !ekKnownOpen;
+  renderEkKnown();
+}
+
+/* Chip-Tap: uebernimmt nur den Namen. Fuellt die erste leere Zeile,
+   sonst wird eine neue angehaengt. Menge/Einheit bleiben leer. */
+function ekPickKnown(i) {
+  if (!ekDraft) return;
+  const name = ekKnownCache[i];
+  if (name === undefined) return;
+  const empty = ekDraft.ingredients.find(ing => !String(ing.name || "").trim());
+  if (empty) empty.name = name;
+  else ekDraft.ingredients.push({ id: uid(), name: name, qty: "", unit: "" });
+  renderEkRecipeRows();
+}
+
+function ekDraftSet(idx, field, val) {
+  if (!ekDraft || !ekDraft.ingredients[idx]) return;
+  ekDraft.ingredients[idx][field] = val;
+}
+
+function ekDraftAddRow() {
+  if (!ekDraft) return;
+  ekDraft.ingredients.push({ id: uid(), name: "", qty: "", unit: "" });
+  renderEkRecipeRows();
+  const rows = document.querySelectorAll("#ek-recipe-rows .ek-ing-name");
+  if (rows.length) rows[rows.length - 1].focus();
+}
+
+function ekDraftRemoveRow(idx) {
+  if (!ekDraft) return;
+  ekDraft.ingredients.splice(idx, 1);
+  if (!ekDraft.ingredients.length) ekDraft.ingredients.push({ id: uid(), name: "", qty: "", unit: "" });
+  renderEkRecipeRows();
+}
+
+function ekSaveRecipe() {
+  if (!ekDraft) return;
+  const s = ekState();
+  const name = (document.getElementById("ek-recipe-name").value || "").trim();
+  if (!name) { toast("Bitte einen Namen eingeben."); return; }
+
+  const ingredients = ekDraft.ingredients
+    .filter(ing => String(ing.name || "").trim())
+    .map(ing => ({
+      id: ing.id || uid(),
+      name: String(ing.name).trim(),
+      qty: String(ing.qty || "").trim().slice(0, 8),
+      unit: String(ing.unit || "")
+    }));
+  if (!ingredients.length) { toast("Mindestens eine Zutat angeben."); return; }
+
+  const lower = name.toLowerCase();
+  if (s.recipes.some(r => r.id !== ekDraft.id && (r.name || "").toLowerCase() === lower)) {
+    toast("Ein Rezept mit diesem Namen gibt es schon.");
+    return;
+  }
+
+  if (ekDraft.id) {
+    const r = s.recipes.find(x => x.id === ekDraft.id);
+    if (!r) return;
+    r.name = name;
+    r.ingredients = ingredients;
+  } else {
+    s.recipes.push({ id: uid(), name: name, createdAt: Date.now(), lastUsedAt: null, ingredients: ingredients });
+  }
+  save();
+  closeModal("ek-recipe-modal");
+  renderEkRecipes();
+  toast("📖 Rezept gespeichert.");
+}
+
+function ekDeleteRecipe() {
+  if (!ekDraft || !ekDraft.id) return;
+  if (!confirm("Rezept löschen? Einträge auf der Einkaufsliste bleiben bestehen.")) return;
+  const s = ekState();
+  if (ekOpenRecipeId === ekDraft.id) ekOpenRecipeId = null;
+  s.recipes = s.recipes.filter(r => r.id !== ekDraft.id);
+  ekDraft = null;
+  save();
+  closeModal("ek-recipe-modal");
+  renderEkRecipes();
+  renderEkList();
+}
+
+/* =====================================================================
    DATENSICHERUNG (Backup) — Export/Import des kompletten State
    ===================================================================== */
 function exportBackup() {
@@ -2558,6 +3184,11 @@ function getDailyLog(date) {
   return state.dailyLog[date];
 }
 
+// Auf welchen Tag schreibt das Tages-Log-Panel gerade? null = heute (Phase 3).
+// Wird von der Tagesansicht gesetzt, damit vergangene Tage nachgetragen werden können.
+let dailyLogDate = null;
+function dlDate() { return dailyLogDate || todayStr(); }
+
 // Faltet einen Tages-Log in das Monats-Archiv (Summen + Zähler, verlustfreie Ø-Bildung).
 function archiveDailyLog(dStr, log) {
   if (!log) return;
@@ -2606,7 +3237,7 @@ function dlSectionDefault(section) {
 }
 
 function saveDailyLogField(section, key, value) {
-  const log = getDailyLog(todayStr());
+  const log = getDailyLog(dlDate());
   if (!log[section]) log[section] = dlSectionDefault(section);
   log[section][key] = value;
   pruneOldLogs();
@@ -2616,7 +3247,7 @@ function saveDailyLogField(section, key, value) {
 }
 
 function saveDailyLogTopLevel(key, value) {
-  const log = getDailyLog(todayStr());
+  const log = getDailyLog(dlDate());
   log[key] = value;
   pruneOldLogs();
   save();
@@ -2888,10 +3519,10 @@ function renderDailyLog() {
 
   // Collapse-Zustand herstellen (default: offen)
   const panel = document.getElementById("daily-log-panel");
-  const open = localStorage.getItem("habitdex_logopen") !== "0";
+  const open = dailyLogDate ? true : localStorage.getItem("habitdex_logopen") !== "0";   // in der Tagesansicht immer offen
   panel.classList.toggle("collapsed", !open);
 
-  const log = getDailyLog(todayStr());
+  const log = getDailyLog(dlDate());
   const sleep = log.sleep || dlSectionDefault("sleep");
   const gym   = log.gym   || dlSectionDefault("gym");
   const food  = log.food  || dlSectionDefault("food");
@@ -3177,6 +3808,7 @@ function getStackTip(habit, stacks) {
   if (!match) return null;
   const partner = match.a.id === habit.id ? match.b : match.a;
   if (isHabitDone(partner)) return null; // schon erledigt, kein Tipp nötig
+  if (!isHabitDueToday(partner)) return null; // heute nicht geplant (feste Tage)
   return partner;
 }
 
@@ -3805,7 +4437,7 @@ function updateDailyHappiness() {
   state.box.forEach(mon => { checkFriendshipEvolution(mon); });
 }
 function updateHeader() {
-  const active = state.habits.filter(h => !isPaused(h));
+  const active = state.habits.filter(h => !isPaused(h) && isHabitDueToday(h));
   const done = active.filter(h => isHabitSatisfied(h)).length;
   const total = active.length;
   document.getElementById("header-day").innerHTML =
@@ -3863,10 +4495,31 @@ function weeklyDoneCount(h, refDateStr) {
 }
 function weeklyTarget(h) { return Math.max(1, h.target || 1); }
 function weeklyGoalMet(h, refDateStr) { return weeklyDoneCount(h, refDateStr) >= weeklyTarget(h); }
+// Erledigte Tage der ISO-Woche von dStr – nur bis einschließlich dStr (für historisch korrekte Tagesansichten)
+function weeklyDoneUntil(h, dStr) {
+  return isoWeekDates(dStr + "T12:00:00").filter(d => d <= dStr && doneOnDay(h, d)).length;
+}
 
 // Pausenmodus: pausiert bis einschließlich pausedUntil
 function isPausedOn(h, dStr) { return !!(h.pausedUntil && dStr <= h.pausedUntil); }
 function isPaused(h) { return isPausedOn(h, todayStr()); }
+
+/* ---- Feste Wochentage (activeDays, nur weekly) ---- */
+const DOW_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+// Wochentag eines "YYYY-MM-DD": 0 = Montag … 6 = Sonntag (lokal)
+function dowOf(dStr) { return (new Date(dStr + "T12:00:00").getDay() + 6) % 7; }
+function hasActiveDays(h) { return h.type === "weekly" && Array.isArray(h.activeDays) && h.activeDays.length > 0; }
+// Rohwert: an dStr abgehakt?
+function doneOnDay(h, dStr) { const i = histInfo(h, dStr); return !!(i && i.done); }
+// Ist der Habit an dStr fällig (= in der Liste sichtbar und zählend)?
+function isHabitDueOn(h, dStr) {
+  if (!hasActiveDays(h)) return true;                  // ohne feste Tage: immer (wie bisher)
+  const dow = dowOf(dStr);
+  if (h.activeDays.includes(dow)) return true;         // geplanter Tag
+  if (doneOnDay(h, dStr)) return true;                 // spontan erledigt → bleibt sichtbar
+  return dow >= 5 && weeklyDoneUntil(h, dStr) < weeklyTarget(h);   // Puffer Sa/So, solange Wochenziel (bis zu diesem Tag) offen
+}
+function isHabitDueToday(h) { return isHabitDueOn(h, todayStr()); }
 
 // War der Habit an einem bestimmten Tag "erfüllt"? (typ-abhängig, für Happiness)
 function habitDoneOn(h, dStr) {
@@ -3876,7 +4529,7 @@ function habitDoneOn(h, dStr) {
 }
 // Ist der Habit aktuell erfüllt? (heute bzw. diese Woche) – ohne Pausen-Sonderfall
 function isHabitSatisfied(h) {
-  if (h.type === "weekly") return weeklyGoalMet(h);
+  if (h.type === "weekly") return isHabitDone(h);   // Wochenziel ODER (feste Tage) heute abgehakt
   return isHabitDone(h);
 }
 
@@ -4331,6 +4984,7 @@ function toggleIlInfoBanner() {
    TABS / MODALS / TOASTS
    ===================================================================== */
 function switchTab(name) {
+  document.body.classList.remove("ek-mode");
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   document.getElementById("tab-" + name).classList.add("active");
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
@@ -4356,13 +5010,17 @@ function switchTab(name) {
 
 /* ---- Ausgaben-Subtab (Analyse-Tab) ---- */
 function switchAnSubtab(name) {
-  const trainerPanel = document.getElementById("an-panel-trainer");
-  const expPanel = document.getElementById("an-panel-expenses");
-  if (trainerPanel) trainerPanel.style.display = name === "trainer" ? "" : "none";
-  if (expPanel) expPanel.style.display = name === "expenses" ? "" : "none";
+  const panels = { trainer: "an-panel-trainer", expenses: "an-panel-expenses", einkauf: "an-panel-einkauf" };
+  if (!panels[name]) name = "trainer";
+  Object.keys(panels).forEach(k => {
+    const el = document.getElementById(panels[k]);
+    if (el) el.style.display = (k === name) ? "" : "none";
+  });
   document.querySelectorAll(".an-subtab-btn").forEach(b => b.classList.toggle("active", b.dataset.sub === name));
+  document.body.classList.toggle("ek-mode", name === "einkauf");
   try { localStorage.setItem("habitdex_an_subtab", name); } catch (e) {}
   if (name === "expenses") renderExpenses();
+  if (name === "einkauf") renderEinkauf();
 }
 
 function renderExpenses() {
@@ -4519,6 +5177,26 @@ function updateTargetWrap() {
   else if (selectedType === "timer") { wrap.style.display = "block"; label.textContent = "Zielminuten (z.B. 30)"; }
   else if (selectedType === "weekly") { wrap.style.display = "block"; label.textContent = "Ziel pro Woche (z.B. 3)"; }
   else wrap.style.display = "none";
+  // Feste Tage nur beim Wochen-Typ
+  const dWrap = document.getElementById("days-wrap");
+  dWrap.style.display = (selectedType === "weekly") ? "block" : "none";
+  if (selectedType === "weekly") buildDaysRow();
+}
+
+let selectedDays = [];   // 0 = Mo … 6 = So; leer = keine festen Tage
+function buildDaysRow() {
+  const row = document.getElementById("days-row");
+  row.innerHTML = DOW_LABELS.map((lbl, i) =>
+    '<button type="button" class="type-chip day-chip' + (selectedDays.includes(i) ? " sel" : "") +
+    '" onclick="pickDay(' + i + ')">' + lbl + '</button>'
+  ).join("");
+}
+function pickDay(i) {
+  if (selectedDays.includes(i)) selectedDays = selectedDays.filter(d => d !== i);
+  else selectedDays = [...selectedDays, i].sort((a, b) => a - b);
+  buildDaysRow();
+  // Wochenziel automatisch = Anzahl Tage (danach frei überschreibbar)
+  if (selectedDays.length) document.getElementById("habit-target-input").value = selectedDays.length;
 }
 
 function openHabitModal(id) {
@@ -4528,6 +5206,7 @@ function openHabitModal(id) {
   document.getElementById("habit-name-input").value = h ? h.name : "";
   document.getElementById("habit-emoji-input").value = h ? (h.emoji || "") : "";
   selectedType = (h && h.type) ? h.type : "yesno";
+  selectedDays = (h && Array.isArray(h.activeDays)) ? h.activeDays.slice() : [];
   buildTypeRow();
   document.getElementById("habit-target-input").value = (h && h.target) ? h.target : "";
   updateTargetWrap();
@@ -4545,20 +5224,22 @@ function saveHabit() {
   const remOn = document.getElementById("habit-reminder-on").checked;
   const remTime = document.getElementById("habit-reminder-time").value || "20:00";
   if (!name) { toast("Bitte einen Namen eingeben."); return; }
+  const activeDays = (selectedType === "weekly" && selectedDays.length) ? selectedDays.slice() : null;
   const targetRaw = parseInt(document.getElementById("habit-target-input").value, 10);
   const target = (selectedType === "count" || selectedType === "timer" || selectedType === "weekly")
-    ? (targetRaw && targetRaw > 0 ? targetRaw : (selectedType === "timer" ? 30 : selectedType === "weekly" ? 3 : 1)) : 0;
+    ? (targetRaw && targetRaw > 0 ? targetRaw : (selectedType === "timer" ? 30 : selectedType === "weekly" ? (activeDays ? activeDays.length : 3) : 1)) : 0;
   const pauseVal = document.getElementById("habit-pause-input").value || null;
   let h;
   if (editingHabitId) {
     h = state.habits.find(x => x.id === editingHabitId);
-    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; h.pausedUntil = pauseVal; h.statTarget = (selectedCat === "eigene") ? selectedStatTarget : null; }
+    if (h) { h.name = name; h.emoji = emoji; h.category = selectedCat; h.type = selectedType; h.target = target; h.pausedUntil = pauseVal; h.statTarget = (selectedCat === "eigene") ? selectedStatTarget : null; h.activeDays = activeDays; }
   } else {
     h = { id: uid(), name, emoji, category: selectedCat, type: selectedType, target,
       doneDate: null, rewardDate: null, streak: 0, lastDoneDate: null, lastFreezeStreak: 0,
       history: {}, reminder: null, timerRunning: false, timerStart: 0,
       pausedUntil: pauseVal, lastWeekKey: null,
-      statTarget: (selectedCat === "eigene") ? selectedStatTarget : null };
+      statTarget: (selectedCat === "eigene") ? selectedStatTarget : null,
+      activeDays, createdAt: todayStr() };
     state.habits.push(h);
   }
   if (h) {
@@ -4591,7 +5272,7 @@ function isHabitDone(h) {
   const t = todayStr();
   if (h.type === "count")  return getCount(h) >= (h.target || 1);
   if (h.type === "timer")  return getTimerSec(h) >= (h.target || 30) * 60;
-  if (h.type === "weekly") return weeklyGoalMet(h);   // Wochenziel erreicht?
+  if (h.type === "weekly") return weeklyGoalMet(h) || (hasActiveDays(h) && doneOnDay(h, t));   // Wochenziel erreicht – oder Fester-Tage-Habit heute abgehakt
   return h.doneDate === t; // yesno + negative
 }
 function getCount(h) { const i = histInfo(h, todayStr()); return (i && i.count) || 0; }
@@ -4785,7 +5466,288 @@ function displayStreak(h) {
   return 0;
 }
 
+/* =====================================================================
+   WOCHENLEISTE & TAGESANSICHT (Phase 2)
+   Heute = bestehende Ansicht (#today-view). Andere Tage = nur lesbar (#day-view).
+   ===================================================================== */
+const DAYVIEW_WEEKS_BACK = 4;   // max. Wochen zurück
+const DAYVIEW_WEEKS_FWD = 1;    // max. Wochen vor
+const DOW_LONG = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+let dayViewWeekOffset = 0;      // 0 = aktuelle Woche, -1 = Vorwoche …
+let dayViewDate = null;         // null = heute (bestehende Ansicht), sonst "YYYY-MM-DD"
+
+// Status eines Habits an einem Tag. null = an dem Tag nicht anzeigen.
+// group: "day" (Pflicht/Plan/Puffer) | "free" (Weekly ohne feste Tage)
+// state: done | missed | planned | neutral | paused | frozen
+// counts: zählt in die Tagesbilanz
+function dayHabitStatus(h, dStr) {
+  const t = todayStr();
+  if ((h.createdAt || "0000-00-00") > dStr) return null;       // existierte noch nicht
+  if (!isHabitDueOn(h, dStr)) return null;
+  const info = histInfo(h, dStr) || {};
+  const free = h.type === "weekly" && !hasActiveDays(h);
+  const planned = !free && (h.type !== "weekly" || h.activeDays.includes(dowOf(dStr)));
+  const future = dStr > t;
+  let meta = "";
+  if (h.type === "count") meta = future ? "Ziel " + (h.target || 1) : (info.count || 0) + " / " + (h.target || 1);
+  else if (h.type === "timer") meta = future ? "Ziel " + (h.target || 30) + " Min" : Math.floor((info.sec || 0) / 60) + " / " + (h.target || 30) + " Min";
+  else if (h.type === "weekly") meta = weeklyDoneUntil(h, dStr) + " / " + weeklyTarget(h) + " Woche";
+  let st;
+  if (isPausedOn(h, dStr)) st = "paused";
+  else if (info.done) st = "done";
+  else if (info.frozen) st = "frozen";
+  else if (future) st = "planned";
+  else if (planned && h.type === "weekly" && weeklyDoneUntil(h, dStr) >= weeklyTarget(h)) st = "done";   // Wochenziel schon erreicht
+  else if (!planned) st = "neutral";                                                                   // frei / Puffer: kein Pflichttag
+  else st = "missed";
+  return {
+    group: free ? "free" : "day",
+    state: st,
+    meta,
+    note: info.note || "",
+    counts: planned && st !== "paused" && st !== "frozen"
+  };
+}
+
+// Tagesbilanz über Pflicht-Habits: { due, done }
+function dayHabitSummary(dStr) {
+  let due = 0, done = 0;
+  state.habits.forEach(h => {
+    const s = dayHabitStatus(h, dStr);
+    if (!s || !s.counts) return;
+    due++;
+    if (s.state === "done") done++;
+  });
+  return { due, done };
+}
+
+// Kurzdatum "15.09." für Meta-Texte
+function dvShort(dStr) { return new Date(dStr + "T12:00:00").toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }); }
+
+// Kontakt-Status einer Person an einem Tag. null = an dem Tag nicht relevant.
+// Fällig = seit dem letzten Kontakt sind mehr Tage vergangen als der Rhythmus erlaubt.
+// Dadurch erscheint ein nicht erledigter Kontakt an jedem Folgetag erneut.
+function dayContactStatus(p, dStr) {
+  const t = todayStr();
+  const ty = PP_TYPES[p.type] || {};
+  const onDay = (p.contacts || []).find(c => c.date === dStr);
+  if (onDay) return { state: "done", meta: ty.badge || "", note: onDay.note || "", counts: true };
+  const prev = (p.contacts || []).map(c => c.date).filter(x => x && x < dStr).sort().pop() || null;
+  if (!prev) {
+    if (dStr < t) return null;                       // ohne Kontakthistorie nicht rückwirkend einfordern
+    return { state: "planned", meta: "noch nie kontaktiert", note: "", counts: true };
+  }
+  const days = Math.round((new Date(dStr + "T12:00:00") - new Date(prev + "T12:00:00")) / 86400000);
+  if (days <= ppRhythmDays(p)) return null;          // noch im Rhythmus
+  return { state: dStr < t ? "missed" : "planned", meta: "seit " + days + " Tagen offen", note: "", counts: true };
+}
+
+// Aufgaben-Status an einem Tag. null = an dem Tag nicht relevant.
+// Überfällige Aufgaben erscheinen an jedem Folgetag erneut, bis sie erledigt sind.
+function dayTaskStatus(x, dStr) {
+  const t = todayStr();
+  const subs = x.subtasks || [];
+  const subMeta = subs.length ? subs.filter(s2 => s2.done).length + " / " + subs.length + " Teilaufgaben" : "";
+  if (x.doneAt === dStr) {
+    return { state: "done", meta: (x.dueDate && x.dueDate !== dStr) ? "fällig war " + dvShort(x.dueDate) : subMeta, counts: true };
+  }
+  if (!x.dueDate) return null;
+  const openThen = !x.done || !x.doneAt || x.doneAt > dStr;   // war die Aufgabe an dem Tag noch offen?
+  if (!openThen) return null;
+  if (x.dueDate === dStr) return { state: dStr < t ? "missed" : "planned", meta: subMeta, counts: true };
+  if (x.dueDate < dStr) return { state: dStr < t ? "missed" : "planned", meta: "überfällig seit " + dvShort(x.dueDate), counts: true };
+  return null;                                                // erst später fällig
+}
+
+// Tagesbilanz über alles Zählende: Pflicht-Habits + Aufgaben + fällige Kontakte
+function daySummary(dStr) {
+  const h = dayHabitSummary(dStr);
+  let due = h.due, done = h.done;
+  (state.tasks || []).forEach(x => { const s = dayTaskStatus(x, dStr); if (s && s.counts) { due++; if (s.state === "done") done++; } });
+  (state.people || []).forEach(p => { const s = dayContactStatus(p, dStr); if (s && s.counts) { due++; if (s.state === "done") done++; } });
+  return { due, done };
+}
+
+function renderWeekStrip() {
+  const el = document.getElementById("week-strip");
+  if (!el) return;
+  const t = todayStr();
+  if (dayViewDate === t) dayViewDate = null;                    // z. B. nach Mitternacht
+  const now = new Date();
+  const anchor = new Date(now.getFullYear(), now.getMonth(), now.getDate() + dayViewWeekOffset * 7);
+  const dates = isoWeekDates(anchor);
+  const kw = Number(isoWeekKey(anchor).split("-W")[1]);
+  const fmt = d => new Date(d + "T12:00:00").toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+  const sel = dayViewDate || t;
+  let html =
+    '<div class="wl-nav">' +
+      '<button class="mini-btn" onclick="shiftWeek(-1)"' + (dayViewWeekOffset <= -DAYVIEW_WEEKS_BACK ? " disabled" : "") + '>◀</button>' +
+      '<div class="wl-label">KW ' + kw + ' · ' + fmt(dates[0]) + '–' + fmt(dates[6]) + '</div>' +
+      '<button class="mini-btn" onclick="shiftWeek(1)"' + (dayViewWeekOffset >= DAYVIEW_WEEKS_FWD ? " disabled" : "") + '>▶</button>' +
+    '</div>' +
+    '<div class="wl-days">';
+  dates.forEach((d, i) => {
+    let dot = "";
+    if (d <= t) {
+      const s = daySummary(d);
+      if (s.due > 0) {
+        if (s.done >= s.due) dot = " all";
+        else if (s.done > 0) dot = " part";
+        else if (d < t) dot = " none";
+      }
+    }
+    html +=
+      '<button class="wl-day' + (d === t ? " today" : "") + (d === sel ? " sel" : "") + (d > t ? " future" : "") +
+        '" onclick="selectDay(\'' + d + '\')">' +
+        '<span class="wl-dow">' + DOW_LABELS[i] + '</span>' +
+        '<span class="wl-date">' + new Date(d + "T12:00:00").getDate() + '</span>' +
+        '<span class="wl-dot' + dot + '"></span>' +
+      '</button>';
+  });
+  html += '</div>';
+  if (dayViewDate || dayViewWeekOffset !== 0) {
+    html += '<button class="mini-btn wl-today-btn" onclick="goToday()">⟲ Heute</button>';
+  }
+  el.innerHTML = html;
+  applyDayView();
+}
+function shiftWeek(delta) {
+  dayViewWeekOffset = Math.max(-DAYVIEW_WEEKS_BACK, Math.min(DAYVIEW_WEEKS_FWD, dayViewWeekOffset + delta));
+  renderWeekStrip();
+}
+function selectDay(d) {
+  dayViewDate = (d === todayStr()) ? null : d;
+  renderWeekStrip();
+}
+function goToday() {
+  dayViewDate = null;
+  dayViewWeekOffset = 0;
+  renderWeekStrip();
+}
+// Hängt das echte Tages-Log-Panel um: target = Slot in der Tagesansicht, null = zurück in die Heute-Ansicht.
+// So bleibt exakt dieselbe Log-UI inklusive aller Eingabefelder erhalten.
+function mountDailyLogPanel(target) {
+  const p = document.getElementById("daily-log-panel");
+  if (!p) return;
+  if (target) { target.appendChild(p); return; }
+  const tv = document.getElementById("today-view");
+  const anchor = document.getElementById("people-panel");
+  if (tv && anchor && p.parentElement !== tv) tv.insertBefore(p, anchor);
+}
+// Schaltet zwischen Heute-Ansicht und Tagesansicht um
+function applyDayView() {
+  const todayEl = document.getElementById("today-view");
+  const dayEl = document.getElementById("day-view");
+  if (!todayEl || !dayEl) return;
+  mountDailyLogPanel(null);          // erst zurückhängen, damit innerHTML das Panel nicht verwirft
+  if (!dayViewDate) {
+    dayViewDate = null;
+    dailyLogDate = null;
+    todayEl.style.display = "";
+    dayEl.style.display = "none";
+    dayEl.innerHTML = "";
+    renderDailyLog();
+    return;
+  }
+  todayEl.style.display = "none";
+  dayEl.style.display = "";
+  dayEl.innerHTML = renderDayView(dayViewDate);
+  const slot = document.getElementById("dayv-log-slot");
+  dailyLogDate = slot ? dayViewDate : null;   // Zukunft: kein Log, Panel bleibt auf heute
+  if (slot) mountDailyLogPanel(slot);
+  renderDailyLog();
+}
+// Nur-lesbare Tagesansicht (vergangen oder Zukunft) – liefert HTML
+function renderDayView(d) {
+  const t = todayStr();
+  const future = d > t;
+  const title = DOW_LONG[dowOf(d)] + ", " +
+    new Date(d + "T12:00:00").toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const groups = { day: [], free: [] };
+  state.habits.forEach(h => {
+    const s = dayHabitStatus(h, d);
+    if (s) groups[s.group].push({ h, s });
+  });
+  const sum = daySummary(d);
+  const sub = future ? "Vorschau · nach aktuellem Stand" : "Vergangener Tag · Tages-Log nachtragbar, Rest nur Ansicht";
+  const sumTxt = future
+    ? sum.due + (sum.due === 1 ? " Eintrag" : " Einträge") + " geplant"
+    : (sum.due ? "✓ " + sum.done + " / " + sum.due + " erledigt" : "Nichts zu erledigen an diesem Tag");
+  const ICON = { done: "✓", missed: "✗", planned: "○", neutral: "–", paused: "⏸", frozen: "🧊" };
+  const row = ({ h, s }) =>
+    '<div class="dayv-row ' + s.state + '">' +
+      '<span class="dayv-ic">' + ICON[s.state] + '</span>' +
+      '<span class="dayv-name">' + (h.emoji ? esc(h.emoji) + " " : "") + esc(h.name) + '</span>' +
+      (s.meta ? '<span class="dayv-meta">' + esc(s.meta) + '</span>' : "") +
+    '</div>' +
+    (s.note ? '<div class="dayv-note">📝 ' + esc(s.note) + '</div>' : "");
+  let html =
+    '<div class="panel dark dayv-head">' +
+      '<div class="dayv-title">' + esc(title) + '</div>' +
+      '<div class="dayv-sub">' + sub + '</div>' +
+      '<div class="dayv-sum">' + sumTxt + '</div>' +
+    '</div>';
+  let any = false;
+  const block = (label, inner) => { any = true; return '<div class="dayv-group">' + label + '</div>' + '<div class="panel dayv-list">' + inner + '</div>'; };
+
+  // 1) Tages-Log – das echte Panel wird von applyDayView() in diesen Slot montiert (nur Vergangenheit)
+  if (!future) { any = true; html += '<div id="dayv-log-slot"></div>'; }
+
+  // 2) Kontakte: an dem Tag kontaktiert oder laut Rhythmus fällig (rollt in die Folgetage)
+  const contacts = [];
+  (state.people || []).forEach(p => { const s = dayContactStatus(p, d); if (s) contacts.push({ p, s }); });
+  if (contacts.length) {
+    html += block("👥 Kontakte", contacts.map(({ p, s }) =>
+      '<div class="dayv-row ' + s.state + '">' +
+          '<span class="dayv-ic">' + ICON[s.state] + '</span>' +
+          '<span class="dayv-name">' + esc(p.name) + '</span>' +
+          (s.meta ? '<span class="dayv-meta">' + esc(s.meta) + '</span>' : "") +
+        '</div>' +
+        (s.note ? '<div class="dayv-note">📝 ' + esc(s.note) + '</div>' : "")
+    ).join(""));
+  }
+
+  // 3) Aufgaben: an dem Tag fällig, an dem Tag erledigt oder überfällig (rollt in die Folgetage)
+  const tasks = [];
+  (state.tasks || []).forEach(x => { const s = dayTaskStatus(x, d); if (s) tasks.push({ x, s }); });
+  if (tasks.length) {
+    html += block("✅ Aufgaben", tasks.map(({ x, s }) =>
+      '<div class="dayv-row ' + s.state + '">' +
+          '<span class="dayv-ic">' + ICON[s.state] + '</span>' +
+          '<span class="dayv-name">' + esc(x.title) + '</span>' +
+          (s.meta ? '<span class="dayv-meta">' + esc(s.meta) + '</span>' : "") +
+        '</div>'
+    ).join(""));
+  }
+
+  // 4) Habits
+  if (groups.day.length) html += block("🔥 Habits", groups.day.map(row).join(""));
+  if (groups.free.length) html += block("Wöchentlich (frei wählbar)", groups.free.map(row).join(""));
+
+  // 5) Ziele mit Zeitraum (Fortschritt ist immer der aktuelle Stand, es gibt keine Snapshots)
+  const goals = (state.goals || []).filter(g => (g.startDate || g.endDate) &&
+    (!g.startDate || g.startDate <= d) && (!g.endDate || d <= g.endDate));
+  if (goals.length) {
+    html += block("🎯 Ziele · Stand heute", goals.map(g => {
+      const pct = Math.min(100, Math.round((g.current / Math.max(1, g.target)) * 100));
+      const due = g.endDate === d;
+      return '<div class="dayv-row ' + (due ? "due" : "neutral") + '">' +
+          '<span class="dayv-ic">' + (due ? "⏰" : "🎯") + '</span>' +
+          '<span class="dayv-name">' + esc(g.name) + (due ? " · fällig" : "") + '</span>' +
+          '<span class="dayv-meta">' + g.current + " / " + g.target + " " + esc(g.unit) + " · " + pct + '%</span>' +
+        '</div>';
+    }).join(""));
+  }
+
+  if (!any) html += '<div class="empty-slot">Keine Einträge an diesem Tag.</div>';
+  return html;
+}
+
+let showAllHabits = false;   // flüchtig: auch heute nicht fällige Habits zeigen
+function toggleShowAllHabits() { showAllHabits = !showAllHabits; renderHabits(); }
+
 function renderHabits() {
+  renderWeekStrip();   // Wochenleiste + Umschalten Heute/Tagesansicht (Phase 2)
   const t = todayStr();
   const days = lastNDays(7);
   const stacks30 = computeStacks(lastNDays(30)); // einmal berechnen, für Stack-Tipps
@@ -4794,11 +5756,15 @@ function renderHabits() {
     el.innerHTML = '<div class="empty-slot">Noch keine Habits.<br>Leg deinen ersten an!</div>';
     return;
   }
-  el.innerHTML = state.habits.map(h => {
+  const visible = state.habits.filter(h => showAllHabits || isHabitDueToday(h));
+  const hiddenCount = state.habits.filter(h => !isHabitDueToday(h)).length;
+  el.innerHTML = visible.map(h => {
     const type = h.type || "yesno";
     const isNeg = type === "negative";
     const paused = isPaused(h);
     const done = isHabitDone(h);
+    const offDay = !isHabitDueToday(h);                                         // nur via „anzeigen“ sichtbar
+    const offPlan = !offDay && hasActiveDays(h) && !h.activeDays.includes(dowOf(t)); // sichtbar, aber kein Plantag
     const streak = displayStreak(h);
     const cat = CATS[h.category];
     const cells = days.map(d => {
@@ -4867,21 +5833,26 @@ function renderHabits() {
       ? '<span class="cat-badge" style="background:#78849a">⏸ bis ' +
           esc(new Date(h.pausedUntil + "T12:00:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})) + '</span>'
       : "";
+    // Plan-Badge: sichtbar außerhalb der festen Tage (Wochenende = Puffer, sonst spontan erledigt = Extra)
+    const planBadge = offPlan
+      ? '<span class="cat-badge" style="background:#78849a">' + (dowOf(t) >= 5 ? "⏳ Puffer" : "➕ Extra") + '</span>'
+      : "";
     // Stack-Tipp: wenn heute erledigt und ein bestätigter Partner noch offen ist
     const tip = done ? getStackTip(h, stacks30) : null;
     const tipHTML = tip
       ? '<div style="font-size:7px;color:var(--gold);margin-top:4px">' +
           '⚡ Stack: Jetzt auch ' + esc(tip.name) + ' erledigen!</div>'
       : "";
-    return '<div class="panel' + (isNeg ? " negative" : "") + (paused ? " paused" : "") + '" data-hid="' + h.id + '">' +
+    return '<div class="panel' + (isNeg ? " negative" : "") + (paused ? " paused" : "") + (offDay ? " offday" : "") + '" data-hid="' + h.id + '">' +
       '<div class="habit-row">' +
         control +
         '<div class="habit-info">' +
           '<div class="habit-name' + (done ? " done" : "") + '">' + (h.emoji ? esc(h.emoji) + " " : "") + esc(h.name) +
             (cat ? '<span class="cat-badge" style="background:' + cat.color + '">' + cat.icon + " " + cat.label + '</span>' : "") +
-            pauseBadge +
+            pauseBadge + planBadge +
           '</div>' +
           '<div class="' + streakCls + '">' + streakIcon + ' Streak: ' + streak + streakUnit +
+            (hasActiveDays(h) ? " · 📅 " + h.activeDays.map(i => DOW_LABELS[i]).join(" ") : "") +
             ((h.reminder && h.reminder.on) ? " · 🔔 " + esc(h.reminder.time) : "") + '</div>' +
         '</div>' +
         '<div class="habit-actions">' +
@@ -4895,7 +5866,15 @@ function renderHabits() {
       '<div class="week">' + cells + '</div>' +
       '<div class="week-labels">' + labels + '</div>' +
     '</div>';
-  }).join("");
+  }).join("") +
+    (!visible.length ? '<div class="empty-slot">Heute keine Habits geplant. 🎉</div>' : "") +
+    (hiddenCount
+      ? '<p class="muted offday-toggle" onclick="toggleShowAllHabits()">' +
+          (showAllHabits
+            ? "▲ Nur heutige Habits zeigen"
+            : "▼ " + hiddenCount + " Habit" + (hiddenCount === 1 ? "" : "s") + " an anderen Tagen anzeigen") +
+        '</p>'
+      : "");
   // Drag & Drop anhängen
   el.querySelectorAll("[data-hid]").forEach(p => attachDrag(p));
   // laufende Timer sicherstellen
@@ -4971,7 +5950,12 @@ document.addEventListener("pointerup", () => {
   if (drag.active && drag.el) {
     drag.el.classList.remove("dragging");
     const order = [...document.querySelectorAll("#habit-list [data-hid]")].map(el => el.dataset.hid);
-    state.habits.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    // Nur sichtbare Habits umsortieren: Sie belegen ihre bisherigen Plätze in neuer Reihenfolge,
+    // ausgeblendete (andere Tage) bleiben an ihrer Position.
+    const slots = [];
+    state.habits.forEach((h, i) => { if (order.includes(h.id)) slots.push(i); });
+    const byId = Object.fromEntries(state.habits.map(h => [h.id, h]));
+    order.forEach((id, k) => { state.habits[slots[k]] = byId[id]; });
     save(); renderHabits();
   }
   drag.active = false; drag.el = null;
@@ -5015,8 +5999,8 @@ function useFreeze(id) {
 /* ---- Perfekter Tag ---- */
 function checkPerfectDay() {
   const t = todayStr();
-  // Pausierte Habits zählen nicht mit
-  const active = state.habits.filter(h => !isPaused(h));
+  // Pausierte und heute nicht fällige (feste Tage) Habits zählen nicht mit
+  const active = state.habits.filter(h => !isPaused(h) && isHabitDueToday(h));
   if (!active.length) return;
   if (state.lastPerfectDay === t) return;
   if (!active.every(h => isHabitSatisfied(h))) return;
@@ -5078,7 +6062,9 @@ function scheduleHabitReminder(h) {
   target.setHours(hh, mm, 0, 0);
   if (target <= now) target.setDate(target.getDate() + 1);
   reminderTimers[h.id] = setTimeout(() => {
-    try {
+    // Feste-Tage-Habits nur an geplanten bzw. Puffer-Tagen erinnern (Prüfung zum Feuerzeitpunkt).
+    // Neuplanung (scheduleHabitReminder unten) läuft trotzdem weiter.
+    if (isHabitDueToday(h)) try {
       new Notification("HabitDex 🎮", {
         body: "Vergiss nicht: " + h.name,
         icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
@@ -5103,18 +6089,23 @@ function openGoalModal(id) {
   document.getElementById("goal-name-input").value = g ? g.name : "";
   document.getElementById("goal-target-input").value = g ? g.target : "";
   document.getElementById("goal-unit-input").value = g ? g.unit : "";
+  document.getElementById("goal-start-input").value = (g && g.startDate) || "";
+  document.getElementById("goal-end-input").value = (g && g.endDate) || "";
   openModal("goal-modal");
 }
 function saveGoal() {
   const name = document.getElementById("goal-name-input").value.trim();
   const target = parseInt(document.getElementById("goal-target-input").value, 10);
   const unit = document.getElementById("goal-unit-input").value.trim() || "Einheiten";
+  let startDate = document.getElementById("goal-start-input").value || null;
+  let endDate = document.getElementById("goal-end-input").value || null;
+  if (startDate && endDate && startDate > endDate) { const sw = startDate; startDate = endDate; endDate = sw; }
   if (!name || !target || target < 1) { toast("Name und Zielwert angeben."); return; }
   if (editingGoalId) {
     const g = state.goals.find(x => x.id === editingGoalId);
-    if (g) { g.name = name; g.target = target; g.unit = unit; }
+    if (g) { g.name = name; g.target = target; g.unit = unit; g.startDate = startDate; g.endDate = endDate; }
   } else {
-    state.goals.push({ id: uid(), name, target, unit, current: 0, claimed: 0 });
+    state.goals.push({ id: uid(), name, target, unit, current: 0, claimed: 0, startDate, endDate });
   }
   save(); closeModal("goal-modal"); renderGoals();
 }
@@ -5396,7 +6387,7 @@ function renderGachaResults(results, tier) {
    ZUCHTSTATION (Phase 2)
    ===================================================================== */
 // Wählt aus einem (evtl. Dual-)Typ-Array einen Typ zufällig
-function pickType(types) {
+function pickBreedType(types) {
   const t = (types || []).filter(Boolean);
   return t.length ? pick(t) : "normal";
 }
@@ -5433,8 +6424,8 @@ async function startBreeding(uidA, uidB) {
 
   // Typen sicherstellen (async geladen, gecacht in cache.pokemon[dex].types)
   const [pa, pb] = await Promise.all([getPokemonData(a.dex), getPokemonData(b.dex)]);
-  const typeA = pickType(pa.types);
-  const typeB = pickType(pb.types);
+  const typeA = pickBreedType(pa.types);
+  const typeB = pickBreedType(pb.types);
   const fusion = buildFusion(typeA, typeB);
 
   const childDex = pick([a.dex, b.dex]); // Sprite/Basiswerte von einem Elternteil
